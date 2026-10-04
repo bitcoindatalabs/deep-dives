@@ -37,71 +37,34 @@
                 <i class="fas fa-microscope"></i> Ad-Hoc Analytics & Incident Forensics
             </div>
             <h1 class="hero-title">
-                Technical <span class="highlight">Deep Dives</span> & Telemetry
+                Technical <span class="highlight">Deep Dives</span> & Forensics
             </h1>
             <p class="hero-description">
-                Ad-hoc forensic inquiries, node anomaly evaluations, security disclosures, and on-chain forensics. Independent, reproducible, and verifiable.
+                Ad-hoc investigative reports, incident forensics, node anomaly evaluations, and on-chain curiosities across Bitcoin and Lightning.
             </p>
 
-            <!-- Quick Metrics Ribbon -->
-            <div class="metrics-ribbon">
-                <div class="metric-stat-card">
-                    <div class="metric-stat-label">Active Hub</div>
-                    <div class="metric-stat-value" style="color: var(--primary);">deep-dives</div>
-                    <div class="metric-stat-hint">GitHub Pages verified</div>
-                </div>
-                <div class="metric-stat-card">
-                    <div class="metric-stat-label">Analysis Pipeline</div>
-                    <div class="metric-stat-value">Reproducible</div>
-                    <div class="metric-stat-hint">Self-contained data + code</div>
-                </div>
-                <div class="metric-stat-card">
-                    <div class="metric-stat-label">Core Focus</div>
-                    <div class="metric-stat-value">BTC & LN</div>
-                    <div class="metric-stat-hint">Security, nodes & protocols</div>
+            <!-- Search Bar -->
+            <div class="search-bar-wrap">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="diveSearchInput" 
+                        class="search-input" 
+                        placeholder="Search investigations by title, keyword, or tag..."
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <span class="search-shortcut"><kbd>/</kbd></span>
                 </div>
             </div>
         </section>
-
-        <!-- Search & Tag Filter Toolbar -->
-        <div class="toolbar-wrap">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input 
-                    type="text" 
-                    id="diveSearchInput" 
-                    class="search-input" 
-                    placeholder="Search investigations by title, keyword, or tag..."
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-                <span class="search-shortcut"><kbd>/</kbd></span>
-            </div>
-
-            <div class="filter-pills" id="tagFilterPills">
-                <button type="button" class="filter-btn active" data-filter="all">
-                    <i class="fas fa-border-all"></i> All
-                </button>
-                <button type="button" class="filter-btn" data-filter="lightning">
-                    <i class="fas fa-bolt"></i> Lightning
-                </button>
-                <button type="button" class="filter-btn" data-filter="security">
-                    <i class="fas fa-shield-alt"></i> Security
-                </button>
-                <button type="button" class="filter-btn" data-filter="onchain">
-                    <i class="fas fa-cubes"></i> On-Chain
-                </button>
-                <button type="button" class="filter-btn" data-filter="hardware">
-                    <i class="fas fa-microchip"></i> Hardware
-                </button>
-            </div>
-        </div>
 
         <!-- Investigations Cards Grid -->
         <div class="cards-grid" id="divesGrid">
 
             <!-- Card 1: Investigation Template & Boilerplate -->
-            <article class="dive-card" data-tags="template,scaffold,starter" data-category="template">
+            <article class="dive-card" data-tags="template,scaffold,starter">
                 <div>
                     <div class="dive-card-header">
                         <span class="dive-date">Boilerplate</span>
@@ -128,7 +91,7 @@
             </article>
 
             <!-- Card 2: Coldcard Hacker Forensics (Preview) -->
-            <article class="dive-card" data-tags="security,hardware,forensics,onchain" data-category="security">
+            <article class="dive-card" data-tags="security,hardware,forensics,onchain,coldcard">
                 <div>
                     <div class="dive-card-header">
                         <span class="dive-date">Upcoming</span>
@@ -151,7 +114,7 @@
             </article>
 
             <!-- Card 3: Core Lightning Channel Closures (Preview) -->
-            <article class="dive-card" data-tags="lightning,cln,nodes,channels" data-category="lightning">
+            <article class="dive-card" data-tags="lightning,cln,nodes,channels">
                 <div>
                     <div class="dive-card-header">
                         <span class="dive-date">Upcoming</span>
@@ -177,7 +140,7 @@
             <div id="noResultsState" class="empty-state" style="display: none;">
                 <i class="fas fa-search"></i>
                 <h3>No deep dives match your search</h3>
-                <p>Try clearing search filters or checking back as new ad-hoc investigations are published.</p>
+                <p>Try clearing search keywords or checking back as new ad-hoc investigations are published.</p>
             </div>
 
         </div>
@@ -190,21 +153,13 @@
     <script src="https://bitcoindatalabs.org/components/app-components.js" onerror="this.onerror=null;this.src='https://sorukumar.github.io/Bitcoin-Data-Labs/components/app-components.js'"></script>
 
     <script>
-        // Centralized App Navigation Configuration for Bitcoin Data Labs
-        const DEEP_DIVES_NAV = [
-            { name: 'All Deep Dives', url: 'index.html' },
-            { name: 'Template Guide', url: 'analyses/_template/index.html' },
-            { name: 'Lightning Hub', url: 'https://lightning.bitcoindatalabs.org/' },
-            { name: 'Bitcoin Data Labs', url: 'https://bitcoindatalabs.org/' }
-        ];
-
         function initAppShell() {
             if (typeof BitcoinLabsApp !== 'undefined') {
+                // Initialize app header & footer without subnav tabs
                 BitcoinLabsApp.init({
                     isApp: true,
                     appName: "deep-dives",
                     appHomeUrl: "index.html",
-                    navLinks: DEEP_DIVES_NAV,
                     footerLinks: [
                         { name: 'Bitcoin Data Labs', url: 'https://bitcoindatalabs.org' },
                         { name: 'PlebDashboard LN', url: 'https://lightning.bitcoindatalabs.org' },
@@ -216,18 +171,15 @@
             }
         }
 
-        // Search & Filtering Interactions
+        // Live Search Filtering Across Cards
         document.addEventListener('DOMContentLoaded', () => {
             initAppShell();
 
             const searchInput = document.getElementById('diveSearchInput');
-            const filterButtons = document.querySelectorAll('.filter-btn');
             const cards = document.querySelectorAll('.dive-card');
             const noResults = document.getElementById('noResultsState');
 
-            let activeFilter = 'all';
-
-            function updateCards() {
+            function filterCards() {
                 const query = searchInput.value.toLowerCase().trim();
                 let visibleCount = 0;
 
@@ -235,12 +187,10 @@
                     const title = card.querySelector('.dive-card-title').textContent.toLowerCase();
                     const desc = card.querySelector('.dive-card-desc').textContent.toLowerCase();
                     const tags = (card.dataset.tags || '').toLowerCase();
-                    const category = card.dataset.category || '';
 
-                    const matchesQuery = !query || title.includes(query) || desc.includes(query) || tags.includes(query);
-                    const matchesCategory = activeFilter === 'all' || category === activeFilter || tags.includes(activeFilter);
+                    const matches = !query || title.includes(query) || desc.includes(query) || tags.includes(query);
 
-                    if (matchesQuery && matchesCategory) {
+                    if (matches) {
                         card.style.display = 'flex';
                         visibleCount++;
                     } else {
@@ -251,18 +201,9 @@
                 noResults.style.display = visibleCount === 0 ? 'block' : 'none';
             }
 
-            filterButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    filterButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    activeFilter = btn.dataset.filter;
-                    updateCards();
-                });
-            });
+            searchInput.addEventListener('input', filterCards);
 
-            searchInput.addEventListener('input', updateCards);
-
-            // '/' keyboard shortcut to focus search
+            // '/' keyboard shortcut to focus search, Esc to clear
             document.addEventListener('keydown', (e) => {
                 if (e.key === '/' && document.activeElement !== searchInput) {
                     e.preventDefault();
@@ -270,7 +211,7 @@
                 } else if (e.key === 'Escape' && document.activeElement === searchInput) {
                     searchInput.value = '';
                     searchInput.blur();
-                    updateCards();
+                    filterCards();
                 }
             });
         });
