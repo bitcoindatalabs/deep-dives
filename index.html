@@ -1,214 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deep Dives | Bitcoin Data Labs</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            btc: '#f7931a',
-          }
-        }
-      }
-    }
-  </script>
-</head>
-<body class="bg-gray-950 text-gray-100 min-h-screen font-sans antialiased selection:bg-amber-500 selection:text-black">
-  <!-- Top Navigation -->
-  <header class="border-b border-gray-800/80 bg-gray-950/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-btc font-bold text-lg">
-          &#8383;
-        </div>
-        <div>
-          <span class="font-extrabold tracking-tight text-white text-base">Bitcoin Data Labs</span>
-          <span class="text-xs text-gray-500 ml-2 font-mono">/ deep-dives</span>
-        </div>
-      </div>
-      <div class="flex items-center space-x-4">
-        <a href="https://github.com/bitcoindatalabs/deep-dives" target="_blank" rel="noopener" class="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 border border-gray-800 px-3 py-1.5 rounded-lg bg-gray-900/60 hover:border-gray-700">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          <span>GitHub</span>
-        </a>
-      </div>
-    </div>
-  </header>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Dives & Incident Forensics | Bitcoin Data Labs</title>
+    <meta name="description" content="Ad-hoc investigations, incident forensics, node anomaly evaluations, and on-chain curiosities across Bitcoin and Lightning.">
 
-  <!-- Hero Section -->
-  <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-8">
-    <div class="max-w-3xl space-y-3">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-        Ad-Hoc Bitcoin & Lightning Analytics
-      </div>
-      <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-        Technical Forensics & <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">Deep Dives</span>
-      </h1>
-      <p class="text-gray-400 text-base sm:text-lg leading-relaxed">
-        Investigative reports, incident forensics, node anomaly evaluations, and on-chain curiosities across Bitcoin and Lightning.
-      </p>
-    </div>
-
-    <!-- Controls: Search & Tags -->
-    <div class="mt-8 pt-6 border-t border-gray-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <!-- Search Input -->
-      <div class="relative flex-1 max-w-md">
-        <input 
-          id="searchInput" 
-          type="text" 
-          placeholder="Search investigations by title, keyword, or tag..." 
-          class="w-full bg-gray-900/90 border border-gray-800 rounded-xl px-4 py-2.5 pl-10 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-amber-500 transition-colors"
-        />
-        <svg class="w-4 h-4 text-gray-500 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-      </div>
-
-      <!-- Tag Filter Buttons -->
-      <div class="flex flex-wrap items-center gap-1.5" id="tagFilters">
-        <button data-tag="all" class="tag-btn active px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-black transition-all">All</button>
-        <button data-tag="lightning" class="tag-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-900 text-gray-400 hover:text-white border border-gray-800 hover:border-gray-700 transition-all">#lightning</button>
-        <button data-tag="security" class="tag-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-900 text-gray-400 hover:text-white border border-gray-800 hover:border-gray-700 transition-all">#security</button>
-        <button data-tag="onchain" class="tag-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-900 text-gray-400 hover:text-white border border-gray-800 hover:border-gray-700 transition-all">#onchain</button>
-        <button data-tag="hardware" class="tag-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-900 text-gray-400 hover:text-white border border-gray-800 hover:border-gray-700 transition-all">#hardware</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Analysis Grid -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 pb-20">
-    <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      
-      <!-- Card: Template / Getting Started -->
-      <article class="analysis-card group bg-gray-900/60 hover:bg-gray-900/90 border border-gray-800 hover:border-amber-500/50 rounded-2xl p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-lg" data-tags="template,scaffold">
-        <div class="space-y-3">
-          <div class="flex items-center justify-between text-xs text-gray-500">
-            <span class="font-mono">Template</span>
-            <span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300">Boilerplate</span>
-          </div>
-          <h2 class="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">
-            Analysis Scaffold Template
-          </h2>
-          <p class="text-sm text-gray-400 leading-relaxed">
-            The standard starting template for spinning up any new ad-hoc investigation with reproducible data pipelines and interactive web reports.
-          </p>
-        </div>
-        <div class="pt-6 mt-6 border-t border-gray-800/80 flex items-center justify-between">
-          <div class="flex gap-1.5 text-xs">
-            <span class="text-amber-400/80 font-mono text-[11px]">#starter</span>
-          </div>
-          <a href="./analyses/_template/index.html" class="inline-flex items-center text-xs font-semibold text-amber-400 hover:text-amber-300 group-hover:translate-x-0.5 transition-transform">
-            View Template &rarr;
-          </a>
-        </div>
-      </article>
-
-      <!-- Placeholder cards to visualize the catalog (will be updated when reports are added) -->
-      <article class="analysis-card group bg-gray-900/40 hover:bg-gray-900/80 border border-dashed border-gray-800 hover:border-gray-700 rounded-2xl p-6 flex flex-col justify-between transition-all" data-tags="security,hardware,forensics">
-        <div class="space-y-3">
-          <div class="flex items-center justify-between text-xs text-gray-500">
-            <span class="font-mono">Upcoming</span>
-            <span class="px-2 py-0.5 rounded bg-blue-900/30 text-blue-400 border border-blue-800/30">Security</span>
-          </div>
-          <h2 class="text-xl font-bold text-gray-300 group-hover:text-white transition-colors">
-            Coldcard Hacker Incident Forensics
-          </h2>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            On-chain trace and signature analysis of hacker addresses, fund routing, and consolidation behaviors.
-          </p>
-        </div>
-        <div class="pt-6 mt-6 border-t border-gray-800/60 flex items-center justify-between">
-          <span class="text-gray-600 font-mono text-[11px]">#security #hardware</span>
-          <span class="text-xs text-gray-600 italic">In progress</span>
-        </div>
-      </article>
-
-      <article class="analysis-card group bg-gray-900/40 hover:bg-gray-900/80 border border-dashed border-gray-800 hover:border-gray-700 rounded-2xl p-6 flex flex-col justify-between transition-all" data-tags="lightning,onchain">
-        <div class="space-y-3">
-          <div class="flex items-center justify-between text-xs text-gray-500">
-            <span class="font-mono">Upcoming</span>
-            <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-400 border border-purple-800/30">Lightning</span>
-          </div>
-          <h2 class="text-xl font-bold text-gray-300 group-hover:text-white transition-colors">
-            Core Lightning Channel Closure Anomaly
-          </h2>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            Investigating unexpected mutual/unilateral channel closures and HTLC expiration timings across CLN network nodes.
-          </p>
-        </div>
-        <div class="pt-6 mt-6 border-t border-gray-800/60 flex items-center justify-between">
-          <span class="text-gray-600 font-mono text-[11px]">#lightning #cln</span>
-          <span class="text-xs text-gray-600 italic">In progress</span>
-        </div>
-      </article>
-
-    </div>
+    <!-- Bitcoin Data Labs Global Shell Styles -->
+    <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css" onerror="this.onerror=null;this.href='https://sorukumar.github.io/Bitcoin-Data-Labs/styles/styles.css'">
     
-    <div id="noResults" class="hidden text-center py-16">
-      <p class="text-gray-500 text-sm">No investigations matched your filter criteria.</p>
+    <!-- Font Awesome for Ecosystem Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Local Light-Mode Stylesheet -->
+    <link rel="stylesheet" href="shared/css/style.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://bitcoindatalabs.org/favicon.png">
+</head>
+
+<body class="has-fixed-header">
+
+    <!-- Global Bitcoin Data Labs Header (Mounted by app-components.js) -->
+    <div id="header"></div>
+
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="brand-eyebrow">
+                <i class="fas fa-microscope"></i> Ad-Hoc Analytics & Incident Forensics
+            </div>
+            <h1 class="hero-title">
+                Technical <span class="highlight">Deep Dives</span> & Telemetry
+            </h1>
+            <p class="hero-description">
+                Ad-hoc forensic inquiries, node anomaly evaluations, security disclosures, and on-chain forensics. Independent, reproducible, and verifiable.
+            </p>
+
+            <!-- Quick Metrics Ribbon -->
+            <div class="metrics-ribbon">
+                <div class="metric-stat-card">
+                    <div class="metric-stat-label">Active Hub</div>
+                    <div class="metric-stat-value" style="color: var(--primary);">deep-dives</div>
+                    <div class="metric-stat-hint">GitHub Pages verified</div>
+                </div>
+                <div class="metric-stat-card">
+                    <div class="metric-stat-label">Analysis Pipeline</div>
+                    <div class="metric-stat-value">Reproducible</div>
+                    <div class="metric-stat-hint">Self-contained data + code</div>
+                </div>
+                <div class="metric-stat-card">
+                    <div class="metric-stat-label">Core Focus</div>
+                    <div class="metric-stat-value">BTC & LN</div>
+                    <div class="metric-stat-hint">Security, nodes & protocols</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search & Tag Filter Toolbar -->
+        <div class="toolbar-wrap">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input 
+                    type="text" 
+                    id="diveSearchInput" 
+                    class="search-input" 
+                    placeholder="Search investigations by title, keyword, or tag..."
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <span class="search-shortcut"><kbd>/</kbd></span>
+            </div>
+
+            <div class="filter-pills" id="tagFilterPills">
+                <button type="button" class="filter-btn active" data-filter="all">
+                    <i class="fas fa-border-all"></i> All
+                </button>
+                <button type="button" class="filter-btn" data-filter="lightning">
+                    <i class="fas fa-bolt"></i> Lightning
+                </button>
+                <button type="button" class="filter-btn" data-filter="security">
+                    <i class="fas fa-shield-alt"></i> Security
+                </button>
+                <button type="button" class="filter-btn" data-filter="onchain">
+                    <i class="fas fa-cubes"></i> On-Chain
+                </button>
+                <button type="button" class="filter-btn" data-filter="hardware">
+                    <i class="fas fa-microchip"></i> Hardware
+                </button>
+            </div>
+        </div>
+
+        <!-- Investigations Cards Grid -->
+        <div class="cards-grid" id="divesGrid">
+
+            <!-- Card 1: Investigation Template & Boilerplate -->
+            <article class="dive-card" data-tags="template,scaffold,starter" data-category="template">
+                <div>
+                    <div class="dive-card-header">
+                        <span class="dive-date">Boilerplate</span>
+                        <span class="dive-badge badge-template">Template</span>
+                    </div>
+                    <h2 class="dive-card-title">
+                        <a href="analyses/_template/index.html" style="text-decoration: none; color: inherit;">
+                            Investigation Scaffold & Pipeline
+                        </a>
+                    </h2>
+                    <p class="dive-card-desc">
+                        The standard blueprint for initiating ad-hoc research. Includes reproducible data extraction scripts, schema isolation, and interactive visualization layouts.
+                    </p>
+                </div>
+                <div class="dive-card-footer">
+                    <div class="dive-tags">
+                        <span class="dive-tag">#starter</span>
+                        <span class="dive-tag">#reproducible</span>
+                    </div>
+                    <a href="analyses/_template/index.html" class="dive-action">
+                        <span>Explore</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </article>
+
+            <!-- Card 2: Coldcard Hacker Forensics (Preview) -->
+            <article class="dive-card" data-tags="security,hardware,forensics,onchain" data-category="security">
+                <div>
+                    <div class="dive-card-header">
+                        <span class="dive-date">Upcoming</span>
+                        <span class="dive-badge badge-security">Security</span>
+                    </div>
+                    <h2 class="dive-card-title">
+                        Coldcard Hacker Incident Forensics
+                    </h2>
+                    <p class="dive-card-desc">
+                        On-chain fund tracing, signature anomaly scrutiny, and consolidation pattern analysis following hardware wallet vulnerability reports.
+                    </p>
+                </div>
+                <div class="dive-card-footer">
+                    <div class="dive-tags">
+                        <span class="dive-tag">#forensics</span>
+                        <span class="dive-tag">#coldcard</span>
+                    </div>
+                    <span class="dive-tag" style="color: var(--tag-madder); font-weight: 600;">In Progress</span>
+                </div>
+            </article>
+
+            <!-- Card 3: Core Lightning Channel Closures (Preview) -->
+            <article class="dive-card" data-tags="lightning,cln,nodes,channels" data-category="lightning">
+                <div>
+                    <div class="dive-card-header">
+                        <span class="dive-date">Upcoming</span>
+                        <span class="dive-badge badge-lightning">Lightning</span>
+                    </div>
+                    <h2 class="dive-card-title">
+                        Core Lightning Channel Closure Anomaly
+                    </h2>
+                    <p class="dive-card-desc">
+                        Investigating unilateral channel force-close spikes, HTLC resolution timeouts, and peer disconnect cascades across CLN routing nodes.
+                    </p>
+                </div>
+                <div class="dive-card-footer">
+                    <div class="dive-tags">
+                        <span class="dive-tag">#lightning</span>
+                        <span class="dive-tag">#cln</span>
+                    </div>
+                    <span class="dive-tag" style="color: var(--tag-heather); font-weight: 600;">In Progress</span>
+                </div>
+            </article>
+
+            <!-- Empty State for Search Filter -->
+            <div id="noResultsState" class="empty-state" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>No deep dives match your search</h3>
+                <p>Try clearing search filters or checking back as new ad-hoc investigations are published.</p>
+            </div>
+
+        </div>
     </div>
-  </main>
 
-  <footer class="border-t border-gray-900 py-8 text-center text-xs text-gray-600">
-    Bitcoin Data Labs &bull; Hosted on GitHub Pages &bull; Open Source Analytics
-  </footer>
+    <!-- Global Bitcoin Data Labs Footer (Mounted by app-components.js) -->
+    <div id="footer"></div>
 
-  <script>
-    const searchInput = document.getElementById('searchInput');
-    const tagButtons = document.querySelectorAll('.tag-btn');
-    const cards = document.querySelectorAll('.analysis-card');
-    const noResults = document.getElementById('noResults');
+    <!-- Bitcoin Data Labs Ecosystem App Components -->
+    <script src="https://bitcoindatalabs.org/components/app-components.js" onerror="this.onerror=null;this.src='https://sorukumar.github.io/Bitcoin-Data-Labs/components/app-components.js'"></script>
 
-    let currentTag = 'all';
+    <script>
+        // Centralized App Navigation Configuration for Bitcoin Data Labs
+        const DEEP_DIVES_NAV = [
+            { name: 'All Deep Dives', url: 'index.html' },
+            { name: 'Template Guide', url: 'analyses/_template/index.html' },
+            { name: 'Lightning Hub', url: 'https://lightning.bitcoindatalabs.org/' },
+            { name: 'Bitcoin Data Labs', url: 'https://bitcoindatalabs.org/' }
+        ];
 
-    function filterCards() {
-      const query = searchInput.value.toLowerCase().trim();
-      let visibleCount = 0;
-
-      cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        const tags = (card.dataset.tags || '').toLowerCase();
-        const matchesQuery = !query || text.includes(query) || tags.includes(query);
-        const matchesTag = currentTag === 'all' || tags.includes(currentTag);
-
-        if (matchesQuery && matchesTag) {
-          card.classList.remove('hidden');
-          visibleCount++;
-        } else {
-          card.classList.add('hidden');
+        function initAppShell() {
+            if (typeof BitcoinLabsApp !== 'undefined') {
+                BitcoinLabsApp.init({
+                    isApp: true,
+                    appName: "deep-dives",
+                    appHomeUrl: "index.html",
+                    navLinks: DEEP_DIVES_NAV,
+                    footerLinks: [
+                        { name: 'Bitcoin Data Labs', url: 'https://bitcoindatalabs.org' },
+                        { name: 'PlebDashboard LN', url: 'https://lightning.bitcoindatalabs.org' },
+                        { name: 'GitHub Repository', url: 'https://github.com/bitcoindatalabs/deep-dives' }
+                    ]
+                });
+            } else {
+                setTimeout(initAppShell, 50);
+            }
         }
-      });
 
-      noResults.classList.toggle('hidden', visibleCount > 0);
-    }
+        // Search & Filtering Interactions
+        document.addEventListener('DOMContentLoaded', () => {
+            initAppShell();
 
-    tagButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tagButtons.forEach(b => {
-          b.classList.remove('bg-amber-500', 'text-black', 'active');
-          b.classList.add('bg-gray-900', 'text-gray-400');
+            const searchInput = document.getElementById('diveSearchInput');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.dive-card');
+            const noResults = document.getElementById('noResultsState');
+
+            let activeFilter = 'all';
+
+            function updateCards() {
+                const query = searchInput.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                cards.forEach(card => {
+                    const title = card.querySelector('.dive-card-title').textContent.toLowerCase();
+                    const desc = card.querySelector('.dive-card-desc').textContent.toLowerCase();
+                    const tags = (card.dataset.tags || '').toLowerCase();
+                    const category = card.dataset.category || '';
+
+                    const matchesQuery = !query || title.includes(query) || desc.includes(query) || tags.includes(query);
+                    const matchesCategory = activeFilter === 'all' || category === activeFilter || tags.includes(activeFilter);
+
+                    if (matchesQuery && matchesCategory) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeFilter = btn.dataset.filter;
+                    updateCards();
+                });
+            });
+
+            searchInput.addEventListener('input', updateCards);
+
+            // '/' keyboard shortcut to focus search
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement !== searchInput) {
+                    e.preventDefault();
+                    searchInput.focus();
+                } else if (e.key === 'Escape' && document.activeElement === searchInput) {
+                    searchInput.value = '';
+                    searchInput.blur();
+                    updateCards();
+                }
+            });
         });
-        btn.classList.add('bg-amber-500', 'text-black', 'active');
-        btn.classList.remove('bg-gray-900', 'text-gray-400');
-        currentTag = btn.dataset.tag;
-        filterCards();
-      });
-    });
-
-    searchInput.addEventListener('input', filterCards);
-  </script>
+    </script>
 </body>
 </html>
