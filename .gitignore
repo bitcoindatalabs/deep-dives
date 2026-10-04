@@ -32,4 +32,14 @@ analyses/**/data/raw/*
 *.zip
 *.sqlite3
 *.db
-*.parquet.tmp
+# Local Agent / Machine instructions (NEVER push to GitHub)
+AGENTS.md
+agents.md
+*.agent.md
+*.local.md
+
+# Internal Vision / Planning documents (kept locally, not published)
+VISION.md
+vision.md
+**/VISION.md
+**/vision.md

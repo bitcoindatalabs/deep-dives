@@ -1,220 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Dives & Incident Forensics | Bitcoin Data Labs</title>
-    <meta name="description" content="Ad-hoc investigations, incident forensics, node anomaly evaluations, and on-chain curiosities across Bitcoin and Lightning.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dives | Bitcoin Data Labs</title>
+  
+  <!-- Favicon (Bitcoin Data Labs </> Brand Mark) -->
+  <link rel="icon" type="image/png" href="favicon.png">
 
-    <!-- Bitcoin Data Labs Global Shell Styles -->
-    <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css" onerror="this.onerror=null;this.href='https://sorukumar.github.io/Bitcoin-Data-Labs/styles/styles.css'">
-    
-    <!-- Font Awesome for Ecosystem Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Typography & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Local Light-Mode Stylesheet -->
-    <link rel="stylesheet" href="shared/css/style.css">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="https://bitcoindatalabs.org/favicon.png">
+  <!-- Bitcoin Data Labs Design System Stylesheet -->
+  <link rel="stylesheet" href="shared/css/style.css">
 </head>
-
 <body class="has-fixed-header">
 
-    <!-- Global Bitcoin Data Labs Header (Mounted by app-components.js) -->
-    <div id="header"></div>
-
-    <div class="main-content">
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="brand-eyebrow">
-                <i class="fas fa-microscope"></i> Ad-Hoc Analytics & Incident Forensics
-            </div>
-            <h1 class="hero-title">
-                Technical <span class="highlight">Deep Dives</span> & Forensics
-            </h1>
-            <p class="hero-description">
-                Ad-hoc investigative reports, incident forensics, node anomaly evaluations, and on-chain curiosities across Bitcoin and Lightning.
-            </p>
-
-            <!-- Search Bar -->
-            <div class="search-bar-wrap">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input 
-                        type="text" 
-                        id="diveSearchInput" 
-                        class="search-input" 
-                        placeholder="Search investigations by title, keyword, or tag..."
-                        autocomplete="off"
-                        spellcheck="false"
-                    >
-                    <span class="search-shortcut"><kbd>/</kbd></span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Investigations Cards Grid -->
-        <div class="cards-grid" id="divesGrid">
-
-            <!-- Card 1: Investigation Template & Boilerplate -->
-            <article class="dive-card" data-tags="template,scaffold,starter">
-                <div>
-                    <div class="dive-card-header">
-                        <span class="dive-date">Boilerplate</span>
-                        <span class="dive-badge badge-template">Template</span>
-                    </div>
-                    <h2 class="dive-card-title">
-                        <a href="analyses/_template/index.html" style="text-decoration: none; color: inherit;">
-                            Investigation Scaffold & Pipeline
-                        </a>
-                    </h2>
-                    <p class="dive-card-desc">
-                        The standard blueprint for initiating ad-hoc research. Includes reproducible data extraction scripts, schema isolation, and interactive visualization layouts.
-                    </p>
-                </div>
-                <div class="dive-card-footer">
-                    <div class="dive-tags">
-                        <span class="dive-tag">#starter</span>
-                        <span class="dive-tag">#reproducible</span>
-                    </div>
-                    <a href="analyses/_template/index.html" class="dive-action">
-                        <span>Explore</span> <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </article>
-
-            <!-- Card 2: Coldcard Hacker Forensics (Preview) -->
-            <article class="dive-card" data-tags="security,hardware,forensics,onchain,coldcard">
-                <div>
-                    <div class="dive-card-header">
-                        <span class="dive-date">Upcoming</span>
-                        <span class="dive-badge badge-security">Security</span>
-                    </div>
-                    <h2 class="dive-card-title">
-                        Coldcard Hacker Incident Forensics
-                    </h2>
-                    <p class="dive-card-desc">
-                        On-chain fund tracing, signature anomaly scrutiny, and consolidation pattern analysis following hardware wallet vulnerability reports.
-                    </p>
-                </div>
-                <div class="dive-card-footer">
-                    <div class="dive-tags">
-                        <span class="dive-tag">#forensics</span>
-                        <span class="dive-tag">#coldcard</span>
-                    </div>
-                    <span class="dive-tag" style="color: var(--tag-madder); font-weight: 600;">In Progress</span>
-                </div>
-            </article>
-
-            <!-- Card 3: Core Lightning Channel Closures (Preview) -->
-            <article class="dive-card" data-tags="lightning,cln,nodes,channels">
-                <div>
-                    <div class="dive-card-header">
-                        <span class="dive-date">Upcoming</span>
-                        <span class="dive-badge badge-lightning">Lightning</span>
-                    </div>
-                    <h2 class="dive-card-title">
-                        Core Lightning Channel Closure Anomaly
-                    </h2>
-                    <p class="dive-card-desc">
-                        Investigating unilateral channel force-close spikes, HTLC resolution timeouts, and peer disconnect cascades across CLN routing nodes.
-                    </p>
-                </div>
-                <div class="dive-card-footer">
-                    <div class="dive-tags">
-                        <span class="dive-tag">#lightning</span>
-                        <span class="dive-tag">#cln</span>
-                    </div>
-                    <span class="dive-tag" style="color: var(--tag-heather); font-weight: 600;">In Progress</span>
-                </div>
-            </article>
-
-            <!-- Empty State for Search Filter -->
-            <div id="noResultsState" class="empty-state" style="display: none;">
-                <i class="fas fa-search"></i>
-                <h3>No deep dives match your search</h3>
-                <p>Try clearing search keywords or checking back as new ad-hoc investigations are published.</p>
-            </div>
-
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       OFFICIAL BITCOIN DATA LABS HEADER (MATCHES PLEBDASHBOARD-LN)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="top-bar app-header-main">
+    <div class="bdl-header-container">
+      <div class="logos-container">
+        <div class="app-logo">
+          <a href="index.html" class="app-name">deep-dives</a>
         </div>
+        <div class="divider"></div>
+        <div class="parent-logo">
+          <a href="https://bitcoindatalabs.org/">
+            <img src="logo.svg" alt="Bitcoin Data Labs" class="parent-logo-img" onerror="this.onerror=null; this.src='https://bitcoindatalabs.org/logo.svg';">
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Global Bitcoin Data Labs Footer (Mounted by app-components.js) -->
-    <div id="footer"></div>
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HERO & SEARCH SECTION
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <main class="main-content">
+    <section class="hero-section">
+      <div class="brand-eyebrow">
+        <i class="fas fa-microscope"></i> Ad-Hoc Analytics & Incident Forensics
+      </div>
+      <h1 class="hero-title">
+        Technical Forensics & <span class="highlight">Deep Dives</span>
+      </h1>
+      <p class="hero-description">
+        Ad-hoc investigative reports, incident forensics, node anomaly evaluations, and on-chain curiosities across Bitcoin and Lightning.
+      </p>
 
-    <!-- Bitcoin Data Labs Ecosystem App Components -->
-    <script src="https://bitcoindatalabs.org/components/app-components.js" onerror="this.onerror=null;this.src='https://sorukumar.github.io/Bitcoin-Data-Labs/components/app-components.js'"></script>
+      <!-- Search Input -->
+      <div class="search-bar-wrap">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input 
+            id="searchInput" 
+            type="text" 
+            placeholder="Search investigations by title, keyword, or tag..." 
+            class="search-input"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <span class="search-shortcut"><kbd>/</kbd></span>
+        </div>
+      </div>
+    </section>
 
-    <script>
-        function initAppShell() {
-            if (typeof BitcoinLabsApp !== 'undefined') {
-                // Initialize app header & footer without subnav tabs
-                BitcoinLabsApp.init({
-                    isApp: true,
-                    appName: "deep-dives",
-                    appHomeUrl: "index.html",
-                    footerLinks: [
-                        { name: 'Bitcoin Data Labs', url: 'https://bitcoindatalabs.org' },
-                        { name: 'PlebDashboard LN', url: 'https://lightning.bitcoindatalabs.org' },
-                        { name: 'GitHub Repository', url: 'https://github.com/bitcoindatalabs/deep-dives' }
-                    ]
-                });
-            } else {
-                setTimeout(initAppShell, 50);
-            }
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ANALYSIS CARDS GRID (ONE CARD PER INVESTIGATION)
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="cardsGrid" class="cards-grid">
+      
+      <!-- Card: Lightning Network Macro Resilience Study -->
+      <article class="dive-card" data-tags="lightning,cln,lnd,btcpay,resilience,security,nodes,channels">
+        <div>
+          <div class="dive-card-header">
+            <span class="dive-date">August – October 2026</span>
+            <span class="dive-badge badge-lightning">Lightning</span>
+          </div>
+          <h2 class="dive-card-title">
+            <a href="./analyses/2026-10-lightning-network-analysis/index.html" style="text-decoration: none; color: inherit;">
+              Lightning Network Macro Resilience Study
+            </a>
+          </h2>
+          <p class="dive-card-desc">
+            Empirical telemetry on network behavior following consecutive critical bugs across LND (BTCPay Server) and Core Lightning (CLN): quantifying force-close cascades, liquidity flight, and implementation patch velocity.
+          </p>
+        </div>
+        <div class="dive-card-footer">
+          <div class="dive-tags">
+            <span class="dive-tag">#lightning</span>
+            <span class="dive-tag">#cln</span>
+            <span class="dive-tag">#lnd</span>
+            <span class="dive-tag">#security</span>
+          </div>
+          <a href="./analyses/2026-10-lightning-network-analysis/index.html" class="dive-action">
+            <span>Explore</span> <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </article>
+
+    </div>
+    
+    <!-- Empty State -->
+    <div id="noResults" class="empty-state" style="display: none;">
+      <i class="fas fa-search"></i>
+      <h3>No investigations matched your search</h3>
+      <p>Try clearing keywords or checking back as new ad-hoc analyses are published.</p>
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       OFFICIAL BITCOIN DATA LABS FOOTER (MATCHES PLEBDASHBOARD-LN)
+       Left: Copyright | Middle: (Empty) | Right: Socials
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <footer class="bdl-global-footer">
+    <div class="bdl-footer-inner">
+      <div class="bdl-footer-copyright">
+        <p style="margin: 0;">
+          © <span id="footer-year">2026</span> <a href="https://bitcoindatalabs.org" target="_blank">Bitcoin Data Labs</a>. All rights reserved.
+        </p>
+      </div>
+      <div class="bdl-footer-socials">
+        <a href="https://github.com/bitcoindatalabs/Bitcoin-Data-Labs" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://x.com/sorukumar" target="_blank" title="X / Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/bitcoin-data-labs" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.dive-card');
+    const noResults = document.getElementById('noResults');
+
+    function filterCards() {
+      const query = searchInput.value.toLowerCase().trim();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const tags = (card.dataset.tags || '').toLowerCase();
+        const matches = !query || text.includes(query) || tags.includes(query);
+
+        if (matches) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
         }
+      });
 
-        // Live Search Filtering Across Cards
-        document.addEventListener('DOMContentLoaded', () => {
-            initAppShell();
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
 
-            const searchInput = document.getElementById('diveSearchInput');
-            const cards = document.querySelectorAll('.dive-card');
-            const noResults = document.getElementById('noResultsState');
+    searchInput.addEventListener('input', filterCards);
 
-            function filterCards() {
-                const query = searchInput.value.toLowerCase().trim();
-                let visibleCount = 0;
-
-                cards.forEach(card => {
-                    const title = card.querySelector('.dive-card-title').textContent.toLowerCase();
-                    const desc = card.querySelector('.dive-card-desc').textContent.toLowerCase();
-                    const tags = (card.dataset.tags || '').toLowerCase();
-
-                    const matches = !query || title.includes(query) || desc.includes(query) || tags.includes(query);
-
-                    if (matches) {
-                        card.style.display = 'flex';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-            }
-
-            searchInput.addEventListener('input', filterCards);
-
-            // '/' keyboard shortcut to focus search, Esc to clear
-            document.addEventListener('keydown', (e) => {
-                if (e.key === '/' && document.activeElement !== searchInput) {
-                    e.preventDefault();
-                    searchInput.focus();
-                } else if (e.key === 'Escape' && document.activeElement === searchInput) {
-                    searchInput.value = '';
-                    searchInput.blur();
-                    filterCards();
-                }
-            });
-        });
-    </script>
+    // Keyboard shortcut: '/' to focus search, Esc to clear
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+      } else if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.value = '';
+        searchInput.blur();
+        filterCards();
+      }
+    });
+  </script>
 </body>
 </html>

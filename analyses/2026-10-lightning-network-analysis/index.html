@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lightning Network Resilience & Vulnerability Analysis | Bitcoin Data Labs</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
+
+  <!-- Typography & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Bitcoin Data Labs Design System Stylesheet -->
+  <link rel="stylesheet" href="../../shared/css/style.css">
+
+  <style>
+    .report-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .report-card h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .report-card p {
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin: 0 0 16px 0;
+      font-size: 0.95rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: var(--primary);
+    }
+
+    .hypothesis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .hypothesis-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+
+    .hypothesis-item h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hypothesis-item p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .chart-box {
+      width: 100%;
+      height: 320px;
+      background: var(--bg-primary);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 16px;
+      gap: 8px;
+    }
+
+    .chart-box i {
+      font-size: 2rem;
+      color: var(--primary);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body class="has-fixed-header">
+
+  <!-- Official Bitcoin Data Labs Header (Matches plebdashboard-ln) -->
+  <div class="top-bar app-header-main">
+    <div class="bdl-header-container">
+      <div class="logos-container">
+        <div class="app-logo">
+          <a href="../../index.html" class="app-name">deep-dives</a>
+        </div>
+        <div class="divider"></div>
+        <div class="parent-logo">
+          <a href="https://bitcoindatalabs.org/">
+            <img src="../../logo.svg" alt="Bitcoin Data Labs" class="parent-logo-img" onerror="this.onerror=null; this.src='https://bitcoindatalabs.org/logo.svg';">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <a href="../../index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Deep Dives Hub
+    </a>
+
+    <!-- Header Section -->
+    <div style="margin-bottom: 32px;">
+      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+        <span class="dive-badge badge-lightning">Lightning</span>
+        <span class="dive-badge badge-security">Security</span>
+        <span style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">August – October 2026</span>
+      </div>
+      <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 12px 0; letter-spacing: -0.02em;">
+        Lightning Network Resilience & Vulnerability Impact Analysis
+      </h1>
+      <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 820px; line-height: 1.6; margin: 0;">
+        Empirical evaluation of network behavior and liquidity dynamics across the recent consecutive software vulnerabilities in <strong>LND / BTCPay Server</strong> and <strong>Core Lightning (CLN)</strong>.
+      </p>
+    </div>
+
+    <!-- Overview & Scope Card -->
+    <section class="report-card">
+      <h2><i class="fas fa-bullseye" style="color: var(--primary);"></i> Analysis Vision & Problem Statement</h2>
+      <p>
+        Over the past 60 days, the Lightning ecosystem weathered critical bug disclosures affecting both major implementations. This deep dive moves beyond social speculation to deliver <strong>hard on-chain and gossip telemetry</strong> on whether the network experienced cascading force-closes, liquidity flight, or whether node diversity effectively cushioned the impact.
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary-border); padding: 6px 14px; border-radius: var(--radius-sm);">
+          <i class="fas fa-microscope"></i> Research Scope Defined &bull; Pipeline In Progress
+        </span>
+      </div>
+    </section>
+
+    <!-- Key Research Questions & Hypotheses -->
+    <section class="report-card">
+      <h2><i class="fas fa-microscope" style="color: var(--primary);"></i> Core Investigative Dimensions</h2>
+      <div class="hypothesis-grid">
+        <div class="hypothesis-item">
+          <h3><i class="fas fa-random" style="color: var(--tag-madder);"></i> Force-Close Cascades</h3>
+          <p>Did unilateral channel closures spike during the 72-hour disclosure windows relative to the 30-day baseline?</p>
+        </div>
+        <div class="hypothesis-item">
+          <h3><i class="fas fa-coins" style="color: var(--tag-amber);"></i> Liquidity Migration</h3>
+          <p>Did total network capacity drop, or did liquidity reallocate towards unaffected implementations (Eclair, LDK)?</p>
+        </div>
+        <div class="hypothesis-item">
+          <h3><i class="fas fa-tachometer-alt" style="color: var(--tag-heather);"></i> Patch Velocity</h3>
+          <p>What was the adoption half-life ($t_{1/2}$) of patched releases among tier-1 routing hubs vs. pleb nodes?</p>
+        </div>
+        <div class="hypothesis-item">
+          <h3><i class="fas fa-fire" style="color: var(--primary);"></i> On-Chain Fee Footprint</h3>
+          <p>What was the on-chain fee burden consumed by emergency sweeps and closure transactions during the peaks?</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visual Dashboard Pipeline (Execution Stage) -->
+    <section class="report-card">
+      <h2><i class="fas fa-chart-area" style="color: var(--primary);"></i> Telemetry & Interactive Visualizations</h2>
+      <p>
+        The data extraction pipeline (<code>run.py</code>) will ingest historical gossip dumps and on-chain spend scripts to populate the following interactive charts:
+      </p>
+
+      <div class="chart-box">
+        <i class="fas fa-chart-bar"></i>
+        <strong style="color: var(--text-primary);">Channel Closures Time-Series: Mutual vs. Unilateral Force-Closes</strong>
+        <span>[Data extraction pipeline in progress — awaiting coding agent execution]</span>
+      </div>
+
+      <div class="chart-box" style="margin-top: 20px;">
+        <i class="fas fa-chart-line"></i>
+        <strong style="color: var(--text-primary);">Node Implementation Version Migration Curves (S-Curves)</strong>
+        <span>[Adoption velocity across LND & CLN public node fleets]</span>
+      </div>
+    </section>
+
+    <!-- Methodology & Reproducibility -->
+    <section class="report-card">
+      <h2><i class="fas fa-terminal" style="color: var(--primary);"></i> Pipeline Architecture</h2>
+      <p>
+        All metrics are reproducible via Python extraction scripts in this directory:
+      </p>
+      <pre style="background: var(--bg-primary); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-primary); overflow-x: auto;"><code># 1. Run local data extraction pipeline
+python run.py
+
+# 2. Output datasets stored in
+data/processed/resilience_summary.json</code></pre>
+    </section>
+  </main>
+
+  <!-- Official Bitcoin Data Labs Footer (Matches plebdashboard-ln) -->
+  <footer class="bdl-global-footer">
+    <div class="bdl-footer-inner">
+      <div class="bdl-footer-copyright">
+        <p style="margin: 0;">
+          © <span id="footer-year">2026</span> <a href="https://bitcoindatalabs.org" target="_blank">Bitcoin Data Labs</a>. All rights reserved.
+        </p>
+      </div>
+      <div class="bdl-footer-socials">
+        <a href="https://github.com/bitcoindatalabs/Bitcoin-Data-Labs" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://x.com/sorukumar" target="_blank" title="X / Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/bitcoin-data-labs" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

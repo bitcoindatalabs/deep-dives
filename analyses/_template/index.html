@@ -1,181 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[Investigation Title] | Bitcoin Data Labs Deep Dives</title>
-    <meta name="description" content="Technical investigation and forensic breakdown by Bitcoin Data Labs.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[Investigation Title] | Bitcoin Data Labs Deep Dives</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
 
-    <!-- Bitcoin Data Labs Global Shell Styles -->
-    <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css" onerror="this.onerror=null;this.href='https://sorukumar.github.io/Bitcoin-Data-Labs/styles/styles.css'">
-    
-    <!-- Font Awesome for Ecosystem Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Typography & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Shared Light-Mode Stylesheet -->
-    <link rel="stylesheet" href="../../shared/css/style.css">
+  <!-- Bitcoin Data Labs Design System Stylesheet -->
+  <link rel="stylesheet" href="../../shared/css/style.css">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="https://bitcoindatalabs.org/favicon.png">
+  <style>
+    .report-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
 
-    <style>
-        .report-section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-sm);
-        }
+    .report-card h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .report-section h2 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0 0 16px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .report-card p {
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin: 0 0 16px 0;
+      font-size: 0.95rem;
+    }
 
-        .report-section p {
-            color: var(--text-secondary);
-            line-height: 1.65;
-            margin: 0 0 16px 0;
-            font-size: 0.95rem;
-        }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+      transition: color 0.2s ease;
+    }
 
-        .back-nav {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 24px;
-            transition: color 0.2s ease;
-        }
+    .back-link:hover {
+      color: var(--primary);
+    }
 
-        .back-nav:hover {
-            color: var(--primary);
-        }
-
-        .chart-box {
-            width: 100%;
-            height: 320px;
-            background: var(--bg-primary);
-            border: 1px dashed var(--border);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 16px;
-        }
-    </style>
+    .chart-box {
+      width: 100%;
+      height: 300px;
+      background: var(--bg-primary);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 16px;
+    }
+  </style>
 </head>
-
 <body class="has-fixed-header">
 
-    <!-- Global Bitcoin Data Labs Header -->
-    <div id="header"></div>
+  <!-- Official Bitcoin Data Labs Header (Matches plebdashboard-ln) -->
+  <div class="top-bar app-header-main">
+    <div class="bdl-header-container">
+      <div class="logos-container">
+        <div class="app-logo">
+          <a href="../../index.html" class="app-name">deep-dives</a>
+        </div>
+        <div class="divider"></div>
+        <div class="parent-logo">
+          <a href="https://bitcoindatalabs.org/">
+            <img src="../../logo.svg" alt="Bitcoin Data Labs" class="parent-logo-img" onerror="this.onerror=null; this.src='https://bitcoindatalabs.org/logo.svg';">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <div class="main-content">
-        <div style="padding-top: 32px;">
-            <a href="../../index.html" class="back-nav">
-                <i class="fas fa-arrow-left"></i> Back to Deep Dives Hub
-            </a>
+  <main class="main-content">
+    <a href="../../index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Deep Dives Hub
+    </a>
 
-            <!-- Investigation Header -->
-            <div style="margin-bottom: 32px;">
-                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
-                    <span class="dive-badge badge-template">Template</span>
-                    <span style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">YYYY-MM-DD</span>
-                </div>
-                <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 12px 0; letter-spacing: -0.02em;">
-                    [Investigation Title]
-                </h1>
-                <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 800px; line-height: 1.6; margin: 0;">
-                    Executive summary of this ad-hoc analysis: the incident background, what anomaly was detected, and headline takeaways.
-                </p>
-            </div>
+    <!-- Header Section -->
+    <div style="margin-bottom: 32px;">
+      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+        <span class="dive-badge badge-template">Template</span>
+        <span style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">YYYY-MM-DD</span>
+      </div>
+      <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 12px 0; letter-spacing: -0.02em;">
+        [Investigation Title]
+      </h1>
+      <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 800px; line-height: 1.6; margin: 0;">
+        Brief overview describing the event, anomaly, or security analysis explored in this deep dive.
+      </p>
+    </div>
 
-            <!-- Metric Stat Ribbon -->
-            <div class="metrics-ribbon">
-                <div class="metric-stat-card">
-                    <div class="metric-stat-label">Metric Primary</div>
-                    <div class="metric-stat-value" style="color: var(--primary);">0.00 BTC</div>
-                    <div class="metric-stat-hint">Observed anomaly delta</div>
-                </div>
-                <div class="metric-stat-card">
-                    <div class="metric-stat-label">Affected Entities</div>
-                    <div class="metric-stat-value">0</div>
-                    <div class="metric-stat-hint">Nodes / Addresses / Channels</div>
-                </div>
-                <div class="metric-stat-card">
-                    <div class="metric-stat-label">Status</div>
-                    <div class="metric-stat-value" style="color: var(--tag-sage);">Verified</div>
-                    <div class="metric-stat-hint">Reproducible via data pipeline</div>
-                </div>
-            </div>
+    <!-- Visual Findings -->
+    <section class="report-card">
+      <h2><i class="fas fa-chart-line" style="color: var(--primary);"></i> Visual Findings & Data Distribution</h2>
+      <p>
+        Insert interactive charts (Chart.js, Plotly, or SVG) loaded from clean aggregated data files in <code>data/processed/</code>.
+      </p>
+      <div class="chart-box">
+        <i class="fas fa-chart-area" style="margin-right: 8px;"></i> [Interactive Visualization Container]
+      </div>
+    </section>
 
-            <!-- Section 1: Findings & Visualization -->
-            <section class="report-section">
-                <h2><i class="fas fa-chart-line" style="color: var(--primary);"></i> Visual Findings & Data Distribution</h2>
-                <p>
-                    Render interactive charts (Chart.js, Plotly, or SVG) below, loaded directly from clean aggregated data files in <code>data/processed/</code>.
-                </p>
-                <div class="chart-box">
-                    <i class="fas fa-chart-area" style="margin-right: 8px;"></i> [Interactive Visualization Container]
-                </div>
-            </section>
+    <!-- Narrative & Evidence -->
+    <section class="report-card">
+      <h2><i class="fas fa-search" style="color: var(--primary);"></i> Detailed Forensic Breakdown</h2>
+      <p>
+        Walk through the technical timeline, transaction IDs, log signatures, or peer disconnect events.
+      </p>
+    </section>
 
-            <!-- Section 2: Narrative & Forensic Evidence -->
-            <section class="report-section">
-                <h2><i class="fas fa-search" style="color: var(--primary);"></i> Detailed Forensic Breakdown</h2>
-                <p>
-                    Walk through the technical timeline, transaction IDs, log signatures, or peer disconnect events. Keep references clear with links to block explorers or git commits.
-                </p>
-            </section>
-
-            <!-- Section 3: Methodology & Reproducibility -->
-            <section class="report-section">
-                <h2><i class="fas fa-terminal" style="color: var(--primary);"></i> Methodology & Reproducibility</h2>
-                <p>
-                    All data queries and extraction logic are self-contained in <code>run.py</code>. Run the extraction pipeline to regenerate data locally:
-                </p>
-                <pre style="background: var(--bg-primary); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-primary); overflow-x: auto;"><code># 1. Run local pipeline
+    <!-- Methodology & Reproducibility -->
+    <section class="report-card">
+      <h2><i class="fas fa-terminal" style="color: var(--primary);"></i> Methodology & Reproducibility</h2>
+      <p>
+        All data queries and extraction logic are self-contained in <code>run.py</code>. Run the extraction pipeline to regenerate data locally:
+      </p>
+      <pre style="background: var(--bg-primary); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-primary); overflow-x: auto;"><code># 1. Run local extraction
 python run.py
 
 # 2. Inspect processed artifacts
 ls -lh data/processed/</code></pre>
-            </section>
-        </div>
+    </section>
+  </main>
+
+  <!-- Official Bitcoin Data Labs Footer (Matches plebdashboard-ln) -->
+  <footer class="bdl-global-footer">
+    <div class="bdl-footer-inner">
+      <div class="bdl-footer-copyright">
+        <p style="margin: 0;">
+          © <span id="footer-year">2026</span> <a href="https://bitcoindatalabs.org" target="_blank">Bitcoin Data Labs</a>. All rights reserved.
+        </p>
+      </div>
+      <div class="bdl-footer-socials">
+        <a href="https://github.com/bitcoindatalabs/Bitcoin-Data-Labs" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://x.com/sorukumar" target="_blank" title="X / Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/bitcoin-data-labs" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      </div>
     </div>
+  </footer>
 
-    <!-- Global Bitcoin Data Labs Footer -->
-    <div id="footer"></div>
-
-    <!-- Ecosystem Scripts -->
-    <script src="https://bitcoindatalabs.org/components/app-components.js" onerror="this.onerror=null;this.src='https://sorukumar.github.io/Bitcoin-Data-Labs/components/app-components.js'"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof BitcoinLabsApp !== 'undefined') {
-                BitcoinLabsApp.init({
-                    isApp: true,
-                    appName: "deep-dives",
-                    appHomeUrl: "../../index.html"
-                });
-            }
-        });
-    </script>
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

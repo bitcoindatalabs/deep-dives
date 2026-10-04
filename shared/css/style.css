@@ -1,19 +1,20 @@
 /* ==========================================================================
    Bitcoin Data Labs — Deep Dives (Light Mode Design System)
-   Aligned with plebdashboard-ln & Bitcoin Data Labs Ecosystem Brand
+   Official Brand Ecosystem Styles (Aligned with Bitcoin Data Labs & PlebDashboard)
    ========================================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 :root {
-    /* Brand Terracotta & Warmth (Artisanal, Organic Clay - Surgical Accent) */
+    /* Brand Terracotta & Warmth (Artisanal Organic Clay - Signature Accent) */
     --primary: #D47355;             /* Refined Terracotta */
     --primary-hover: #BF6245;       /* Deepened Terracotta */
     --primary-dark: #A95137;        /* Hearth Terracotta */
     --primary-light: #FBF2ED;       /* Whisper Terracotta Tint */
     --primary-border: #ECCDC1;      /* Soft Terracotta Border */
     --primary-wash-hover: #F3E6DE;  /* Elevated Warm Wash on Hover */
-    --accent-color: #D47355;
 
-    /* Deep Ink & Slate (Authoritative, Literary Anthropic Structure) */
+    /* Deep Ink & Slate (Authoritative Structure) */
     --secondary: #242D38;           /* Deep Charcoal Slate */
     --secondary-hover: #182029;     /* Deep Ink Hover */
     --secondary-light: #F0F3F6;     /* Slate Mist Tint */
@@ -43,13 +44,18 @@
     --tag-madder-bg: #FBEFEF;
     --tag-madder-border: #F3D2D2;
 
-    --tag-amber: #9A6715;           /* Harvest Amber (Hardware / Core / Mining) */
+    --tag-amber: #9A6715;           /* Harvest Amber (Hardware / Mining) */
     --tag-amber-bg: #FEF7EA;
     --tag-amber-border: #F5E2B8;
 
     --tag-heather: #583F7A;         /* Heather Purple (Lightning Network) */
     --tag-heather-bg: #F2EEF8;
     --tag-heather-border: #E2D9EE;
+
+    /* Header & Layout Specifics (Matches plebdashboard-ln) */
+    --header-height: 80px;
+    --max-width: 1160px;
+    --z-header: 1000;
 
     /* Shadows & Transitions */
     --shadow-sm: 0 1px 3px rgba(36, 45, 56, 0.05);
@@ -59,9 +65,6 @@
     --radius-md: 12px;
     --radius-lg: 16px;
     --radius-full: 9999px;
-
-    /* Global widths */
-    --max-content-width: 1160px;
 }
 
 /* Reset & Base */
@@ -80,20 +83,100 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+body.has-fixed-header {
+    padding-top: var(--header-height);
+}
+
+/* ==========================================================================
+   OFFICIAL BITCOIN DATA LABS HEADER (EXACTLY AS IN PLEBDASHBOARD-LN)
+   ========================================================================== */
+
+.top-bar {
+    background: rgba(250, 248, 245, 0.95);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: var(--z-header);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.25s ease;
+}
+
+.bdl-header-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+}
+
+.logos-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.app-logo {
+    display: flex;
+    align-items: center;
+}
+
+.app-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none !important;
+    letter-spacing: -0.01em;
+    transition: opacity 0.2s ease;
+}
+
+.app-name:hover {
+    opacity: 0.85;
+}
+
+.divider {
+    width: 1px;
+    height: 30px;
+    background: var(--border);
+    margin: 0 0.25rem;
+}
+
+.parent-logo {
+    display: flex;
+    align-items: center;
+}
+
+.parent-logo-img {
+    height: 40px;
+    width: auto;
+    display: block;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.parent-logo-img:hover {
+    transform: scale(1.03);
+    opacity: 0.95;
+}
+
+/* ==========================================================================
+   PAGE CONTENT & HERO
+   ========================================================================== */
+
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    max-width: var(--max-content-width);
+    max-width: var(--max-width);
     width: 100%;
     margin: 0 auto;
-    padding: 0 24px 80px 24px;
+    padding: 40px 24px 80px 24px;
 }
 
-/* Hero Section */
 .hero-section {
-    padding: 48px 0 32px 0;
-    text-align: left;
+    padding-bottom: 24px;
 }
 
 .brand-eyebrow {
@@ -345,4 +428,72 @@ body {
     margin: 0;
     color: var(--text-secondary);
     font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   OFFICIAL BITCOIN DATA LABS FOOTER (EXACTLY AS IN PLEBDASHBOARD-LN)
+   Left: Copyright | Middle: None | Right: Social Icons
+   ========================================================================== */
+
+.bdl-global-footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 0;
+    margin-top: auto;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.bdl-footer-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.bdl-footer-copyright {
+    text-align: left;
+}
+
+.bdl-footer-copyright a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.bdl-footer-socials {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.bdl-footer-socials a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 1.25rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.bdl-footer-socials a:hover {
+    color: var(--primary);
+    transform: scale(1.1);
+}
+
+@media screen and (max-width: 768px) {
+    .bdl-footer-inner {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    .bdl-footer-copyright {
+        text-align: center;
+    }
+    .bdl-footer-socials {
+        justify-content: center;
+    }
 }
