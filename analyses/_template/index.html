@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investigation Title | Bitcoin Data Labs Deep Dives</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#f7931a',
+              dark: '#0d1117',
+              card: '#161b22',
+              border: '#30363d',
+              muted: '#8b949e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans antialiased">
+  <!-- Top Navigation -->
+  <header class="border-b border-gray-800 bg-gray-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="../../index.html" class="flex items-center space-x-2 text-sm text-gray-400 hover:text-amber-400 transition-colors">
+          <span>&larr; Back to Deep Dives Hub</span>
+        </a>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          Bitcoin Data Labs
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-10">
+    <!-- Header Section -->
+    <div class="space-y-4">
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <span class="px-2 py-1 rounded bg-gray-800 text-gray-300">YYYY-MM-DD</span>
+        <span class="px-2 py-1 rounded bg-blue-900/40 text-blue-300 border border-blue-800/40">#bitcoin</span>
+        <span class="px-2 py-1 rounded bg-emerald-900/40 text-emerald-300 border border-emerald-800/40">#security</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        [Investigation Title]
+      </h1>
+      <p class="text-lg text-gray-400 leading-relaxed max-w-3xl">
+        Brief overview describing the event, anomaly, or security analysis explored in this deep dive.
+      </p>
+    </div>
+
+    <!-- Metric Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-5">
+        <div class="text-xs font-medium text-gray-400 uppercase tracking-wider">Metric 1</div>
+        <div class="mt-2 text-2xl font-bold text-amber-400">12,450 sats</div>
+        <div class="mt-1 text-xs text-gray-500">Benchmark comparison</div>
+      </div>
+      <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-5">
+        <div class="text-xs font-medium text-gray-400 uppercase tracking-wider">Affected Channels / Entities</div>
+        <div class="mt-2 text-2xl font-bold text-white">184</div>
+        <div class="mt-1 text-xs text-emerald-400">&plusmn;5% within range</div>
+      </div>
+      <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-5">
+        <div class="text-xs font-medium text-gray-400 uppercase tracking-wider">Analysis Status</div>
+        <div class="mt-2 text-2xl font-bold text-emerald-400">Verified</div>
+        <div class="mt-1 text-xs text-gray-500">Reproducible on-chain</div>
+      </div>
+    </div>
+
+    <!-- Chart / Visual Container -->
+    <section class="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4">
+      <h2 class="text-xl font-bold text-white">Visual Findings</h2>
+      <p class="text-sm text-gray-400">
+        Insert interactive charts (Chart.js, Plotly, Vega, or static SVG/canvas) here.
+      </p>
+      <div class="w-full h-72 border border-dashed border-gray-800 rounded-lg flex items-center justify-center bg-gray-950/50 text-gray-600 text-sm">
+        [Chart Canvas / Visualization Area]
+      </div>
+    </section>
+
+    <!-- Narrative / Breakdown -->
+    <section class="prose prose-invert max-w-none space-y-6">
+      <div class="bg-gray-900/60 border border-gray-800/80 rounded-xl p-6 space-y-4">
+        <h2 class="text-xl font-bold text-white">Detailed Breakdown</h2>
+        <p class="text-gray-300 leading-relaxed">
+          Provide detailed walkthrough of the transactions, log traces, or node behavior observed during the analysis.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-gray-800/60 mt-20 py-8 text-center text-xs text-gray-600">
+    &copy; 2026 Bitcoin Data Labs &bull; <a href="../../index.html" class="hover:text-amber-400 underline">Deep Dives Hub</a>
+  </footer>
+</body>
+</html>

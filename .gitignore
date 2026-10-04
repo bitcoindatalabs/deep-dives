@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node / Web build artifacts (if applicable)
+node_modules/
+dist/
+
+# Large / Raw Data Files (Keep git repo light < 1GB)
+# Raw data should not be committed to git. Use processed data (<25MB) or GH Releases.
+analyses/**/data/raw/*
+!analyses/**/data/raw/.gitkeep
+*.tar.gz
+*.zip
+*.sqlite3
+*.db
+*.parquet.tmp
