@@ -56,7 +56,7 @@ def main():
 
     print("Client labels …")
     labels = im.node_labels(refresh=args.refresh_labels)
-    dates = im.gossip_dates()
+    dates = [d for d in im.gossip_dates() if d >= WINDOW_START.replace("-", "")]   # gossip goes back to 2023
 
     # Q1 — outage (peer-disabled share toward each cohort) + cohort size from the same snapshots
     print(f"Outage metrics over {len(dates)} gossip days …")
