@@ -66,6 +66,10 @@ def main():
                                          "pct_disabled", "pct_cap_disabled"]]))
     write("outage_effect", records(im.outage_effect(daily)))
 
+    bynet = im.outage_by_network(labels, dates)
+    bynet = bynet[bynet["target"].isin(["CLN", "LND"]) & bynet["net"].isin(["tor-only", "both", "clearnet-only"])]
+    write("outage_by_transport", records(bynet[["date", "target", "net", "dirs", "pct_disabled"]]))
+
     panel = im.node_dark_panel(labels, "CLN", dates)
     write("cln_compliance_by_size", records(im.compliance_by_size(panel)))
     write("cln_recovery", records(im.recovery_curve(panel)))

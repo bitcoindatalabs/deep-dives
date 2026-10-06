@@ -181,7 +181,7 @@
       <p class="kicker">Context</p>
       <h2><i class="fas fa-timeline" style="color: var(--primary);"></i> What happened</h2>
       <ul class="timeline" id="timeline"></ul>
-      <p style="margin-top: 14px; font-size: 0.85rem;">Approximate dates are marked ≈. The BTCPay incident was an application-layer credential leak (macaroons), not an LND protocol bug.</p>
+      <p style="margin-top: 14px; font-size: 0.85rem;">Approximate dates are marked ≈. The Jul 10 event has no public advisory: we observed it in gossip — channels toward Tor-only nodes of every client were disabled at once. The BTCPay incident was an application-layer credential leak (macaroons), not an LND protocol bug.</p>
     </section>
 
     <!-- Q1 outage -->
@@ -197,12 +197,20 @@
       </div>
       <div class="small-multiples" id="outage-sm"></div>
       <details class="tableview"><summary>Table view</summary><div class="tablewrap" id="outage-table"></div></details>
+
+      <h3 style="font-size: 0.95rem; margin: 28px 0 4px 0; color: var(--text-primary);">It was Tor-reachable CLN nodes that went dark</h3>
+      <p style="font-size: 0.9rem;" id="transport-lede"></p>
+      <div class="legend">
+        <span><i class="ln" style="background: var(--c-cln);"></i> Toward CLN nodes</span>
+        <span><i class="ln" style="background: var(--c-lnd);"></i> Toward LND nodes</span>
+      </div>
+      <div class="small-multiples" id="transport-sm" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));"></div>
     </section>
 
     <!-- Compliance & recovery -->
     <section class="report-card">
       <p class="kicker">Q1 · Who complied, and how fast did they come back?</p>
-      <h2><i class="fas fa-rotate-left" style="color: var(--primary);"></i> Bigger operators went dark more; a fifth never came back</h2>
+      <h2><i class="fas fa-rotate-left" style="color: var(--primary);"></i> Bigger operators went dark more; a third were still dark five weeks later</h2>
       <div class="two-col">
         <div>
           <h3>Went dark after the shutdown call</h3>
@@ -215,7 +223,7 @@
           <div class="chart" id="recovery"></div>
         </div>
       </div>
-      <p style="margin-top: 14px; font-size: 0.85rem;">"Dark" = at least 80% of the channels toward the node disabled by peers, or the node gone from gossip.</p>
+      <p style="margin-top: 14px; font-size: 0.85rem;">"Dark" = at least 80% of the channels toward the node disabled by peers, or the node gone from gossip. Some nodes came back briefly and went dark again; counting only nodes that never reappeared even for a day, the share is lower (see the paper).</p>
       <details class="tableview"><summary>Table view</summary><div class="tablewrap" id="recovery-table"></div></details>
     </section>
 
@@ -329,7 +337,7 @@ python run.py --refresh-labels  # after client-inference rule changes</code></pr
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
   (async function () {
-    const FILES = ['meta', 'outage_daily', 'outage_effect', 'cln_compliance_by_size', 'cln_recovery', 'cohort_census',
+    const FILES = ['meta', 'outage_daily', 'outage_by_transport', 'outage_effect', 'cln_compliance_by_size', 'cln_recovery', 'cohort_census',
                    'closes_daily', 'mass_close_events', 'top_closers_aug', 'force_close_rates', 'spend_events_daily', 'fees_by_close_type'];
     const D = {};
     try {
@@ -459,10 +467,9 @@ python run.py --refresh-labels  # after client-inference rule changes</code></pr
       const max = niceMax(Math.max(...od.map(r => r[key])));
       const box = document.getElementById('outage-sm');
       box.innerHTML = '';
-      for (const c of CLIENTS) {
-        const div = document.createElement('div');
-        div.className = 'chart';
-        box.appendChild(div);
+      const divs = CLIENTS.map(() => { const d = document.createElement('div'); d.className = 'chart'; box.appendChild(d); return d; });
+      for (const [ci, c] of CLIENTS.entries()) {
+        const div = divs[ci];
         const W = Math.max(div.clientWidth, 300), H = 190, m = { l: 36, r: 12, t: 22, b: 22 };
         const s = svg(div, W, H);
         const g = el('g', {}, s);
@@ -515,6 +522,50 @@ python run.py --refresh-labels  # after client-inference rule changes</code></pr
     table('outage-table', [['Date', r => r.date], ['Client', r => r.target], ['Nodes', r => int(r.nodes)], ['Channels', r => int(r.dirs)],
       ['Disabled %', r => fmt(r.pct_disabled, 1)], ['Capacity BTC', r => fmt(r.cap_btc, 1)], ['Capacity disabled %', r => fmt(r.pct_cap_disabled, 1)]],
       od.filter(r => r.date >= '2026-08-15' && r.date <= '2026-09-10'));
+
+    // ---------- by transport ----------
+    const tr = D.outage_by_transport.filter(r => r.date >= '2026-07-01');
+    const trDates = [...new Set(tr.map(r => r.date))].sort();
+    const trAt = (t, n, d) => (tr.find(r => r.target === t && r.net === n && r.date === d) || {}).pct_disabled;
+    document.getElementById('transport-lede').innerHTML = `Split by how each target node is reachable. Tor-only LND nodes did not move on Aug 27 (${fmt(trAt('LND', 'tor-only', '2026-08-26'), 0)}% → ${fmt(trAt('LND', 'tor-only', '2026-08-27'), 0)}%), so this was not a Tor outage. But among CLN nodes, the ones reachable over Tor went dark and stayed dark (Tor-only ${fmt(trAt('CLN', 'tor-only', '2026-08-26'), 0)}% → ${fmt(trAt('CLN', 'tor-only', '2026-08-28'), 0)}%; Tor + clearnet ${fmt(trAt('CLN', 'both', '2026-08-26'), 0)}% → ${fmt(trAt('CLN', 'both', '2026-08-28'), 0)}%), while clearnet-only CLN nodes — often hosted servers — barely blinked. On Jul 10 the opposite happened: Tor-only nodes of every client lost their peers at once.`;
+    function drawTransport() {
+      const box = document.getElementById('transport-sm');
+      box.innerHTML = '';
+      const max = niceMax(Math.max(...tr.map(r => r.pct_disabled)));
+      const panels = [['tor-only', 'Tor-only nodes'], ['both', 'Tor + clearnet'], ['clearnet-only', 'Clearnet-only nodes']]
+        .map(([net, title]) => { const div = document.createElement('div'); div.className = 'chart'; box.appendChild(div); return [net, title, div]; });
+      for (const [net, title, div] of panels) {
+        const W = Math.max(div.clientWidth, 240), H = 170, m = { l: 34, r: 8, t: 22, b: 22 };
+        const s = svg(div, W, H), g = el('g', {}, s);
+        const X = timeScale(trDates, m.l, W - m.r), Y = v => H - m.b - v / max * (H - m.t - m.b);
+        const tt = el('text', { x: m.l, y: 13, class: 'panel-title' }, g); tt.textContent = title;
+        yGrid(g, m.l, W - m.r, Y, max, 2, v => v + '%');
+        monthTicks(g, trDates, X, H - 6);
+        incidentLines(g, trDates, X, m.t, H - m.b, i => i.date === '2026-07-10' || i.date === '2026-08-26');
+        const series = {};
+        for (const c of ['LND', 'CLN']) {
+          const rows = tr.filter(r => r.target === c && r.net === net).sort((a, b) => a.date < b.date ? -1 : 1);
+          series[c] = rows;
+          let d = '', prev = null;
+          for (const r of rows) {
+            const gap = prev && (parse(r.date) - parse(prev.date)) > 86400000 * 1.5;
+            d += `${!prev || gap ? 'M' : 'L'}${X(r.date).toFixed(1)},${Y(r.pct_disabled).toFixed(1)}`; prev = r;
+          }
+          el('path', { d, fill: 'none', stroke: COLOR[c], 'stroke-width': c === 'CLN' ? 2 : 1.5, 'stroke-linejoin': 'round' }, g);
+        }
+        const cross = el('line', { y1: m.t, y2: H - m.b, stroke: INK, 'stroke-width': 1, opacity: 0 }, g);
+        const hit = el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }, s);
+        hit.addEventListener('mousemove', ev => {
+          const pt = s.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+          const px = pt.matrixTransform(s.getScreenCTM().inverse()).x;
+          const d = trDates.reduce((a, b) => Math.abs(X(b) - px) < Math.abs(X(a) - px) ? b : a);
+          cross.setAttribute('x1', X(d)); cross.setAttribute('x2', X(d)); cross.setAttribute('opacity', 0.35);
+          const v = c => (series[c].find(r => r.date === d) || {});
+          showTip(`<b>${title} · ${fmtDay(parse(d))}</b><br><span class="tsw" style="background:${COLOR.CLN}"></span>CLN ${fmt(v('CLN').pct_disabled, 1)}% of ${int(v('CLN').dirs || 0)}<br><span class="tsw" style="background:${COLOR.LND}"></span>LND ${fmt(v('LND').pct_disabled, 1)}% of ${int(v('LND').dirs || 0)}`, ev);
+        });
+        hit.addEventListener('mouseleave', () => { cross.setAttribute('opacity', 0); hideTip(); });
+      }
+    }
 
     // ---------- compliance bars ----------
     function drawCompliance() {
@@ -819,7 +870,7 @@ python run.py --refresh-labels  # after client-inference rule changes</code></pr
     document.getElementById('generated').textContent = `Data generated ${meta.generated_utc}.`;
 
     // ---------- render & resize ----------
-    function drawAll() { drawOutage(); drawCompliance(); drawRecovery(); drawCloses(); drawRates(); drawMass(); drawWave(); drawHtlc(); drawCensus();
+    function drawAll() { drawOutage(); drawTransport(); drawCompliance(); drawRecovery(); drawCloses(); drawRates(); drawMass(); drawWave(); drawHtlc(); drawCensus();
       drawChange('nodechange', 'nodes', v => int(v) + ' nodes'); drawChange('capchange', 'cap_btc', v => fmt(v, 0) + ' BTC'); }
     drawAll();
     let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(drawAll, 150); });
