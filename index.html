@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deep Dives | Bitcoin Data Labs</title>
+  <title>Deep Dives — Bitcoin & Lightning, Measured | Bitcoin Data Labs</title>
+  <meta name="description" content="Data-first investigations into Bitcoin and Lightning: what actually happened on-chain and in gossip when something broke, changed, or looked strange.">
+
   
   <!-- Favicon (Bitcoin Data Labs </> Brand Mark) -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -44,13 +46,14 @@
   <main class="main-content">
     <section class="hero-section">
       <div class="brand-eyebrow">
-        <i class="fas fa-microscope"></i> Ad-Hoc Analytics & Incident Forensics
+        <i class="fas fa-microscope"></i> Bitcoin Data Labs · Deep Dives
       </div>
       <h1 class="hero-title">
-        Technical Forensics & <span class="highlight">Deep Dives</span>
+        What actually happened, <span class="highlight">measured</span>
       </h1>
       <p class="hero-description">
-        Ad-hoc investigative reports, incident forensics, node anomaly evaluations, and on-chain curiosities across Bitcoin and Lightning.
+        When something breaks, shifts, or looks strange in Bitcoin or Lightning, we go to the data — our own full node, daily gossip snapshots, every on-chain close — and write up what it shows.
+        Each deep dive ships its numbers, its caveats, and the code to reproduce them.
       </p>
 
       <!-- Search Input -->
@@ -75,28 +78,29 @@
          ═══════════════════════════════════════════════════════════════════════ -->
     <div id="cardsGrid" class="cards-grid">
       
-      <!-- Card: Lightning Network Macro Resilience Study -->
-      <article class="dive-card" data-tags="lightning,cln,lnd,btcpay,resilience,security,nodes,channels">
+      <!-- Card: The Summer Lightning Broke (a Little) -->
+      <article class="dive-card" data-tags="lightning,cln,lnd,eclair,ldk,btcpay,outage,force-close,security,client diversity,tabconf">
         <div>
           <div class="dive-card-header">
-            <span class="dive-date">August – October 2026</span>
+            <span class="dive-date">May – Oct 2026 · TABConf</span>
             <span class="dive-badge badge-lightning">Lightning</span>
           </div>
           <h2 class="dive-card-title">
             <a href="./analyses/2026-10-lightning-network-analysis/index.html" style="text-decoration: none; color: inherit;">
-              Lightning Network Macro Resilience Study
+              The Summer Lightning Broke (a Little)
             </a>
           </h2>
           <p class="dive-card-desc">
-            Empirical telemetry on network behavior following consecutive critical bugs across LND (BTCPay Server) and Core Lightning (CLN): quantifying force-close cascades, liquidity flight, and implementation patch velocity.
+            Every Lightning implementation shipped security fixes in the same ten weeks. When Core Lightning asked operators to go offline, 38% of channels toward CLN nodes went disabled overnight, and a quarter of the nodes that went dark were still dark five weeks later.
+            The big force-close spikes turned out to be single operators. Measured from daily gossip and every on-chain close.
           </p>
         </div>
         <div class="dive-card-footer">
           <div class="dive-tags">
-            <span class="dive-tag">#lightning</span>
             <span class="dive-tag">#cln</span>
             <span class="dive-tag">#lnd</span>
-            <span class="dive-tag">#security</span>
+            <span class="dive-tag">#force-closes</span>
+            <span class="dive-tag">#outage</span>
           </div>
           <a href="./analyses/2026-10-lightning-network-analysis/index.html" class="dive-action">
             <span>Explore</span> <i class="fas fa-arrow-right"></i>

@@ -3,21 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lightning Network Resilience & Vulnerability Analysis | Bitcoin Data Labs</title>
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="../../favicon.png">
+  <title>The Summer Lightning Broke (a Little) | Bitcoin Data Labs</title>
+  <meta name="description" content="How the Lightning Network absorbed the 2026 security wave: a measured Core Lightning outage, force-close waves, recovery, and cost — from daily gossip and our own Bitcoin node.">
 
-  <!-- Typography & Icons -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <!-- Bitcoin Data Labs Design System Stylesheet -->
   <link rel="stylesheet" href="../../shared/css/style.css">
 
   <style>
+    :root {
+      /* Client identity — validated (dataviz validate_palette.js, light, adjacent pairs).
+         CVD worst pair 7.8 → every series is direct-labeled or titled. */
+      --c-lnd: #2a78d6;
+      --c-cln: #D4603A;
+      --c-eclair: #1a9e6e;
+      --c-ldk: #4a3aa7;
+      /* Neutral (non-client) marks */
+      --ink-mark: #4A5563;
+      --ink-mark-light: #C4CBD3;
+      --grid: #EFEBE4;
+      --axis: #E5DFD5;
+    }
+
     .report-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -26,97 +36,108 @@
       margin-bottom: 24px;
       box-shadow: var(--shadow-sm);
     }
-
     .report-card h2 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin: 0 0 16px 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-size: 1.35rem; font-weight: 700; color: var(--text-primary);
+      margin: 0 0 8px 0; display: flex; align-items: center; gap: 10px;
     }
-
-    .report-card p {
-      color: var(--text-secondary);
-      line-height: 1.65;
-      margin: 0 0 16px 0;
-      font-size: 0.95rem;
+    .report-card .kicker {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px 0;
     }
+    .report-card p { color: var(--text-secondary); line-height: 1.65; margin: 0 0 14px 0; font-size: 0.95rem; max-width: 820px; }
+    .report-card p strong { color: var(--text-primary); }
 
     .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
-      margin-bottom: 20px;
-      transition: color 0.2s ease;
+      display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary);
+      text-decoration: none; font-size: 0.85rem; font-weight: 500; margin-bottom: 20px; transition: color 0.2s ease;
+    }
+    .back-link:hover { color: var(--primary); }
+
+    /* Stat tiles */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 0 0 24px 0; }
+    .stat {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 18px 20px; box-shadow: var(--shadow-sm);
+    }
+    .stat .v { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1.1; }
+    .stat .v small { font-size: 1rem; font-weight: 600; color: var(--text-secondary); }
+    .stat .l { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; margin-top: 6px; }
+    .stat .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: 1px; }
+
+    /* Timeline */
+    .timeline { list-style: none; margin: 8px 0 0 0; padding: 0; display: grid; gap: 10px; }
+    .timeline li { display: grid; grid-template-columns: 92px 1fr; gap: 14px; align-items: baseline; font-size: 0.92rem; color: var(--text-secondary); }
+    .timeline .d { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+    .timeline .tag { font-size: 0.7rem; font-weight: 600; padding: 1px 8px; border-radius: var(--radius-full); margin-left: 6px; border: 1px solid var(--border); color: var(--text-secondary); white-space: nowrap; }
+
+    /* Chart chrome */
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 14px 0; }
+    .seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+    .seg button {
+      font: inherit; font-size: 0.82rem; font-weight: 600; padding: 6px 12px; border: 0; background: var(--surface);
+      color: var(--text-secondary); cursor: pointer;
+    }
+    .seg button + button { border-left: 1px solid var(--border); }
+    .seg button[aria-pressed="true"] { background: var(--primary-light); color: var(--primary-dark); }
+    .seg button:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+
+    .chart { position: relative; width: 100%; }
+    .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .chart text { font-family: 'Inter', sans-serif; fill: var(--text-muted); font-size: 11px; }
+    .chart .tick text { font-variant-numeric: tabular-nums; }
+    .chart .panel-title { fill: var(--text-primary); font-weight: 700; font-size: 12.5px; }
+    .chart .annot { fill: var(--text-secondary); font-size: 11px; }
+    .chart .val { fill: var(--text-primary); font-weight: 600; font-size: 11.5px; }
+
+    .small-multiples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; }
+    .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+    .two-col h3 { font-size: 0.95rem; margin: 0 0 4px 0; color: var(--text-primary); }
+    .two-col .sub { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 8px 0; }
+    @media (max-width: 760px) {
+      .small-multiples, .two-col { grid-template-columns: 1fr; }
+      .report-card { padding: 22px 18px; }
     }
 
-    .back-link:hover {
-      color: var(--primary);
-    }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.82rem; color: var(--text-secondary); margin: 2px 0 8px 0; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .legend i.ln { width: 16px; height: 2px; display: inline-block; }
 
-    .hypothesis-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-      margin: 20px 0;
+    .tooltip {
+      position: fixed; pointer-events: none; z-index: 2000; background: var(--secondary); color: #fff;
+      font-size: 0.8rem; line-height: 1.45; padding: 8px 10px; border-radius: 8px; box-shadow: var(--shadow-md);
+      max-width: 260px; font-variant-numeric: tabular-nums;
     }
+    .tooltip b { font-weight: 700; }
+    .tooltip .tsw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
 
-    .hypothesis-item {
-      background: var(--bg-primary);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 18px;
+    .callout {
+      border-left: 3px solid var(--primary); background: var(--primary-light); padding: 12px 16px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 0.9rem; color: var(--text-secondary); margin: 14px 0 0 0;
+      line-height: 1.6; max-width: 820px;
     }
+    .callout strong { color: var(--text-primary); }
 
-    .hypothesis-item h3 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin: 0 0 8px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    details.tableview { margin-top: 12px; }
+    details.tableview summary { cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+    details.tableview summary:hover { color: var(--primary); }
+    .tablewrap { overflow-x: auto; max-height: 360px; margin-top: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); }
+    table.data { border-collapse: collapse; font-size: 0.8rem; width: 100%; }
+    table.data th, table.data td { padding: 6px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--border-subtle); font-variant-numeric: tabular-nums; }
+    table.data th { position: sticky; top: 0; background: var(--bg-secondary); color: var(--text-primary); font-weight: 600; }
+    table.data td:first-child, table.data th:first-child { text-align: left; }
+    table.data td { color: var(--text-secondary); }
 
-    .hypothesis-item p {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-      margin: 0;
+    ul.plain { margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; max-width: 820px; }
+    pre.cmd {
+      background: var(--bg-primary); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-sm);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text-primary); overflow-x: auto;
     }
-
-    .chart-box {
-      width: 100%;
-      height: 320px;
-      background: var(--bg-primary);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius-md);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-top: 16px;
-      gap: 8px;
-    }
-
-    .chart-box i {
-      font-size: 2rem;
-      color: var(--primary);
-      opacity: 0.7;
-    }
+    .loading { color: var(--text-muted); font-size: 0.9rem; padding: 40px 0; text-align: center; }
   </style>
 </head>
 <body class="has-fixed-header">
 
-  <!-- Official Bitcoin Data Labs Header (Matches plebdashboard-ln) -->
   <div class="top-bar app-header-main">
     <div class="bdl-header-container">
       <div class="logos-container">
@@ -134,102 +155,165 @@
   </div>
 
   <main class="main-content">
-    <a href="../../index.html" class="back-link">
-      <i class="fas fa-arrow-left"></i> Back to Deep Dives Hub
-    </a>
+    <a href="../../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Deep Dives Hub</a>
 
-    <!-- Header Section -->
-    <div style="margin-bottom: 32px;">
-      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+    <div style="margin-bottom: 28px;">
+      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
         <span class="dive-badge badge-lightning">Lightning</span>
         <span class="dive-badge badge-security">Security</span>
-        <span style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">August – October 2026</span>
+        <span class="dive-badge badge-onchain">On-chain</span>
+        <span style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">May – October 2026 · TABConf 2026</span>
       </div>
-      <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 12px 0; letter-spacing: -0.02em;">
-        Lightning Network Resilience & Vulnerability Impact Analysis
+      <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 12px 0; letter-spacing: -0.02em; line-height: 1.15;">
+        The Summer Lightning Broke (a Little)
       </h1>
       <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 820px; line-height: 1.6; margin: 0;">
-        Empirical evaluation of network behavior and liquidity dynamics across the recent consecutive software vulnerabilities in <strong>LND / BTCPay Server</strong> and <strong>Core Lightning (CLN)</strong>.
+        Every Lightning implementation shipped security fixes in the same ten weeks — but the bugs were different.
+        We measured how the network absorbed them: one client cohort went dark on command, peers force-closed on it,
+        most of it came back. Everything below comes from daily gossip snapshots and our own Bitcoin node.
       </p>
     </div>
 
-    <!-- Overview & Scope Card -->
+    <div class="stat-grid" id="stats"><div class="loading">Loading measurements…</div></div>
+
+    <!-- Timeline -->
     <section class="report-card">
-      <h2><i class="fas fa-bullseye" style="color: var(--primary);"></i> Analysis Vision & Problem Statement</h2>
-      <p>
-        Over the past 60 days, the Lightning ecosystem weathered critical bug disclosures affecting both major implementations. This deep dive moves beyond social speculation to deliver <strong>hard on-chain and gossip telemetry</strong> on whether the network experienced cascading force-closes, liquidity flight, or whether node diversity effectively cushioned the impact.
-      </p>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
-        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary-border); padding: 6px 14px; border-radius: var(--radius-sm);">
-          <i class="fas fa-microscope"></i> Research Scope Defined &bull; Pipeline In Progress
-        </span>
-      </div>
+      <p class="kicker">Context</p>
+      <h2><i class="fas fa-timeline" style="color: var(--primary);"></i> What happened</h2>
+      <ul class="timeline" id="timeline"></ul>
+      <p style="margin-top: 14px; font-size: 0.85rem;">Approximate dates are marked ≈. The BTCPay incident was an application-layer credential leak (macaroons), not an LND protocol bug.</p>
     </section>
 
-    <!-- Key Research Questions & Hypotheses -->
+    <!-- Q1 outage -->
     <section class="report-card">
-      <h2><i class="fas fa-microscope" style="color: var(--primary);"></i> Core Investigative Dimensions</h2>
-      <div class="hypothesis-grid">
-        <div class="hypothesis-item">
-          <h3><i class="fas fa-random" style="color: var(--tag-madder);"></i> Force-Close Cascades</h3>
-          <p>Did unilateral channel closures spike during the 72-hour disclosure windows relative to the 30-day baseline?</p>
-        </div>
-        <div class="hypothesis-item">
-          <h3><i class="fas fa-coins" style="color: var(--tag-amber);"></i> Liquidity Migration</h3>
-          <p>Did total network capacity drop, or did liquidity reallocate towards unaffected implementations (Eclair, LDK)?</p>
-        </div>
-        <div class="hypothesis-item">
-          <h3><i class="fas fa-tachometer-alt" style="color: var(--tag-heather);"></i> Patch Velocity</h3>
-          <p>What was the adoption half-life ($t_{1/2}$) of patched releases among tier-1 routing hubs vs. pleb nodes?</p>
-        </div>
-        <div class="hypothesis-item">
-          <h3><i class="fas fa-fire" style="color: var(--primary);"></i> On-Chain Fee Footprint</h3>
-          <p>What was the on-chain fee burden consumed by emergency sweeps and closure transactions during the peaks?</p>
+      <p class="kicker">Q1 · Did the outage show up?</p>
+      <h2><i class="fas fa-power-off" style="color: var(--primary);"></i> Core Lightning went dark — on command</h2>
+      <p id="outage-lede">Share of channels pointing at each client's nodes that their peers marked <em>disabled</em>, daily. A node that goes offline can't announce anything; its peers disable their side of the channel. Other clients are the control group.</p>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Weighting">
+          <button type="button" data-w="count" aria-pressed="true">By channel count</button>
+          <button type="button" data-w="cap" aria-pressed="false">By capacity</button>
         </div>
       </div>
+      <div class="small-multiples" id="outage-sm"></div>
+      <details class="tableview"><summary>Table view</summary><div class="tablewrap" id="outage-table"></div></details>
     </section>
 
-    <!-- Visual Dashboard Pipeline (Execution Stage) -->
+    <!-- Compliance & recovery -->
     <section class="report-card">
-      <h2><i class="fas fa-chart-area" style="color: var(--primary);"></i> Telemetry & Interactive Visualizations</h2>
-      <p>
-        The data extraction pipeline (<code>run.py</code>) will ingest historical gossip dumps and on-chain spend scripts to populate the following interactive charts:
-      </p>
-
-      <div class="chart-box">
-        <i class="fas fa-chart-bar"></i>
-        <strong style="color: var(--text-primary);">Channel Closures Time-Series: Mutual vs. Unilateral Force-Closes</strong>
-        <span>[Data extraction pipeline in progress — awaiting coding agent execution]</span>
+      <p class="kicker">Q1 · Who complied, and how fast did they come back?</p>
+      <h2><i class="fas fa-rotate-left" style="color: var(--primary);"></i> Bigger operators went dark more; a fifth never came back</h2>
+      <div class="two-col">
+        <div>
+          <h3>Went dark after the shutdown call</h3>
+          <p class="sub">CLN nodes by capacity quintile (Aug 25 → Aug 28)</p>
+          <div class="chart" id="compliance"></div>
+        </div>
+        <div>
+          <h3>Still dark, days after Aug 26</h3>
+          <p class="sub" id="recovery-sub">CLN nodes that went dark on Aug 27</p>
+          <div class="chart" id="recovery"></div>
+        </div>
       </div>
-
-      <div class="chart-box" style="margin-top: 20px;">
-        <i class="fas fa-chart-line"></i>
-        <strong style="color: var(--text-primary);">Node Implementation Version Migration Curves (S-Curves)</strong>
-        <span>[Adoption velocity across LND & CLN public node fleets]</span>
-      </div>
+      <p style="margin-top: 14px; font-size: 0.85rem;">"Dark" = at least 80% of the channels toward the node disabled by peers, or the node gone from gossip.</p>
+      <details class="tableview"><summary>Table view</summary><div class="tablewrap" id="recovery-table"></div></details>
     </section>
 
-    <!-- Methodology & Reproducibility -->
+    <!-- Q2 closes -->
     <section class="report-card">
-      <h2><i class="fas fa-terminal" style="color: var(--primary);"></i> Pipeline Architecture</h2>
-      <p>
-        All metrics are reproducible via Python extraction scripts in this directory:
-      </p>
-      <pre style="background: var(--bg-primary); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-primary); overflow-x: auto;"><code># 1. Run local data extraction pipeline
-python run.py
+      <p class="kicker">Q2 · Did the incidents cause a closing wave?</p>
+      <h2><i class="fas fa-link-slash" style="color: var(--primary);"></i> The big force-close spikes were single operators — but CLN's peers did force-close</h2>
+      <p>Every force close since May, read from the blockchain. Days when one node was party to 20+ force closes are <strong>mass-close events</strong>: an operator closing many channels at once. Read naively, they look like incidents.</p>
+      <div class="legend">
+        <span><i class="sw" style="background: var(--ink-mark);"></i> Organic force closes</span>
+        <span><i class="sw" style="background: var(--ink-mark-light);"></i> Mass-close events (one node, 20+ in a day)</span>
+        <span><i class="ln" style="background: var(--primary);"></i> Incident</span>
+      </div>
+      <div class="chart" id="closes"></div>
+      <div class="callout" id="closes-callout"></div>
+      <div class="two-col" style="margin-top: 24px;">
+        <div>
+          <h3>Organic force-close rate, Aug 26 – Sep 8 vs. Jul 1 – Aug 25</h3>
+          <p class="sub">Per 1,000 open channels involving each client · 1.0× = no change</p>
+          <div class="chart" id="rates"></div>
+        </div>
+        <div>
+          <h3>Mass-close events, by client of the node at the center</h3>
+          <p class="sub">May 1 – Oct 5, 2026</p>
+          <div class="chart" id="mass"></div>
+        </div>
+      </div>
+      <h3 style="font-size: 0.95rem; margin: 28px 0 4px 0; color: var(--text-primary);">Who drove the early-August closing wave</h3>
+      <p class="sub" style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 8px 0;" id="wave-sub"></p>
+      <div class="legend">
+        <span><i class="sw" style="background: var(--ink-mark-light);"></i> Cooperative closes</span>
+        <span><i class="sw" style="background: var(--ink-mark);"></i> Force closes</span>
+      </div>
+      <div class="chart" id="wave"></div>
+      <details class="tableview"><summary>Table view — all mass-close events</summary><div class="tablewrap" id="mass-table"></div></details>
+      <details class="tableview"><summary>Table view — daily closes</summary><div class="tablewrap" id="closes-table"></div></details>
+    </section>
 
-# 2. Output datasets stored in
-data/processed/resilience_summary.json</code></pre>
+    <!-- Q2 resolution -->
+    <section class="report-card">
+      <p class="kicker">Q2 · Was anything stolen on-chain?</p>
+      <h2><i class="fas fa-shield-halved" style="color: var(--primary);"></i> No justice transactions in the incident window</h2>
+      <p id="breach-lede"></p>
+      <div class="legend">
+        <span><i class="sw" style="background: var(--ink-mark);"></i> HTLCs resolved by timeout</span>
+        <span><i class="sw" style="background: var(--ink-mark-light);"></i> HTLCs resolved with preimage</span>
+      </div>
+      <div class="chart" id="htlc"></div>
+      <details class="tableview"><summary>Table view</summary><div class="tablewrap" id="htlc-table"></div></details>
+    </section>
+
+    <!-- Q3 capital -->
+    <section class="report-card">
+      <p class="kicker">Q3 · Did capital move?</p>
+      <h2><i class="fas fa-scale-unbalanced" style="color: var(--primary);"></i> CLN lost a fifth of its public nodes and capacity; client shares barely moved</h2>
+      <p id="census-lede"></p>
+      <div class="legend" id="census-legend"></div>
+      <div class="chart" id="census"></div>
+      <div class="two-col" style="margin-top: 20px;">
+        <div>
+          <h3>Public nodes, change Aug 1 → latest</h3>
+          <p class="sub">Nodes with at least one public channel</p>
+          <div class="chart" id="nodechange"></div>
+        </div>
+        <div>
+          <h3>Node capacity, change Aug 1 → latest</h3>
+          <p class="sub">BTC in public channels, both endpoints counted</p>
+          <div class="chart" id="capchange"></div>
+        </div>
+      </div>
+      <details class="tableview"><summary>Table view</summary><div class="tablewrap" id="census-table"></div></details>
+    </section>
+
+    <!-- Q5 cost -->
+    <section class="report-card">
+      <p class="kicker">Q5 · What did it cost?</p>
+      <h2><i class="fas fa-coins" style="color: var(--primary);"></i> Force closes cost ~6× a cooperative close — in sats, not bitcoins</h2>
+      <p id="fees-lede"></p>
+      <div class="tablewrap" id="fees-table" style="max-height: none;"></div>
+    </section>
+
+    <!-- Method -->
+    <section class="report-card">
+      <p class="kicker">Method & limits</p>
+      <h2><i class="fas fa-flask" style="color: var(--primary);"></i> How we measured it</h2>
+      <ul class="plain" id="method"></ul>
+      <ul class="plain" id="caveats" style="margin-top: 10px;"></ul>
+      <pre class="cmd"><code># Reproduce (requires the Bitcoin Data Labs data lake)
+python run.py                   # → data/processed/*.json
+python run.py --refresh-labels  # after client-inference rule changes</code></pre>
+      <p style="font-size: 0.85rem;" id="generated"></p>
     </section>
   </main>
 
-  <!-- Official Bitcoin Data Labs Footer (Matches plebdashboard-ln) -->
   <footer class="bdl-global-footer">
     <div class="bdl-footer-inner">
       <div class="bdl-footer-copyright">
-        <p style="margin: 0;">
-          © <span id="footer-year">2026</span> <a href="https://bitcoindatalabs.org" target="_blank">Bitcoin Data Labs</a>. All rights reserved.
-        </p>
+        <p style="margin: 0;">© <span id="footer-year">2026</span> <a href="https://bitcoindatalabs.org" target="_blank">Bitcoin Data Labs</a>. All rights reserved.</p>
       </div>
       <div class="bdl-footer-socials">
         <a href="https://github.com/bitcoindatalabs/Bitcoin-Data-Labs" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
@@ -239,8 +323,507 @@ data/processed/resilience_summary.json</code></pre>
     </div>
   </footer>
 
+  <div class="tooltip" id="tip" hidden></div>
+
   <script>
-    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  (async function () {
+    const FILES = ['meta', 'outage_daily', 'outage_effect', 'cln_compliance_by_size', 'cln_recovery', 'cohort_census',
+                   'closes_daily', 'mass_close_events', 'top_closers_aug', 'force_close_rates', 'spend_events_daily', 'fees_by_close_type'];
+    const D = {};
+    try {
+      await Promise.all(FILES.map(async f => { D[f] = await (await fetch(`data/processed/${f}.json`)).json(); }));
+    } catch (e) {
+      document.getElementById('stats').innerHTML = '<div class="loading">Could not load data/processed/*.json — serve this folder over HTTP.</div>';
+      return;
+    }
+
+    // ---------- constants & helpers ----------
+    const CLIENTS = ['LND', 'CLN', 'Eclair', 'LDK'];
+    const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const COLOR = { LND: css('--c-lnd'), CLN: css('--c-cln'), Eclair: css('--c-eclair'), LDK: css('--c-ldk') };
+    const INK = css('--ink-mark'), INK_L = css('--ink-mark-light'), GRID = css('--grid'), AXIS = css('--axis'), PRIMARY = css('--primary');
+    const NS = 'http://www.w3.org/2000/svg';
+    const parse = s => new Date(s + 'T00:00:00Z');
+    const fmtDay = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    const fmt = (v, p = 1) => v == null || isNaN(v) ? '–' : Number(v).toLocaleString('en-US', { minimumFractionDigits: p, maximumFractionDigits: p });
+    const int = v => Number(v).toLocaleString('en-US');
+    const byDate = (rows, d) => rows.find(r => r.date === d);
+    const meta = D.meta;
+    const incidents = meta.incidents;
+
+    function el(tag, attrs = {}, parent) {
+      const e = document.createElementNS(NS, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (parent) parent.appendChild(e);
+      return e;
+    }
+    function svg(container, w, h) {
+      container.innerHTML = '';
+      return el('svg', { viewBox: `0 0 ${w} ${h}`, role: 'img' }, container);
+    }
+    function niceMax(v) {
+      const p = Math.pow(10, Math.floor(Math.log10(v || 1)));
+      for (const m of [1, 1.25, 1.5, 2, 2.5, 5, 10]) if (m * p >= v) return m * p;
+      return 10 * p;
+    }
+    // Rounded-top bar path anchored to the baseline (4px data-end radius)
+    function barPath(x, y, w, h, r = 4) {
+      if (h <= 0) return '';
+      r = Math.min(r, w / 2, h);
+      return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+    }
+
+    const tip = document.getElementById('tip');
+    function showTip(html, ev) {
+      tip.innerHTML = html; tip.hidden = false;
+      const pad = 14, r = tip.getBoundingClientRect();
+      let x = ev.clientX + pad, y = ev.clientY + pad;
+      if (x + r.width > window.innerWidth - 8) x = ev.clientX - r.width - pad;
+      if (y + r.height > window.innerHeight - 8) y = ev.clientY - r.height - pad;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    }
+    const hideTip = () => { tip.hidden = true; };
+
+    function table(container, cols, rows) {
+      const h = cols.map(c => `<th>${c[0]}</th>`).join('');
+      const b = rows.map(r => '<tr>' + cols.map(c => `<td>${c[1](r)}</td>`).join('') + '</tr>').join('');
+      document.getElementById(container).innerHTML = `<table class="data"><thead><tr>${h}</tr></thead><tbody>${b}</tbody></table>`;
+    }
+
+    // Generic time axis + incident markers
+    function timeScale(dates, x0, x1) {
+      const t0 = parse(dates[0]).getTime(), t1 = parse(dates[dates.length - 1]).getTime();
+      return d => x0 + (parse(d).getTime() - t0) / (t1 - t0 || 1) * (x1 - x0);
+    }
+    function monthTicks(g, dates, X, y, every = 1) {
+      const seen = new Set();
+      let i = 0;
+      for (const d of dates) {
+        const m = d.slice(0, 7);
+        if (seen.has(m) || d.slice(8) !== '01') continue;
+        seen.add(m);
+        if (i++ % every) continue;
+        const t = el('text', { x: X(d), y, 'text-anchor': 'middle' }, g);
+        t.textContent = parse(d).toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+      }
+    }
+    function incidentLines(g, dates, X, y0, y1, clientFilter) {
+      for (const inc of incidents) {
+        if (inc.date < dates[0] || inc.date > dates[dates.length - 1]) continue;
+        if (clientFilter && !clientFilter(inc)) continue;
+        el('line', { x1: X(inc.date), x2: X(inc.date), y1: y0, y2: y1, stroke: PRIMARY, 'stroke-width': 1, opacity: 0.55 }, g);
+      }
+    }
+    function yGrid(g, x0, x1, Y, max, steps, fmtTick) {
+      for (let i = 0; i <= steps; i++) {
+        const v = max * i / steps, y = Y(v);
+        el('line', { x1: x0, x2: x1, y1: y, y2: y, stroke: i ? GRID : AXIS, 'stroke-width': 1 }, g);
+        const t = el('text', { x: x0 - 6, y: y + 3.5, 'text-anchor': 'end', class: 'tick' }, g);
+        t.textContent = fmtTick(v);
+      }
+    }
+
+    // ---------- stat tiles ----------
+    const eff = Object.fromEntries(D.outage_effect.map(r => [r.target, r]));
+    const rec = D.cln_recovery;
+    const recLast = rec[rec.length - 1];
+    const rates = Object.fromEntries(D.force_close_rates.map(r => [r.cohort, r]));
+    const winStart = '2026-08-26';
+    const breachTotal = D.spend_events_daily.reduce((s, r) => s + (r.to_local_revocation_breach || 0) + (r.htlc_revocation_breach || 0), 0);
+    const breachWindow = D.spend_events_daily.filter(r => r.date >= '2026-07-15').reduce((s, r) => s + (r.to_local_revocation_breach || 0) + (r.htlc_revocation_breach || 0), 0);
+    const fees = Object.fromEntries(D.fees_by_close_type.map(r => [r.close_type, r]));
+    const sw = c => `<span class="swatch" style="background:${COLOR[c]}"></span>`;
+    document.getElementById('stats').innerHTML = `
+      <div class="stat"><div class="v">${fmt(eff.CLN.pct_disabled_peak, 0)}<small>%</small></div>
+        <div class="l">${sw('CLN')}of channels toward CLN nodes disabled on Aug 27 — normally ${fmt(eff.CLN.pct_disabled_base, 0)}%. Other clients flat.</div></div>
+      <div class="stat"><div class="v">${fmt(100 * recLast.share_still_dark, 0)}<small>%</small></div>
+        <div class="l">${sw('CLN')}of the ${recLast.cohort} CLN nodes that went dark were still dark ${recLast.day} days later.</div></div>
+      <div class="stat"><div class="v">${fmt(rates.CLN.ratio_vs_LND_only, 1)}<small>×</small></div>
+        <div class="l">${sw('CLN')}organic force-close rate on CLN channels after the shutdown call, relative to LND-only channels.</div></div>
+      <div class="stat"><div class="v">${breachWindow}</div>
+        <div class="l">justice (breach-penalty) transactions since mid-July. ${breachTotal} in all of May–Oct.</div></div>`;
+
+    // ---------- timeline ----------
+    document.getElementById('timeline').innerHTML = incidents.map(i => `
+      <li><span class="d">${i.approx ? '≈ ' : ''}${fmtDay(parse(i.date))}</span>
+      <span>${i.label}<span class="tag">${i.client === 'all' ? 'all clients' : i.client}</span></span></li>`).join('');
+
+    // ---------- Q1 small multiples ----------
+    const od = D.outage_daily;
+    const odDates = [...new Set(od.map(r => r.date))].sort();
+    let weight = 'count';
+    function drawOutage() {
+      const key = weight === 'count' ? 'pct_disabled' : 'pct_cap_disabled';
+      const max = niceMax(Math.max(...od.map(r => r[key])));
+      const box = document.getElementById('outage-sm');
+      box.innerHTML = '';
+      for (const c of CLIENTS) {
+        const div = document.createElement('div');
+        div.className = 'chart';
+        box.appendChild(div);
+        const W = Math.max(div.clientWidth, 300), H = 190, m = { l: 36, r: 12, t: 22, b: 22 };
+        const s = svg(div, W, H);
+        const g = el('g', {}, s);
+        const X = timeScale(odDates, m.l, W - m.r), Y = v => H - m.b - v / max * (H - m.t - m.b);
+        const tt = el('text', { x: m.l, y: 13, class: 'panel-title' }, g);
+        tt.textContent = c;
+        el('rect', { x: m.l + c.length * 8.4 + 6, y: 4, width: 10, height: 10, rx: 3, fill: COLOR[c] }, g);
+        yGrid(g, m.l, W - m.r, Y, max, 4, v => v + '%');
+        monthTicks(g, odDates, X, H - 6);
+        incidentLines(g, odDates, X, m.t, H - m.b, i => i.client === c || i.client === 'all');
+        const rows = od.filter(r => r.target === c).sort((a, b) => a.date < b.date ? -1 : 1);
+        // break the line at gossip gaps (> 1 day)
+        let dpath = '', prev = null;
+        for (const r of rows) {
+          const gap = prev && (parse(r.date) - parse(prev.date)) > 86400000 * 1.5;
+          dpath += `${!prev || gap ? 'M' : 'L'}${X(r.date).toFixed(1)},${Y(r[key]).toFixed(1)}`;
+          prev = r;
+        }
+        el('path', { d: dpath, fill: 'none', stroke: COLOR[c], 'stroke-width': 2, 'stroke-linejoin': 'round' }, g);
+        // label the peak for the panel that matters
+        const pk = rows.reduce((a, b) => b[key] > a[key] ? b : a, rows[0]);
+        if (c === 'CLN') {
+          const nearEdge = X(pk.date) > W - m.r - 110;
+          const t = el('text', { x: X(pk.date) + (nearEdge ? -6 : 6), y: Y(pk[key]) + 4, class: 'val', 'text-anchor': nearEdge ? 'end' : 'start' }, g);
+          t.textContent = `${fmt(pk[key], 1)}% · ${fmtDay(parse(pk.date))}`;
+        }
+        // hover layer: crosshair + dot
+        const cross = el('line', { y1: m.t, y2: H - m.b, stroke: INK, 'stroke-width': 1, opacity: 0 }, g);
+        const dot = el('circle', { r: 4.5, fill: COLOR[c], stroke: '#fff', 'stroke-width': 2, opacity: 0 }, g);
+        const hit = el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }, s);
+        hit.addEventListener('mousemove', ev => {
+          const pt = s.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+          const p = pt.matrixTransform(s.getScreenCTM().inverse());
+          let best = rows[0], bd = Infinity;
+          for (const r of rows) { const d = Math.abs(X(r.date) - p.x); if (d < bd) { bd = d; best = r; } }
+          cross.setAttribute('x1', X(best.date)); cross.setAttribute('x2', X(best.date)); cross.setAttribute('opacity', 0.35);
+          dot.setAttribute('cx', X(best.date)); dot.setAttribute('cy', Y(best[key])); dot.setAttribute('opacity', 1);
+          const inc = incidents.find(i => i.date === best.date);
+          showTip(`<b>${c} · ${fmtDay(parse(best.date))}</b><br>${fmt(best.pct_disabled, 1)}% of ${int(best.dirs)} channels disabled<br>${fmt(best.pct_cap_disabled, 1)}% of ${fmt(best.cap_btc, 0)} BTC<br>${int(best.nodes)} nodes${inc ? `<br><span style="opacity:.8">${inc.label}</span>` : ''}`, ev);
+        });
+        hit.addEventListener('mouseleave', () => { cross.setAttribute('opacity', 0); dot.setAttribute('opacity', 0); hideTip(); });
+      }
+    }
+    document.querySelectorAll('.seg button[data-w]').forEach(b => b.addEventListener('click', () => {
+      weight = b.dataset.w;
+      document.querySelectorAll('.seg button[data-w]').forEach(x => x.setAttribute('aria-pressed', x === b));
+      drawOutage();
+    }));
+    document.getElementById('outage-lede').innerHTML += ` On Aug 27 the CLN share jumped <strong>${fmt(eff.CLN.pct_disabled_z, 0)} standard deviations</strong> above its Aug 1–25 baseline (by capacity: ${fmt(eff.CLN.pct_cap_disabled_base, 1)}% → ${fmt(eff.CLN.pct_cap_disabled_peak, 1)}%). LND, Eclair and LDK did not move.`;
+    table('outage-table', [['Date', r => r.date], ['Client', r => r.target], ['Nodes', r => int(r.nodes)], ['Channels', r => int(r.dirs)],
+      ['Disabled %', r => fmt(r.pct_disabled, 1)], ['Capacity BTC', r => fmt(r.cap_btc, 1)], ['Capacity disabled %', r => fmt(r.pct_cap_disabled, 1)]],
+      od.filter(r => r.date >= '2026-08-15' && r.date <= '2026-09-10'));
+
+    // ---------- compliance bars ----------
+    function drawCompliance() {
+      const div = document.getElementById('compliance');
+      const rows = D.cln_compliance_by_size;
+      const W = Math.max(div.clientWidth, 280), H = 220, m = { l: 36, r: 8, t: 18, b: 40 };
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const max = niceMax(Math.max(...rows.map(r => r.pct_went_dark)));
+      const Y = v => H - m.b - v / max * (H - m.t - m.b);
+      yGrid(g, m.l, W - m.r, Y, max, 4, v => v + '%');
+      const bw = (W - m.l - m.r) / rows.length;
+      rows.forEach((r, i) => {
+        const x = m.l + i * bw + 2, w = bw - 4, y = Y(r.pct_went_dark);
+        const p = el('path', { d: barPath(x + w * 0.15, y, w * 0.7, H - m.b - y), fill: COLOR.CLN }, g);
+        const v = el('text', { x: x + w / 2, y: y - 5, 'text-anchor': 'middle', class: 'val' }, g); v.textContent = fmt(r.pct_went_dark, 0) + '%';
+        const t = el('text', { x: x + w / 2, y: H - m.b + 15, 'text-anchor': 'middle' }, g); t.textContent = r.size_bin;
+        const t2 = el('text', { x: x + w / 2, y: H - m.b + 28, 'text-anchor': 'middle' }, g);
+        t2.textContent = r.size_bin === 'Q1' ? 'smallest' : r.size_bin === 'Q5' ? 'largest' : '';
+        const hit = el('rect', { x: m.l + i * bw, y: m.t, width: bw, height: H - m.t - m.b, fill: 'transparent' }, s);
+        hit.addEventListener('mousemove', ev => showTip(`<b>${r.size_bin}</b> · ${fmt(r.min_cap_btc, 3)}–${fmt(r.max_cap_btc, 3)} BTC<br>${r.went_dark} of ${r.nodes} nodes went dark (${fmt(r.pct_went_dark, 1)}%)`, ev));
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    }
+
+    // ---------- recovery curve ----------
+    function drawRecovery() {
+      const div = document.getElementById('recovery');
+      const W = Math.max(div.clientWidth, 280), H = 220, m = { l: 36, r: 12, t: 18, b: 40 };
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const maxDay = Math.max(...rec.map(r => r.day));
+      const X = d => m.l + d / maxDay * (W - m.l - m.r), Y = v => H - m.b - v * (H - m.t - m.b);
+      yGrid(g, m.l, W - m.r, v => Y(v / 100), 100, 4, v => v + '%');
+      for (const d of [0, 7, 14, 21, 28, 35]) if (d <= maxDay) {
+        const t = el('text', { x: X(d), y: H - m.b + 15, 'text-anchor': 'middle' }, g); t.textContent = d;
+      }
+      const lab = el('text', { x: (m.l + W - m.r) / 2, y: H - m.b + 30, 'text-anchor': 'middle' }, g); lab.textContent = 'days after Aug 26';
+      const pts = [{ day: 0, share_still_dark: 1 }, ...rec];
+      let d = `M${X(0)},${Y(1)}`;
+      for (let i = 1; i < pts.length; i++) d += `H${X(pts[i].day).toFixed(1)}V${Y(pts[i].share_still_dark).toFixed(1)}`;
+      el('path', { d, fill: 'none', stroke: COLOR.CLN, 'stroke-width': 2 }, g);
+      const end = pts[pts.length - 1];
+      const t = el('text', { x: X(end.day) - 2, y: Y(end.share_still_dark) - 8, 'text-anchor': 'end', class: 'val' }, g);
+      t.textContent = `${fmt(100 * end.share_still_dark, 0)}% still dark`;
+      const dot = el('circle', { r: 4.5, fill: COLOR.CLN, stroke: '#fff', 'stroke-width': 2, opacity: 0 }, g);
+      const hit = el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }, s);
+      hit.addEventListener('mousemove', ev => {
+        const pt = s.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+        const p = pt.matrixTransform(s.getScreenCTM().inverse());
+        const r = rec.reduce((a, b) => Math.abs(X(b.day) - p.x) < Math.abs(X(a.day) - p.x) ? b : a);
+        dot.setAttribute('cx', X(r.day)); dot.setAttribute('cy', Y(r.share_still_dark)); dot.setAttribute('opacity', 1);
+        showTip(`<b>Day ${r.day}</b> · ${fmtDay(parse(r.date))}<br>${fmt(100 * r.share_still_dark, 1)}% of ${r.cohort} nodes still dark`, ev);
+      });
+      hit.addEventListener('mouseleave', () => { dot.setAttribute('opacity', 0); hideTip(); });
+    }
+    document.getElementById('recovery-sub').textContent = `The ${rec[0].cohort} CLN nodes that went dark on Aug 27`;
+    table('recovery-table', [['Day', r => r.day], ['Date', r => r.date], ['Nodes in cohort', r => r.cohort], ['Still dark %', r => fmt(100 * r.share_still_dark, 1)]], rec);
+
+    // ---------- closes (daily stacked force closes) ----------
+    const cd = D.closes_daily.slice().sort((a, b) => a.date < b.date ? -1 : 1);
+    const cdDates = cd.map(r => r.date);
+    function drawCloses() {
+      const div = document.getElementById('closes');
+      const W = Math.max(div.clientWidth, 320), H = 260, m = { l: 40, r: 10, t: 16, b: 24 };
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const max = niceMax(Math.max(...cd.map(r => r.force)));
+      const Y = v => H - m.b - v / max * (H - m.t - m.b);
+      const n = cd.length, step = (W - m.l - m.r) / n, bw = Math.max(step - 1, 1);
+      const X = d => m.l + cdDates.indexOf(d) * step + step / 2;
+      yGrid(g, m.l, W - m.r, Y, max, 4, v => int(v));
+      monthTicks(g, cdDates, X, H - 6);
+      incidentLines(g, cdDates, X, m.t, H - m.b);
+      cd.forEach((r, i) => {
+        const x = m.l + i * step + (step - bw) / 2;
+        const yo = Y(r.force_organic);
+        el('rect', { x, y: yo, width: bw, height: H - m.b - yo, fill: INK }, g);
+        if (r.force_mass > 0) {
+          const ym = Y(r.force_organic + r.force_mass);
+          const gap = r.force_organic > 0 ? 1 : 0;
+          el('path', { d: barPath(x, ym, bw, yo - ym - gap, Math.min(2, bw / 2)), fill: INK_L }, g);
+        }
+      });
+      // annotate the two biggest mass-close days
+      // the callout below carries the same facts on narrow screens
+      const top = W < 640 ? [] : cd.filter(r => r.force_mass > 0).sort((a, b) => b.force_mass - a.force_mass).slice(0, 2);
+      for (const r of top) {
+        const ev = D.mass_close_events.filter(e => e.date === r.date).sort((a, b) => b.force_closes - a.force_closes)[0];
+        const t = el('text', { x: X(r.date) + 5, y: Y(r.force) + 4, class: 'annot' }, g);
+        t.textContent = ev ? `${fmtDay(parse(r.date))}: ${ev.hub_alias} (${ev.hub_client}), ${ev.force_closes} closes` : '';
+      }
+      const hl = el('rect', { y: m.t, height: H - m.t - m.b, width: step, fill: INK, opacity: 0 }, g);
+      const hit = el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }, s);
+      hit.addEventListener('mousemove', ev => {
+        const pt = s.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+        const p = pt.matrixTransform(s.getScreenCTM().inverse());
+        const i = Math.max(0, Math.min(n - 1, Math.floor((p.x - m.l) / step))), r = cd[i];
+        hl.setAttribute('x', m.l + i * step); hl.setAttribute('opacity', 0.06);
+        const inc = incidents.find(x => x.date === r.date);
+        const hubs = D.mass_close_events.filter(e => e.date === r.date).map(e => `${e.hub_alias} (${e.force_closes})`).join(', ');
+        showTip(`<b>${fmtDay(parse(r.date))}</b><br>Force closes: ${int(r.force)}<br>${hubs ? `Mass close: ${hubs}<br>` : ''}<span class="tsw" style="background:${INK}"></span>organic ${int(r.force_organic)} · <span class="tsw" style="background:${INK_L}"></span>mass ${int(r.force_mass)}<br>Involving CLN (organic): ${int(r.force_organic_CLN)}<br>Mutual closes: ${int(r.mutual)}${inc ? `<br><span style="opacity:.8">${inc.label}</span>` : ''}`, ev);
+      });
+      hit.addEventListener('mouseleave', () => { hl.setAttribute('opacity', 0); hideTip(); });
+    }
+    const big = D.mass_close_events.slice().sort((a, b) => b.force_closes - a.force_closes).slice(0, 2);
+    document.getElementById('closes-callout').innerHTML = `<strong>The two biggest force-close days were one node each.</strong> ${big.map(e => `on ${fmtDay(parse(e.date))}, <strong>${e.hub_alias}</strong> (${e.hub_client}) was party to ${e.force_closes} force closes (${fmt(e.cap_btc, 1)} BTC)`).join('; ')}. The Aug 26 spike lands on the day of CLN's shutdown call, but it is one LND operator force-closing its own channels — a textbook confound. Separating mass-close events, channels involving CLN nodes saw <strong>${fmt(rates.CLN.ratio, 1)}× their normal organic force-close rate</strong>, while LND-only channels saw ${fmt(rates.LND_only.ratio, 2)}×.`;
+
+    // ---------- rate ratios ----------
+    function drawRates() {
+      const div = document.getElementById('rates');
+      const rows = [['CLN', 'CLN'], ['Eclair', 'Eclair'], ['LDK', 'LDK'], ['LND_only', 'LND ↔ LND']].map(([k, l]) => ({ ...rates[k], label: l, key: k }));
+      const W = Math.max(div.clientWidth, 280), rowH = 40, m = { l: 82, r: 56, t: 8, b: 26 }, H = m.t + m.b + rows.length * rowH;
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const max = Math.max(2.5, Math.ceil(Math.max(...rows.map(r => r.ratio)) * 2) / 2);
+      const X = v => m.l + v / max * (W - m.l - m.r);
+      for (let v = 0; v <= max; v += 0.5) {
+        el('line', { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: v === 1 ? INK : GRID, 'stroke-width': 1, opacity: v === 1 ? 0.5 : 1 }, g);
+        const t = el('text', { x: X(v), y: H - 8, 'text-anchor': 'middle', class: 'tick' }, g); t.textContent = v + '×';
+      }
+      rows.forEach((r, i) => {
+        const y = m.t + i * rowH + 10, h = rowH - 20;
+        const color = r.key === 'LND_only' ? COLOR.LND : COLOR[r.key];
+        const x1 = X(r.ratio);
+        el('path', { d: `M${m.l},${y}H${x1 - 4}Q${x1},${y} ${x1},${y + 4}V${y + h - 4}Q${x1},${y + h} ${x1 - 4},${y + h}H${m.l}Z`, fill: color }, g);
+        const l = el('text', { x: m.l - 8, y: y + h / 2 + 4, 'text-anchor': 'end', class: 'val' }, g); l.textContent = r.label;
+        const v = el('text', { x: x1 + 6, y: y + h / 2 + 4, class: 'val' }, g); v.textContent = fmt(r.ratio, 2) + '×';
+        const hit = el('rect', { x: 0, y: m.t + i * rowH, width: W, height: rowH, fill: 'transparent' }, s);
+        hit.addEventListener('mousemove', ev => showTip(`<b>${r.label}</b><br>Baseline: ${fmt(r.baseline_rate, 2)} / 1,000 ch / day (${int(r.baseline_n)} closes)<br>Window: ${fmt(r.window_rate, 2)} (${int(r.window_n)} closes)`, ev));
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    }
+
+    // ---------- mass events by client ----------
+    function drawMass() {
+      const div = document.getElementById('mass');
+      const cnt = {}; const cap = {};
+      for (const e of D.mass_close_events) { cnt[e.hub_client] = (cnt[e.hub_client] || 0) + 1; cap[e.hub_client] = (cap[e.hub_client] || 0) + e.force_closes; }
+      const rows = CLIENTS.filter(c => cnt[c]).map(c => ({ c, n: cnt[c], closes: cap[c] }));
+      const W = Math.max(div.clientWidth, 280), rowH = 40, m = { l: 82, r: 96, t: 8, b: 26 }, H = m.t + m.b + rows.length * rowH;
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const max = niceMax(Math.max(...rows.map(r => r.n)));
+      const X = v => m.l + v / max * (W - m.l - m.r);
+      for (let i = 0; i <= 4; i++) {
+        const v = max * i / 4;
+        el('line', { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: i ? GRID : AXIS }, g);
+        const t = el('text', { x: X(v), y: H - 8, 'text-anchor': 'middle', class: 'tick' }, g); t.textContent = v;
+      }
+      rows.forEach((r, i) => {
+        const y = m.t + i * rowH + 10, h = rowH - 20, x1 = X(r.n);
+        el('path', { d: `M${m.l},${y}H${x1 - 4}Q${x1},${y} ${x1},${y + 4}V${y + h - 4}Q${x1},${y + h} ${x1 - 4},${y + h}H${m.l}Z`, fill: COLOR[r.c] }, g);
+        const l = el('text', { x: m.l - 8, y: y + h / 2 + 4, 'text-anchor': 'end', class: 'val' }, g); l.textContent = r.c;
+        const v = el('text', { x: x1 + 6, y: y + h / 2 + 4, class: 'val' }, g); v.textContent = `${r.n} event${r.n === 1 ? '' : 's'}`;
+        const hit = el('rect', { x: 0, y: m.t + i * rowH, width: W, height: rowH, fill: 'transparent' }, s);
+        hit.addEventListener('mousemove', ev => showTip(`<b>${r.c}</b><br>${r.n} mass-close events<br>${int(r.closes)} force closes in total`, ev));
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    }
+    table('closes-table', [['Date', r => r.date], ['Mutual', r => int(r.mutual)], ['Force', r => int(r.force)], ['Force (organic)', r => int(r.force_organic)],
+      ['Force (mass events)', r => int(r.force_mass)], ['Organic, CLN involved', r => int(r.force_organic_CLN)], ['Organic, LND only', r => int(r.force_organic_LND_only)], ['Splice', r => int(r.splice)]],
+      cd.filter(r => r.date >= '2026-07-20' && r.date <= '2026-09-15'));
+
+    // ---------- early-August wave: top closers ----------
+    const TC = D.top_closers_aug;
+    const waveTotal = Math.round(TC[0].closes / (TC[0].share_of_window / 100));
+    document.getElementById('wave-sub').textContent = `Nodes party to the most closes, Aug 2–16 (${int(waveTotal)} closes in total; the top ${TC.length} were on ${fmt(TC.reduce((a, r) => a + r.share_of_window, 0), 0)}% of them — a close between two of them counts for both)`;
+    function drawWave() {
+      const div = document.getElementById('wave');
+      const W = Math.max(div.clientWidth, 300), narrow = W < 500, rowH = 30, m = { l: narrow ? 118 : 190, r: 50, t: 4, b: 24 }, H = m.t + m.b + TC.length * rowH;
+      const maxLen = narrow ? 14 : 22, ticks = narrow ? 2 : 4;
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const max = niceMax(Math.max(...TC.map(r => r.closes)));
+      const X = v => m.l + v / max * (W - m.l - m.r);
+      for (let i = 0; i <= ticks; i++) {
+        const v = max * i / ticks;
+        el('line', { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: i ? GRID : AXIS }, g);
+        const t = el('text', { x: X(v), y: H - 6, 'text-anchor': 'middle', class: 'tick' }, g); t.textContent = int(v);
+      }
+      TC.forEach((r, i) => {
+        const y = m.t + i * rowH + 7, h = rowH - 14;
+        const mu = r.mutual || 0, fo = r.force || 0, xm = X(mu), xf = X(mu + fo);
+        if (mu) el('rect', { x: m.l, y, width: Math.max(xm - m.l - (fo ? 2 : 0), 0.5), height: h, fill: INK_L }, g);
+        if (fo) el('path', { d: `M${xm},${y}H${xf - 3}Q${xf},${y} ${xf},${y + 3}V${y + h - 3}Q${xf},${y + h} ${xf - 3},${y + h}H${xm}Z`, fill: INK }, g);
+        const full = [...(r.alias || r.pub)], name = full.length > maxLen ? full.slice(0, maxLen - 1).join('') + '…' : full.join('');
+        const l = el('text', { x: m.l - 8, y: y + h / 2 + 4, 'text-anchor': 'end', class: 'val' }, g); l.textContent = name;
+        const v = el('text', { x: xf + 6, y: y + h / 2 + 4, class: 'val' }, g); v.textContent = int(r.closes);
+        const hit = el('rect', { x: 0, y: m.t + i * rowH, width: W, height: rowH, fill: 'transparent' }, s);
+        hit.addEventListener('mousemove', ev => showTip(`<b>${r.alias || r.pub}</b> · ${r.client}<br>${int(r.closes)} closes (${fmt(r.share_of_window, 1)}% of all)<br>cooperative ${int(mu)} · force ${int(fo)}<br>${fmt(r.cap_btc, 1)} BTC of channels`, ev));
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    }
+    table('mass-table', [['Date', e => e.date], ['Node', e => e.hub_alias || e.hub_pub], ['Client', e => e.hub_client], ['Pub key', e => e.hub_pub + '…'],
+      ['Force closes', e => int(e.force_closes)], ['Capacity BTC', e => fmt(e.cap_btc, 2)]], D.mass_close_events.slice().sort((a, b) => b.force_closes - a.force_closes));
+
+    // ---------- HTLC resolutions (weekly) ----------
+    const sp = D.spend_events_daily.slice().sort((a, b) => a.date < b.date ? -1 : 1);
+    const weekOf = d => { const t = parse(d); const dow = (t.getUTCDay() + 6) % 7; return new Date(t - dow * 86400000).toISOString().slice(0, 10); };
+    const wk = {};
+    for (const r of sp) {
+      const w = weekOf(r.date);
+      wk[w] = wk[w] || { week: w, timeout: 0, success: 0, breach: 0 };
+      wk[w].timeout += (r.htlc_timeout_2nd_stage || 0) + (r.htlc_remote_timeout_claim || 0);
+      wk[w].success += (r.htlc_success_2nd_stage || 0) + (r.htlc_remote_preimage_claim || 0);
+      wk[w].breach += (r.to_local_revocation_breach || 0) + (r.htlc_revocation_breach || 0);
+    }
+    const weeks = Object.values(wk).sort((a, b) => a.week < b.week ? -1 : 1);
+    const breachDates = sp.filter(r => (r.to_local_revocation_breach || 0) + (r.htlc_revocation_breach || 0) > 0).map(r => fmtDay(parse(r.date)));
+    document.getElementById('breach-lede').innerHTML = `When a node publishes an old (revoked) channel state, its peer can claim everything with a <em>justice transaction</em>. We found <strong>${breachTotal}</strong> in five months (${breachDates.join(', ')}) — none after mid-July. Caveat: a theft that <em>succeeds</em> leaves no justice transaction, so this is a floor on attempts, not proof of none. Below: in-flight payments (HTLCs) settled on-chain after force closes, by week.`;
+    function drawHtlc() {
+      const div = document.getElementById('htlc');
+      const W = Math.max(div.clientWidth, 320), H = 220, m = { l: 40, r: 10, t: 14, b: 24 };
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const max = niceMax(Math.max(...weeks.map(w => w.timeout + w.success)));
+      const Y = v => H - m.b - v / max * (H - m.t - m.b);
+      const step = (W - m.l - m.r) / weeks.length, bw = Math.max(step - 2, 2);
+      yGrid(g, m.l, W - m.r, Y, max, 4, v => int(v));
+      weeks.forEach((w, i) => {
+        const x = m.l + i * step + 1, yt = Y(w.timeout), ys = Y(w.timeout + w.success);
+        el('rect', { x, y: yt, width: bw, height: H - m.b - yt, fill: INK }, g);
+        if (w.success) el('path', { d: barPath(x, ys, bw, yt - ys - 2, 3), fill: INK_L }, g);
+        if (i % 4 === 0) { const t = el('text', { x: x + bw / 2, y: H - 6, 'text-anchor': 'middle' }, g); t.textContent = fmtDay(parse(w.week)); }
+        const hit = el('rect', { x: m.l + i * step, y: m.t, width: step, height: H - m.t - m.b, fill: 'transparent' }, s);
+        hit.addEventListener('mousemove', ev => showTip(`<b>Week of ${fmtDay(parse(w.week))}</b><br>Timed out: ${int(w.timeout)}<br>Settled with preimage: ${int(w.success)}<br>Justice txs: ${w.breach}`, ev));
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    }
+    table('htlc-table', [['Week of', w => w.week], ['HTLC timeouts', w => int(w.timeout)], ['HTLC preimage settles', w => int(w.success)], ['Justice txs', w => w.breach]], weeks);
+
+    // ---------- census ----------
+    const cen = D.cohort_census;
+    const cenDates = [...new Set(cen.map(r => r.date))].sort();
+    const dA = cenDates.includes('2026-08-01') ? '2026-08-01' : cenDates[0], dB = cenDates[cenDates.length - 1];
+    const at = (d, c) => cen.find(r => r.date === d && r.target === c);
+    document.getElementById('census-legend').innerHTML = CLIENTS.map(c => `<span><i class="sw" style="background:${COLOR[c]}"></i>${c}</span>`).join('');
+    const lndA = at(dA, 'LND'), lndB = at(dB, 'LND');
+    document.getElementById('census-lede').innerHTML = `LND runs <strong>${fmt(lndB.node_share, 0)}% of public nodes and ${fmt(lndB.cap_share, 0)}% of public capacity</strong> — the monoculture is the backdrop to everything above. Over the incident period, CLN's public node count fell ${fmt(100 * (1 - at(dB, 'CLN').nodes / at(dA, 'CLN').nodes), 0)}% versus ${fmt(100 * (1 - lndB.nodes / lndA.nodes), 0)}% for LND. The whole public graph shrank (LND capacity ${fmt(100 * (lndB.cap_btc / lndA.cap_btc - 1), 0)}%), so shares barely changed — only LDK grew.`;
+    function drawCensus() {
+      const div = document.getElementById('census');
+      const W = Math.max(div.clientWidth, 320), rowH = 34, m = { l: 150, r: 10, t: 6, b: 22 };
+      const rows = [[dA, 'node_share', 'nodes'], [dB, 'node_share', 'nodes'], [dA, 'cap_share', 'capacity'], [dB, 'cap_share', 'capacity']];
+      const H = m.t + m.b + rows.length * rowH + 10;
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const X = v => m.l + v / 100 * (W - m.l - m.r);
+      for (const v of [0, 25, 50, 75, 100]) {
+        el('line', { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: v ? GRID : AXIS }, g);
+        const t = el('text', { x: X(v), y: H - 6, 'text-anchor': 'middle', class: 'tick' }, g); t.textContent = v + '%';
+      }
+      rows.forEach(([d, key, what], i) => {
+        const y = m.t + i * rowH + (i >= 2 ? 10 : 0) + 6, h = rowH - 12;
+        const l = el('text', { x: m.l - 8, y: y + h / 2 + 4, 'text-anchor': 'end', class: 'val' }, g);
+        l.textContent = `Share of ${what}, ${fmtDay(parse(d))}`;
+        let x = m.l;
+        CLIENTS.forEach((c, j) => {
+          const r = at(d, c); const w = r[key] / 100 * (W - m.l - m.r);
+          const gap = j < CLIENTS.length - 1 ? 2 : 0;
+          el('rect', { x, y, width: Math.max(w - gap, 0.5), height: h, fill: COLOR[c], rx: j === CLIENTS.length - 1 ? 3 : 0 }, g);
+          if (w > 34) { const t = el('text', { x: x + 6, y: y + h / 2 + 4, fill: '#fff', style: 'fill:#fff;font-weight:600;font-size:11px' }, g); t.textContent = fmt(r[key], 0) + '%'; }
+          const hit = el('rect', { x, y, width: Math.max(w, 6), height: h, fill: 'transparent' }, s);
+          hit.addEventListener('mousemove', ev => showTip(`<b>${c} · ${fmtDay(parse(d))}</b><br>${fmt(r.node_share, 1)}% of nodes (${int(r.nodes)})<br>${fmt(r.cap_share, 1)}% of capacity (${fmt(r.cap_btc, 0)} BTC)`, ev));
+          hit.addEventListener('mouseleave', hideTip);
+          x += w;
+        });
+      });
+    }
+    function drawChange(id, key, unit) {
+      const div = document.getElementById(id);
+      const rows = CLIENTS.map(c => ({ c, a: at(dA, c)[key], b: at(dB, c)[key] })).map(r => ({ ...r, pct: 100 * (r.b / r.a - 1) }));
+      const W = Math.max(div.clientWidth, 260), rowH = 36, m = { l: 64, r: 10, t: 6, b: 24 }, H = m.t + m.b + rows.length * rowH;
+      const s = svg(div, W, H), g = el('g', {}, s);
+      const lim = Math.max(25, Math.ceil(Math.max(...rows.map(r => Math.abs(r.pct))) / 5) * 5);
+      const X = v => m.l + (v + lim) / (2 * lim) * (W - m.l - m.r);
+      for (const v of [-lim, -lim / 2, 0, lim / 2, lim]) {
+        el('line', { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: v === 0 ? INK : GRID, opacity: v === 0 ? 0.5 : 1 }, g);
+        const t = el('text', { x: X(v), y: H - 6, 'text-anchor': 'middle', class: 'tick' }, g); t.textContent = (v > 0 ? '+' : '') + v + '%';
+      }
+      rows.forEach((r, i) => {
+        const y = m.t + i * rowH + 9, h = rowH - 18, x0 = X(0), x1 = X(r.pct);
+        el('rect', { x: Math.min(x0, x1), y, width: Math.max(Math.abs(x1 - x0), 1), height: h, fill: COLOR[r.c], rx: 3 }, g);
+        const l = el('text', { x: m.l - 8, y: y + h / 2 + 4, 'text-anchor': 'end', class: 'val' }, g); l.textContent = r.c;
+        const v = el('text', { x: r.pct < 0 ? x1 - 5 : x1 + 5, y: y + h / 2 + 4, 'text-anchor': r.pct < 0 ? 'end' : 'start', class: 'val' }, g);
+        v.textContent = (r.pct > 0 ? '+' : '') + fmt(r.pct, 0) + '%';
+        const hit = el('rect', { x: 0, y: m.t + i * rowH, width: W, height: rowH, fill: 'transparent' }, s);
+        hit.addEventListener('mousemove', ev => showTip(`<b>${r.c}</b><br>${fmtDay(parse(dA))}: ${unit(r.a)}<br>${fmtDay(parse(dB))}: ${unit(r.b)}`, ev));
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    }
+    table('census-table', [['Date', r => r.date], ['Client', r => r.target], ['Nodes', r => int(r.nodes)], ['Node share %', r => fmt(r.node_share, 1)],
+      ['Capacity BTC', r => fmt(r.cap_btc, 1)], ['Capacity share %', r => fmt(r.cap_share, 1)]], cen.filter(r => r.date.endsWith('-01') || r.date === dB));
+
+    // ---------- fees ----------
+    const F = fees.force, M = fees.mutual;
+    document.getElementById('fees-lede').innerHTML = `A force close pays for the commitment transaction <em>and</em> for sweeping its outputs later (anchors, delayed outputs, HTLCs). Median all-in cost: <strong>${int(Math.round(F.total_fee_median))} sats</strong> for a force close versus <strong>${int(Math.round(M.total_fee_median))} sats</strong> for a cooperative close. All ${int(F.closes)} force closes since May paid ${fmt(F.total_fee_btc, 2)} BTC in fees combined. Sweep fees are split across the inputs of batched sweep transactions.`;
+    table('fees-table', [['Close type', r => r.close_type], ['Closes', r => int(r.closes)], ['Median close-tx fee (sats)', r => int(Math.round(r.close_fee_median))],
+      ['Median all-in fee (sats)', r => int(Math.round(r.total_fee_median))], ['Mean all-in fee (sats)', r => int(Math.round(r.total_fee_mean))], ['Total fees (BTC)', r => fmt(r.total_fee_btc, 3)]], D.fees_by_close_type);
+
+    // ---------- method ----------
+    document.getElementById('method').innerHTML = [
+      `<strong>Gossip:</strong> ${meta.gossip_days} daily snapshots of the public channel graph (${meta.gossip_first.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')} → ${meta.gossip_last.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')}) from our LND node.`,
+      `<strong>On-chain:</strong> every block since ${meta.onchain_from} scanned on our own Bitcoin Core node for spends of known channel funding outputs (${int(meta.closes)} closes) and of force-close outputs (${int(meta.commitment_spends)} spends). Force closes are recognized by the BOLT 3 commitment encoding (nLockTime 0x20…, nSequence 0x80…); outputs are classified from their witness scripts. Complete through ${meta.onchain_complete_through_utc} UTC.`,
+      `<strong>Client inference:</strong> implementation-specific feature bits in node announcements (rules ${meta.client_rules}), labels fixed per node as of ${meta.label_ref_date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')} so the incident can't reshuffle cohorts.`,
+      `<strong>Rates:</strong> organic force closes per 1,000 open public channels involving each client, per day; a channel between CLN and LND counts for both.`,
+    ].map(x => `<li>${x}</li>`).join('');
+    document.getElementById('caveats').innerHTML = meta.caveats.map(x => `<li>${x}</li>`).join('') +
+      '<li>LDK\'s baseline force-close rate is high because a few LDK nodes routinely force-close hundreds of channels (below the mass-event threshold on any single day).</li>';
+    document.getElementById('generated').textContent = `Data generated ${meta.generated_utc}.`;
+
+    // ---------- render & resize ----------
+    function drawAll() { drawOutage(); drawCompliance(); drawRecovery(); drawCloses(); drawRates(); drawMass(); drawWave(); drawHtlc(); drawCensus();
+      drawChange('nodechange', 'nodes', v => int(v) + ' nodes'); drawChange('capchange', 'cap_btc', v => fmt(v, 0) + ' BTC'); }
+    drawAll();
+    let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(drawAll, 150); });
+  })();
   </script>
 </body>
 </html>
