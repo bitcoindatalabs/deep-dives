@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Summer Lightning Broke (a Little) | TABConf 2026</title>
+<link rel="icon" type="image/png" href="../../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<!--
+  TABConf 2026 talk deck. One self-contained file: no framework, no build, no network needed
+  (fonts fall back to system fonts offline). Numbers come from data/processed/*.json (cutoff 2026-10-04).
+
+  Keys:  → / Space / PageDown  next      ← / PageUp  back      Home / End
+         P  presenter window (notes, timer, pace; stays in sync)
+         N  notes on this screen        F  fullscreen        B or .  black screen
+         digits  jump to slide          ?  help
+-->
+<style>
+:root {
+  --bg: #FAF8F5; --bg2: #F3EFEA; --surface: #FFFFFF;
+  --ink: #242D38; --ink2: #5E6977; --ink3: #8893A0; --line: #E5DFD5;
+  --accent: #D47355; --accent-d: #A95137; --accent-l: #FBF2ED; --accent-b: #ECCDC1;
+  --sage: #2E7559; --sage-l: #EDF5F0; --madder: #A93E3B; --madder-l: #FBEFEF;
+  --grey: #C3BBB0;
+  --lnd: #2a78d6; --cln: #D4603A; --eclair: #1a9e6e; --ldk: #4a3aa7;
+  --sans: Inter, system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+#viewport { position: fixed; inset: 0; }
+#stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform-origin: center; background: var(--bg); overflow: hidden; cursor: pointer; }
+
+/* ── slides ── */
+.slide { position: absolute; inset: 0; padding: 64px 110px 96px; display: none; flex-direction: column; }
+.slide.on { display: flex; animation: enter .35s ease-out; }
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.slide.center { justify-content: center; }
+.notes { display: none; }
+
+.kicker { font: 700 22px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 22px; }
+h1 { font-size: 104px; line-height: 1.02; font-weight: 800; letter-spacing: -.035em; margin: 0; }
+h2 { font-size: 60px; line-height: 1.1; font-weight: 750; letter-spacing: -.02em; margin: 0 0 36px; }
+.lead { font-size: 34px; line-height: 1.4; color: var(--ink2); margin: 0; }
+.hl { color: var(--accent); }
+.muted { color: var(--ink3); }
+.mono { font-family: var(--mono); }
+.say { font-size: 34px; line-height: 1.35; margin: 0; }
+.say b { color: var(--accent-d); }
+.src { position: absolute; left: 110px; bottom: 52px; font: 500 17px var(--mono); color: var(--ink3); }
+
+/* ── reveal steps ── */
+.step { opacity: 0; transform: translateY(16px); transition: opacity .45s, transform .45s; }
+.step.in { opacity: 1; transform: none; }
+svg .step { transform: none; }
+
+/* ── quiz ── */
+.quiz { display: grid; gap: 22px; grid-template-columns: repeat(4, 1fr); margin: 0 0 40px; }
+.quiz.two { grid-template-columns: 1fr 1fr; }
+.opt { display: flex; align-items: center; gap: 22px; padding: 22px 30px; border: 2px solid var(--line); border-radius: 18px; background: var(--surface); font-size: 46px; font-weight: 700; transition: all .5s; }
+.quiz.two .opt { font-size: 38px; line-height: 1.2; padding: 30px 34px; }
+.opt b { flex: none; width: 58px; height: 58px; border-radius: 50%; background: var(--bg2); display: grid; place-items: center; font: 700 28px var(--mono); color: var(--ink2); transition: all .5s; }
+.quiz.in .opt { opacity: .25; transform: scale(.97); }
+.quiz.in .opt.ok { opacity: 1; transform: scale(1.04); border-color: var(--accent); background: var(--accent-l); box-shadow: 0 10px 30px rgba(212,115,85,.2); }
+.quiz.in .opt.ok b { background: var(--accent); color: #fff; }
+.vote { font: 600 24px var(--mono); color: var(--ink3); margin: -18px 0 28px; }
+.vote::before { content: "✋ "; }
+
+/* ── horizontal bars ── */
+.hbars { display: flex; flex-direction: column; gap: 20px; }
+.hb { display: grid; grid-template-columns: 470px 1fr; align-items: center; gap: 28px; font-size: 30px; }
+.hb .lab small { display: block; font-size: 21px; color: var(--ink3); margin-top: 2px; }
+.hb .track { display: flex; align-items: center; gap: 18px; height: 60px; }
+.hb .fill { height: 100%; width: 0; border-radius: 0 10px 10px 0; background: var(--grey); transition: width 1.1s cubic-bezier(.2,.8,.2,1); }
+.hb.hot .fill { background: var(--accent); }
+.hb .val { font-size: 38px; font-weight: 800; white-space: nowrap; }
+.hb.hot .val { color: var(--accent-d); }
+.in .hb .fill, .hb.in .fill { width: var(--w); }
+.hb .val { opacity: 0; transition: opacity .4s .5s; }
+.in .hb .val, .hb.in .val { opacity: 1; }
+
+/* ── stacked share bar ── */
+.stack { display: flex; height: 92px; border-radius: 14px; overflow: hidden; width: 100%; }
+.stack i { display: block; height: 100%; width: 0; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.in .stack i { width: var(--w); }
+.chips { display: flex; gap: 34px; margin-top: 22px; font-size: 30px; flex-wrap: wrap; }
+.chips span::before { content: ""; display: inline-block; width: 22px; height: 22px; border-radius: 6px; background: var(--c); margin-right: 10px; vertical-align: -2px; }
+
+/* ── cards & tiles ── */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 30px 32px; }
+.card h3 { margin: 0 0 12px; font-size: 32px; font-weight: 750; }
+.card p { margin: 0; font-size: 26px; line-height: 1.4; color: var(--ink2); }
+.card .num { font-size: 72px; font-weight: 800; letter-spacing: -.03em; color: var(--accent); line-height: 1; margin-bottom: 14px; }
+.card.good h3 { color: var(--sage); } .card.bad h3 { color: var(--madder); }
+
+/* ── timeline ── */
+.tl { display: flex; flex-direction: column; gap: 14px; }
+.tl div { display: grid; grid-template-columns: 170px 150px 1fr; align-items: center; gap: 20px; font-size: 29px; padding: 10px 18px; border-radius: 12px; }
+.tl .d { font: 700 26px var(--mono); color: var(--ink2); }
+.tl .t { font: 700 19px var(--mono); text-align: center; padding: 6px 0; border-radius: 8px; color: #fff; background: var(--c); }
+.tl .big { background: var(--accent-l); border: 2px solid var(--accent-b); font-weight: 650; }
+
+/* ── takeaways ── */
+.take { display: flex; flex-direction: column; gap: 30px; }
+.take > div { display: grid; grid-template-columns: 84px 1fr; gap: 26px; align-items: start; }
+.take .n { width: 72px; height: 72px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font: 800 34px var(--mono); }
+.take h3 { margin: 4px 0 6px; font-size: 44px; font-weight: 800; letter-spacing: -.01em; }
+.take p { margin: 0; font-size: 28px; color: var(--ink2); line-height: 1.4; }
+
+/* ── charts ── */
+svg text { font-family: var(--sans); }
+svg .grid { stroke: var(--line); stroke-width: 1.5; }
+svg .tick { font-size: 22px; fill: var(--ink3); }
+svg .mark { stroke: var(--ink3); stroke-width: 2; stroke-dasharray: 6 6; }
+svg .mlab { font-size: 21px; fill: var(--ink2); }
+svg .org { fill: var(--grey); }
+svg .mass { fill: var(--grey); transition: fill .7s; }
+.slide[data-k]:not([data-k="0"]) svg .mass { fill: var(--accent); }
+svg .clab { font-size: 23px; font-weight: 800; fill: var(--ink); }
+svg .csub { font-size: 20px; fill: var(--accent-d); font-weight: 600; }
+
+.g100 { display: grid; grid-template-columns: repeat(20, 1fr); gap: 9px; width: 760px; }
+.g100 i { aspect-ratio: 1; border-radius: 6px; background: var(--ink2); transition: background .5s, box-shadow .5s; }
+.in .g100 i.gone { background: transparent; box-shadow: inset 0 0 0 2px var(--accent); }
+
+.stat { border-left: 6px solid var(--accent); padding: 4px 0 4px 24px; }
+.stat .v { font-size: 64px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+.stat .k { font-size: 25px; color: var(--ink2); line-height: 1.35; }
+
+/* ── chrome ── */
+#foot { position: absolute; left: 110px; right: 110px; bottom: 26px; display: flex; justify-content: space-between; font: 500 17px var(--mono); color: var(--ink3); pointer-events: none; }
+#prog { position: absolute; left: 0; bottom: 0; height: 6px; background: var(--accent); transition: width .3s; }
+#black { position: fixed; inset: 0; background: #000; display: none; z-index: 50; }
+body.black #black { display: block; }
+#notesbar, #help { position: fixed; left: 0; right: 0; bottom: 0; max-height: 40vh; overflow: auto; background: rgba(36,45,56,.96); color: #F3EFEA; font: 18px/1.55 var(--sans); padding: 18px 28px; display: none; z-index: 40; }
+#notesbar p { margin: 0 0 8px; }
+body.shownotes #notesbar, body.showhelp #help { display: block; }
+#help { top: 0; bottom: auto; max-height: none; font: 17px/1.8 var(--mono); }
+
+/* ── presenter window (?presenter) ── */
+#panel { display: none; }
+body.presenter { background: #1d232b; }
+body.presenter #viewport { inset: 16px auto auto 16px; width: calc(58vw - 24px); height: calc(58vw * 9 / 16); border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px #3a4350; }
+body.presenter #panel { display: flex; flex-direction: column; gap: 14px; position: fixed; top: 16px; right: 16px; bottom: 16px; width: calc(42vw - 24px); color: #F3EFEA; font-family: var(--sans); }
+body.presenter #nextwrap { position: fixed; left: 16px; top: calc(58vw * 9 / 16 + 30px); width: calc(58vw - 24px); color: #AEB6C1; font: 20px/1.5 var(--sans); }
+#ptime { font: 700 64px/1 var(--mono); }
+#ppace { font: 600 20px var(--mono); color: #AEB6C1; }
+#ppace.behind { color: #F0A58C; } #ppace.ahead { color: #8FD0B0; }
+#ptitle { font-size: 22px; font-weight: 700; } #ptitle span { color: #AEB6C1; font-weight: 500; }
+#pnotes { flex: 1; overflow: auto; background: #262e38; border-radius: 10px; padding: 18px 22px; font-size: 21px; line-height: 1.55; }
+#pnotes p { margin: 0 0 12px; } #pnotes b { color: #F6C3AF; }
+.pbtns { display: flex; gap: 10px; }
+.pbtns button { flex: 1; font: 600 18px var(--sans); padding: 12px; border: 0; border-radius: 8px; background: #3a4350; color: #fff; cursor: pointer; }
+#pblack { display: none; color: #F0A58C; font: 700 18px var(--mono); }
+body.black.presenter #black { display: none; }
+body.black.presenter #pblack { display: block; }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- 1 · Title -->
+<section class="slide center" data-title="Title" data-min="0.33">
+  <p class="kicker">TABConf 2026 · Lightning data</p>
+  <h1>The Summer Lightning<br>Broke <span class="hl">(a Little)</span></h1>
+  <p class="lead" style="margin-top:34px">What the network actually felt during the 2026 security wave, measured.</p>
+  <p class="lead" style="margin-top:56px;font-size:28px;color:var(--ink)"><b>Saurabh Kumar</b> · Bitcoin Data Labs</p>
+  <aside class="notes">
+    <p>Don't present yet. Say hi, one line on who you are, then go straight to the hands.</p>
+    <p>"This summer every Lightning implementation shipped security fixes in the same few weeks. I measured what the network actually felt. But first, I want to know who's in the room."</p>
+  </aside>
+</section>
+
+<!-- 2 · Hands up -->
+<section class="slide center" data-title="Hands up" data-min="0.67">
+  <p class="kicker">Before we start</p>
+  <h2>Raise your hand if you…</h2>
+  <div style="display:flex;flex-direction:column;gap:30px">
+    <p class="say step">✋ &nbsp;run a Lightning node</p>
+    <p class="say step">✋ &nbsp;have had a channel <b>force-closed</b> on you</p>
+    <p class="say step">✋ &nbsp;upgraded a node this summer because of a <b>security advisory</b></p>
+  </div>
+  <aside class="notes">
+    <p>One click per question. Count the hands out loud: "about half the room", "a few brave ones".</p>
+    <p>If many run nodes: "Great, a lot of this is about you." If few: "No problem, I'll explain everything as we go."</p>
+    <p>On question 3, ask one person which client they upgraded. It's a nice bridge to the quiz.</p>
+  </aside>
+</section>
+
+<!-- 3 · Quiz: LND share -->
+<section class="slide" data-title="Quiz: LND share" data-min="1">
+  <p class="kicker">Quiz 1</p>
+  <h2>What share of public Lightning nodes run <span style="color:var(--lnd)">LND</span>?</h2>
+  <p class="vote">vote with your hands</p>
+  <div class="quiz key">
+    <div class="opt"><b>A</b>51%</div>
+    <div class="opt"><b>B</b>70%</div>
+    <div class="opt ok"><b>C</b>89%</div>
+    <div class="opt"><b>D</b>99%</div>
+  </div>
+  <div class="step">
+    <div class="stack">
+      <i style="--w:89.1%;background:var(--lnd)"></i><i style="--w:8.9%;background:var(--cln)"></i><i style="--w:1.5%;background:var(--ldk)"></i><i style="--w:0.5%;background:var(--eclair)"></i>
+    </div>
+    <div class="chips">
+      <span style="--c:var(--lnd)"><b>LND</b> 89%</span>
+      <span style="--c:var(--cln)"><b>Core Lightning</b> 9%</span>
+      <span style="--c:var(--ldk)"><b>LDK</b> 1.5%</span>
+      <span style="--c:var(--eclair)"><b>Eclair</b> 0.5%</span>
+    </div>
+  </div>
+  <p class="say step" style="margin-top:34px">Eclair is just <b>42 nodes</b>, but they hold <b>6% of the bitcoin</b>. Remember that.</p>
+  <p class="src">Public nodes on Oct 4, 2026 · client inferred from feature bits and defaults</p>
+  <aside class="notes">
+    <p>Read the question and the four options. "Hands up for A… B… C… D." Then click to reveal.</p>
+    <p><b>Answer: 89%</b> (8,265 of ~9,300 public nodes). Core Lightning about 9%, LDK 1.5%, Eclair 0.5%.</p>
+    <p>"How do I know? Nodes don't announce their software. I fingerprint it from feature bits and default settings."</p>
+    <p>On LDK: "LDK is mostly embedded in apps and wallets, often with private channels, so a public map undercounts it."</p>
+    <p>On Eclair: plant the seed. "42 nodes, 6% of capacity. One of them is ACINQ. We'll come back to it."</p>
+  </aside>
+</section>
+
+<!-- 4 · Quiz: force close cost -->
+<section class="slide" data-title="Quiz: force-close cost" data-min="0.83">
+  <p class="kicker">Quiz 2</p>
+  <h2>You can close a channel <span style="color:var(--sage)">together</span> or <span style="color:var(--madder)">alone</span> (a “force close”). How much more does alone cost in fees?</h2>
+  <div class="quiz key">
+    <div class="opt"><b>A</b>Same</div>
+    <div class="opt"><b>B</b>2×</div>
+    <div class="opt ok"><b>C</b>6×</div>
+    <div class="opt"><b>D</b>50×</div>
+  </div>
+  <div class="hbars step">
+    <div class="hb"><div class="lab">Together (cooperative)</div><div class="track"><div class="fill" style="--w:17%;background:var(--sage)"></div><span class="val">209 sat</span></div></div>
+    <div class="hb hot"><div class="lab">Alone (force close)</div><div class="track"><div class="fill" style="--w:100%;max-width:880px"></div><span class="val">1,222 sat</span></div></div>
+  </div>
+  <p class="src">Median fee per close, 44,774 on-chain closes, May 1 – Oct 7, 2026</p>
+  <aside class="notes">
+    <p>Quick one. Take a vote, then reveal.</p>
+    <p><b>Answer: about 6×.</b> Median 209 sat cooperative vs 1,222 sat all-in for a force close (the close plus the follow-up sweeps).</p>
+    <p>"The fees aren't the real pain. With a force close, your own money is stuck behind a time-lock for days." Across all force closes since May: about 0.17 BTC in fees.</p>
+  </aside>
+</section>
+
+<!-- 5 · Quiz teaser: CLN vs one node -->
+<section class="slide center" data-title="Quiz: one node vs CLN (vote only)" data-min="0.5">
+  <p class="kicker">Quiz 3 · answer at the end</p>
+  <h2>Which would hurt Lightning payments more if it switched off tomorrow?</h2>
+  <div class="quiz two">
+    <div class="opt"><b>A</b>Every Core Lightning node (~620 that route payments)</div>
+    <div class="opt"><b>B</b>One single node</div>
+  </div>
+  <p class="say step muted">Hold on to your vote. 🙂</p>
+  <aside class="notes">
+    <p>Take the vote and note the split out loud ("most of you say A"). <b>Don't reveal.</b> The answer is slide 14.</p>
+    <p>"Keep that in your head. That's really what this talk is about."</p>
+  </aside>
+</section>
+
+<!-- 6 · Lightning in 60 seconds -->
+<section class="slide" data-title="Lightning in 60 seconds" data-min="1">
+  <p class="kicker">Lightning in 60 seconds</p>
+  <h2 style="margin-bottom:10px">Payments hop through channels, often through a hub</h2>
+  <svg viewBox="0 0 1380 230" width="1380" height="230" aria-label="Alice and Bob each have a channel with a hub">
+    <line x1="215" y1="125" x2="595" y2="125" stroke="#8893A0" stroke-width="7"/>
+    <line x1="785" y1="125" x2="1165" y2="125" stroke="#8893A0" stroke-width="7"/>
+    <text x="405" y="105" text-anchor="middle" font-size="24" fill="#5E6977">channel</text>
+    <text x="975" y="105" text-anchor="middle" font-size="24" fill="#5E6977">channel</text>
+    <text x="405" y="165" text-anchor="middle" font-size="20" fill="#8893A0">shared bitcoin, locked on-chain</text>
+    <text x="975" y="165" text-anchor="middle" font-size="20" fill="#8893A0">shared bitcoin, locked on-chain</text>
+    <circle cx="145" cy="125" r="70" fill="#fff" stroke="#242D38" stroke-width="3"/>
+    <circle cx="690" cy="125" r="95" fill="#FBF2ED" stroke="#D47355" stroke-width="4"/>
+    <circle cx="1235" cy="125" r="70" fill="#fff" stroke="#242D38" stroke-width="3"/>
+    <text x="145" y="135" text-anchor="middle" font-size="30" font-weight="700" fill="#242D38">Alice</text>
+    <text x="690" y="135" text-anchor="middle" font-size="34" font-weight="800" fill="#A95137">Hub</text>
+    <text x="1235" y="135" text-anchor="middle" font-size="30" font-weight="700" fill="#242D38">Bob</text>
+    <text x="690" y="22" text-anchor="middle" font-size="24" font-weight="600" fill="#A95137">⚡ Alice pays Bob through the hub</text>
+  </svg>
+  <div class="cards" style="margin-top:22px">
+    <div class="card step"><h3>Gossip</h3><p>Nodes announce their channels. That public map is what I recorded every day.</p></div>
+    <div class="card good step"><h3>Cooperative close</h3><p>Both sides sign. One cheap transaction. Money is free right away.</p></div>
+    <div class="card bad step"><h3>Force close</h3><p>One side closes alone. Higher fees, and the money waits out a time-lock.</p></div>
+  </div>
+  <aside class="notes">
+    <p>For the newer folks; experts will forgive you. Keep it under a minute.</p>
+    <p>"A channel is bitcoin two people lock together on-chain. Payments hop across channels, and in practice they often go through big, well-connected nodes: hubs."</p>
+    <p>Click through the three cards. "Gossip is the public map. Cooperative close is the polite exit. Force close is the messy one."</p>
+    <p>Ask: "Quick check: if your peer disappears, which close are you stuck with?" (Force close.)</p>
+  </aside>
+</section>
+
+<!-- 7 · Timeline -->
+<section class="slide" data-title="Summer 2026 timeline" data-min="1">
+  <p class="kicker">Summer 2026</p>
+  <h2 style="margin-bottom:26px">Every implementation shipped security fixes</h2>
+  <div class="tl">
+    <div><span class="d">Jul 10</span><span class="t" style="--c:#5E6977">TOR</span><span>DoS wave on Tor: Tor-only nodes of <i>every</i> client lose peers</span></div>
+    <div><span class="d">Jul 19</span><span class="t" style="--c:var(--cln)">CLN</span><span>Memory-exhaustion DoS bugs disclosed (already fixed)</span></div>
+    <div><span class="d">Aug 7</span><span class="t" style="--c:var(--lnd)">BTCPAY</span><span>BTCPay Server bug leaks merchants' LND credentials; funds stolen</span></div>
+    <div><span class="d">Aug 11</span><span class="t" style="--c:var(--lnd)">LND</span><span>10 security advisories for older versions</span></div>
+    <div class="big"><span class="d">Aug 26</span><span class="t" style="--c:var(--cln)">CLN</span><span>Devs: “upgrade now, or restart your node offline”</span></div>
+    <div><span class="d">Sep 9–22</span><span class="t" style="--c:#5E6977">ALL</span><span>Fixes: LDK 0.2.6 · Eclair 0.14.3 · CLN 26.06.8 · 8 more LND/btcd advisories</span></div>
+    <div><span class="d">Oct 2</span><span class="t" style="--c:var(--cln)">CLN</span><span>Attackers actively targeting old versions</span></div>
+  </div>
+  <p class="say step" style="margin-top:26px">Different bugs, same summer. <b>So what did the network actually feel?</b></p>
+  <aside class="notes">
+    <p>Ask first: "Who remembers any of these? Which one hit you?" Take one or two answers; that's your back-and-forth.</p>
+    <p>Point at Aug 26: "This one is unusual. A dev team asked operators to <b>take their nodes off the network</b>. That's a natural experiment."</p>
+    <p>Be fair: the BTCPay issue was an application bug, not an LND protocol bug. And every client patched something.</p>
+    <p>Click: "So the question isn't which client is buggy. It's what the network felt."</p>
+  </aside>
+</section>
+
+<!-- 8 · How we measured -->
+<section class="slide" data-title="How I measured" data-min="0.5">
+  <p class="kicker">How I measured</p>
+  <h2>Two of my own nodes, watching every day</h2>
+  <div class="cards">
+    <div class="card"><div class="num">148</div><h3>days of the map</h3><p>A daily snapshot of public Lightning gossip from my LND node, May 1 – Oct 4.</p></div>
+    <div class="card"><div class="num">44,774</div><h3>channel closes</h3><p>Every block scanned by my own Bitcoin Core node, each close classified.</p></div>
+    <div class="card"><div class="num">4</div><h3>clients told apart</h3><p>Nodes don't say what they run. I infer it from feature bits and defaults.</p></div>
+  </div>
+  <p class="say step muted" style="margin-top:34px;font-size:28px">Caveat: one vantage point, public channels only. Private channels inside wallets are invisible here.</p>
+  <aside class="notes">
+    <p>30 seconds. "Everything here comes from data anyone could collect: a Lightning node, a Bitcoin node, and patience."</p>
+    <p>Say the caveat honestly; it builds trust with a technical crowd.</p>
+  </aside>
+</section>
+
+<!-- 9 · Quiz: how many went dark -->
+<section class="slide" data-title="Quiz: how many CLN nodes went dark" data-min="1.33">
+  <p class="kicker">Quiz 4 · Aug 26 · “upgrade, or go offline”</p>
+  <h2>What share of Core Lightning nodes actually went dark?</h2>
+  <div class="quiz key">
+    <div class="opt"><b>A</b>2%</div>
+    <div class="opt ok"><b>B</b>22%</div>
+    <div class="opt"><b>C</b>50%</div>
+    <div class="opt"><b>D</b>90%</div>
+  </div>
+  <div class="hbars step">
+    <div class="hb"><div class="lab">An ordinary day<small>CLN nodes that drop off anyway</small></div><div class="track"><div class="fill" style="--w:9.4%"></div><span class="val">2.3%</span></div></div>
+    <div class="hb hot"><div class="lab">Right after the call<small>137 of 624 routing CLN nodes</small></div><div class="track"><div class="fill" style="--w:90%"></div><span class="val">22%</span></div></div>
+  </div>
+  <p class="say step" style="margin-top:30px">Who listened most? <b>The biggest nodes</b> (32%) and <b>Tor-only nodes</b> (28% vs 7% for clearnet-only). LND, LDK, Eclair: no change.</p>
+  <aside class="notes">
+    <p>Vote, then reveal. Option A is the trap: 2% is just a normal day's churn.</p>
+    <p><b>Answer: 22%.</b> About ten times an ordinary day. Peers saw it too: the share of channels toward CLN nodes marked disabled jumped from 12% to 38%.</p>
+    <p>Ask: "Is 22% a lot or a little for an emergency call?" Let someone answer. Both views are fair: most operators patched instead of going offline.</p>
+    <p>Second click: the largest fifth of CLN nodes complied most (32%). Other clients didn't move, so this was contained to one client.</p>
+  </aside>
+</section>
+
+<!-- 10 · Recovery -->
+<section class="slide" data-title="Coming back" data-min="0.67">
+  <p class="kicker">Coming back</p>
+  <h2>Half were back within a week. A third were still dark five weeks later.</h2>
+  <div style="display:flex;gap:56px;align-items:center">
+    <svg id="recov" viewBox="0 0 1000 430" width="1000" height="430" aria-label="Share of the 137 dark CLN nodes still dark, by day"></svg>
+    <div style="display:flex;flex-direction:column;gap:34px">
+      <div class="stat step"><div class="v">39%</div><div class="k">back by day 3,<br>right after the fix</div></div>
+      <div class="stat step"><div class="v">53%</div><div class="k">back within a week</div></div>
+      <div class="stat step"><div class="v">32%</div><div class="k">still dark on Oct 4</div></div>
+    </div>
+  </div>
+  <p class="src">Share of the 137 CLN nodes that went dark still offline, Aug 27 – Oct 4</p>
+  <aside class="notes">
+    <p>"Of the 137 that went dark, how fast did they come back?" Point at the cliff right after the CLN 26.06.7 release on Aug 28.</p>
+    <p>Click through the three numbers. On the last one: "A third were still gone five weeks later. Some nodes that go offline just don't come back."</p>
+    <p>The Oct 2 "active attacks" warning produced no second wave. If short on time, skip this slide with one sentence.</p>
+  </aside>
+</section>
+
+<!-- 11 · Guess the spike -->
+<section class="slide" data-title="Guess the spike" data-min="1.17">
+  <p class="kicker">Guess the spike</p>
+  <h2 style="margin-bottom:8px">Force closes per day. Are these spikes attacks?</h2>
+  <svg id="spikes" viewBox="0 0 1380 440" width="1380" height="440" aria-label="Daily force closes, July to September 2026"></svg>
+  <p class="say step" style="margin-top:12px">Each spike is <b>one operator</b> closing its own channels. Without them, force closes on CLN channels still ran <b>2.2×</b> normal for two weeks (LND-only: 0.8×).</p>
+  <aside class="notes">
+    <p>Ask: "What do you think these tall spikes are? Hacks? Panic?" Let a couple of people guess.</p>
+    <p>Click: each spike is one node force-closing many channels in a day. NiceHash: 226 on Aug 3. Kraken: 101 on Aug 12 while moving its node. Wallet of Satoshi: 205 on Aug 26, the same day as the CLN call. That's a coincidence that could fool a quick analysis.</p>
+    <p>Second click, the real signal: with those operators removed, organic force closes on CLN channels ran 2.2× their July–August rate for two weeks.</p>
+    <p>Lesson: "When you see a spike on a chart, ask who's behind it."</p>
+  </aside>
+</section>
+
+<!-- 12 · Quiz: channels gone -->
+<section class="slide" data-title="Quiz: channels gone" data-min="1">
+  <p class="kicker">Quiz 5</p>
+  <h2>Of the public channels open on Aug 1, how many were gone by Oct 4?</h2>
+  <div class="quiz key" style="margin-bottom:34px">
+    <div class="opt"><b>A</b>5%</div>
+    <div class="opt"><b>B</b>15%</div>
+    <div class="opt ok"><b>C</b>38%</div>
+    <div class="opt"><b>D</b>60%</div>
+  </div>
+  <div style="display:flex;gap:64px;align-items:center" class="key">
+    <div class="g100" id="g100"></div>
+    <div style="display:flex;flex-direction:column;gap:22px;font-size:28px;line-height:1.35">
+      <div class="step">Normal for 9 weeks: <b>18%</b></div>
+      <div class="step"><b>79%</b> closed cooperatively: calm exits, not panic</div>
+      <div class="step"><b>10 operators</b> were in 31% of closes</div>
+    </div>
+  </div>
+  <p class="src">38,081 public channels on Aug 1; 14,547 gone and 6,833 new by Oct 4</p>
+  <aside class="notes">
+    <p>Vote, reveal. <b>Answer: 38%</b>, against about 18% in the same-length window starting May 1. 44% of the capacity.</p>
+    <p>The grid: each square is 1% of the channels. The outlined ones are gone.</p>
+    <p>"Does that mean people fled Lightning?" Not really: most closes were cooperative, and ten operators were party to almost a third of them, led by Kraken moving its node. Client shares barely moved.</p>
+  </aside>
+</section>
+
+<!-- 13 · Tor vs CLN -->
+<section class="slide" data-title="Tor vs CLN" data-min="1">
+  <p class="kicker">So what actually breaks payments?</p>
+  <h2 style="margin-bottom:14px">Which cut more payment routes?</h2>
+  <p class="lead" style="margin-bottom:30px;font-size:28px">Pick two random nodes: can a 100,000-sat payment find a path? Normally, yes for about 80% of pairs.</p>
+  <div class="quiz two key" style="margin-bottom:34px">
+    <div class="opt"><b>A</b>Core Lightning shutdown (Aug 26)</div>
+    <div class="opt ok"><b>B</b>Tor DoS wave (Jul 10)</div>
+  </div>
+  <div class="hbars step">
+    <div class="hb"><div class="lab">Any normal two days</div><div class="track"><div class="fill" style="--w:21%"></div><span class="val">−3.6 pts</span></div></div>
+    <div class="hb"><div class="lab">CLN shutdown</div><div class="track"><div class="fill" style="--w:46%;background:var(--cln)"></div><span class="val">−7.8 pts</span></div></div>
+    <div class="hb hot"><div class="lab">Tor DoS wave</div><div class="track"><div class="fill" style="--w:94%;background:#5E6977"></div><span class="val" style="color:var(--ink)">−16 pts</span></div></div>
+  </div>
+  <p class="src">Drop in node pairs that can route 100k sat, in percentage points, over two-day windows</p>
+  <aside class="notes">
+    <p>Explain reachability in one breath: "pick any two nodes; can a 100k-sat payment get from one to the other?"</p>
+    <p>Vote, reveal. <b>The Tor wave cost twice as much</b>: 15.6–16 points vs 7.8 for the CLN shutdown. A normal two days costs about 3.6.</p>
+    <p>"The thing that hurt most this summer wasn't a Lightning bug. It was the network underneath Lightning."</p>
+    <p>Honesty note if asked: 4 of 94 ordinary windows cost more than the CLN shutdown (early-August closing waves).</p>
+  </aside>
+</section>
+
+<!-- 14 · Answer to quiz 3 -->
+<section class="slide" data-title="Quiz 3 answer: one node" data-min="1">
+  <p class="kicker">Back to Quiz 3</p>
+  <h2>Every Core Lightning node, or one single node?</h2>
+  <div class="hbars key">
+    <div class="hb"><div class="lab">All ~620 CLN nodes off</div><div class="track"><div class="fill" style="--w:21%;background:var(--cln)"></div><span class="val">−3.7 pts</span></div></div>
+    <div class="hb hot"><div class="lab">One node off<small>ACINQ, an Eclair hub</small></div><div class="track"><div class="fill" style="--w:90%;background:var(--eclair)"></div><span class="val" style="color:var(--eclair)">−15.9 pts</span></div></div>
+  </div>
+  <p class="say step" style="margin-top:44px">One hub outweighs a whole client, <b>4×</b>.</p>
+  <p class="say step" style="margin-top:18px">Of the 20 nodes the network can least afford to lose, <b>19 run LND</b> and 1 runs Eclair.</p>
+  <p class="src">Simulated removal on the Aug 25 graph · drop in node pairs that can route 100k sat</p>
+  <aside class="notes">
+    <p>"Remember your vote? Who said A? Who said B?" Then reveal.</p>
+    <p><b>Answer: B, one node.</b> Turning off every routing CLN node costs 3.7 points. Turning off ACINQ alone costs 15.9 points, four times as much.</p>
+    <p>Callback to Quiz 1: "Eclair: 42 nodes, 6% of the bitcoin. This is why."</p>
+    <p>The critical list is almost all LND, simply because the hubs run LND. Client diversity counted by nodes doesn't tell you where the risk sits.</p>
+  </aside>
+</section>
+
+<!-- 15 · Takeaways -->
+<section class="slide" data-title="Takeaways" data-min="1">
+  <p class="kicker">Three things to take home</p>
+  <div class="take">
+    <div class="step"><span class="n">1</span><div><h3>Count isn't resilience</h3><p>The #2 client went offline and the damage stayed contained to it.</p></div></div>
+    <div class="step"><span class="n">2</span><div><h3>Hubs set the blast radius</h3><p>One well-connected node outweighs every Core Lightning node combined.</p></div></div>
+    <div class="step"><span class="n">3</span><div><h3>Look under the client</h3><p>A Tor attack cut more routes than any Lightning bug this summer. And when a chart spikes, ask who's behind it.</p></div></div>
+  </div>
+  <aside class="notes">
+    <p>Slow down here. One sentence per point, then pause.</p>
+    <p>If time allows, ask: "Which of these surprised you most?"</p>
+  </aside>
+</section>
+
+<!-- 16 · Q&A -->
+<section class="slide center" data-title="Your turn / Q&A" data-min="2">
+  <div style="display:flex;gap:90px;align-items:center">
+    <div style="flex:1">
+      <p class="kicker">Your turn</p>
+      <h2>What should I measure next?</h2>
+      <p class="lead">The full interactive report, with every chart and its data:</p>
+      <p class="mono" style="font-size:24px;margin:18px 0 40px;color:var(--accent-d);word-break:break-all">bitcoindatalabs.github.io/deep-dives/analyses/<br>2026-10-lightning-network-analysis</p>
+      <p class="lead" style="font-size:28px;color:var(--ink)"><b>Saurabh Kumar</b> · Bitcoin Data Labs</p>
+    </div>
+    <div style="width:330px;flex:none;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px">
+      <svg viewBox="0 0 45 45" width="294" height="294" aria-label="QR code for the report"><path stroke="#242d38" d="M2 2.5h7m2 0h4m1 0h1m4 0h1m1 0h3m2 0h2m1 0h3m2 0h7m-41 1h1m5 0h1m6 0h2m1 0h2m2 0h1m2 0h2m2 0h2m1 0h1m1 0h1m1 0h1m5 0h1m-41 1h1m1 0h3m1 0h1m4 0h3m1 0h3m1 0h5m2 0h1m2 0h1m2 0h1m1 0h1m1 0h3m1 0h1m-41 1h1m1 0h3m1 0h1m6 0h1m1 0h1m1 0h1m2 0h3m2 0h1m1 0h1m1 0h1m4 0h1m1 0h3m1 0h1m-41 1h1m1 0h3m1 0h1m2 0h1m1 0h3m1 0h1m1 0h1m5 0h1m3 0h2m1 0h1m3 0h1m1 0h3m1 0h1m-41 1h1m5 0h1m1 0h5m1 0h6m1 0h1m2 0h4m1 0h1m1 0h2m1 0h1m5 0h1m-41 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-32 1h2m1 0h1m2 0h3m3 0h1m2 0h1m1 0h2m1 0h1m2 0h1m-33 1h1m2 0h1m1 0h2m1 0h2m2 0h2m2 0h1m2 0h1m1 0h1m2 0h3m1 0h1m4 0h1m1 0h1m-34 1h4m1 0h1m1 0h1m1 0h2m3 0h2m3 0h1m2 0h1m3 0h2m2 0h4m1 0h4m-41 1h1m1 0h1m3 0h1m2 0h4m3 0h4m4 0h3m1 0h1m2 0h1m2 0h1m2 0h3m-37 1h3m5 0h4m1 0h1m1 0h1m1 0h3m1 0h2m2 0h1m1 0h1m4 0h1m2 0h1m-36 1h2m1 0h3m1 0h1m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h3m1 0h4m2 0h1m2 0h1m-40 1h1m3 0h1m1 0h1m1 0h4m1 0h4m2 0h1m1 0h2m1 0h3m3 0h1m6 0h1m-39 1h1m1 0h1m1 0h1m1 0h1m4 0h2m2 0h1m2 0h2m1 0h1m1 0h1m1 0h5m2 0h1m1 0h2m4 0h1m-40 1h5m1 0h1m1 0h3m2 0h1m1 0h2m2 0h2m1 0h1m1 0h1m2 0h2m4 0h1m1 0h1m3 0h1m-40 1h2m2 0h3m2 0h1m5 0h2m2 0h3m1 0h1m2 0h3m1 0h2m2 0h1m3 0h2m-39 1h1m1 0h2m1 0h5m1 0h2m1 0h2m3 0h1m1 0h1m2 0h1m1 0h1m3 0h1m1 0h2m1 0h4m-41 1h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m4 0h1m2 0h1m2 0h1m1 0h1m1 0h1m3 0h1m2 0h2m-38 1h2m3 0h1m2 0h1m1 0h1m2 0h1m2 0h3m2 0h2m1 0h3m4 0h2m3 0h2m-40 1h1m1 0h1m2 0h2m2 0h1m1 0h3m2 0h1m2 0h1m1 0h3m1 0h5m2 0h2m2 0h4m-40 1h1m1 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m1 0h1m5 0h1m3 0h3m3 0h3m-41 1h2m2 0h1m1 0h1m4 0h1m2 0h4m1 0h2m1 0h1m5 0h1m1 0h2m1 0h2m1 0h2m1 0h1m-39 1h1m2 0h2m3 0h2m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m1 0h4m1 0h1m4 0h2m1 0h1m-39 1h4m2 0h2m3 0h1m1 0h2m1 0h2m1 0h1m1 0h1m3 0h1m1 0h3m1 0h2m1 0h2m-35 1h2m2 0h1m1 0h1m1 0h1m3 0h3m1 0h1m1 0h2m1 0h1m1 0h1m4 0h3m3 0h1m1 0h1m1 0h1m-40 1h2m1 0h5m1 0h1m1 0h1m1 0h2m1 0h2m3 0h1m1 0h1m1 0h2m2 0h1m2 0h1m1 0h2m3 0h2m-40 1h1m2 0h2m1 0h1m2 0h1m1 0h2m1 0h4m2 0h1m1 0h1m1 0h1m3 0h2m1 0h1m1 0h2m-36 1h2m3 0h5m2 0h1m1 0h2m1 0h1m1 0h1m1 0h2m1 0h1m3 0h2m3 0h1m5 0h2m-40 1h2m1 0h2m2 0h3m1 0h1m1 0h8m2 0h1m1 0h2m1 0h2m2 0h2m3 0h3m-41 1h1m1 0h2m1 0h3m1 0h3m5 0h2m4 0h2m1 0h1m3 0h1m6 0h2m1 0h1m-39 1h1m6 0h6m1 0h3m2 0h1m2 0h1m1 0h5m2 0h1m1 0h1m1 0h1m-38 1h1m2 0h5m2 0h1m2 0h1m4 0h1m1 0h2m2 0h3m1 0h1m2 0h6m1 0h1m1 0h1m-33 1h1m2 0h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h2m2 0h1m3 0h1m3 0h2m2 0h1m-41 1h7m2 0h2m4 0h2m1 0h5m1 0h3m1 0h2m2 0h1m1 0h1m1 0h4m-40 1h1m5 0h1m1 0h2m1 0h1m2 0h1m3 0h2m3 0h3m2 0h2m1 0h2m3 0h3m-39 1h1m1 0h3m1 0h1m5 0h2m2 0h1m1 0h1m1 0h1m2 0h1m2 0h1m1 0h1m3 0h6m-38 1h1m1 0h3m1 0h1m1 0h4m3 0h1m1 0h6m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h1m3 0h1m-41 1h1m1 0h3m1 0h1m2 0h1m3 0h2m1 0h2m2 0h1m1 0h2m2 0h1m1 0h2m6 0h2m1 0h2m-41 1h1m5 0h1m4 0h1m1 0h1m1 0h2m1 0h2m1 0h5m1 0h1m1 0h1m1 0h2m1 0h2m3 0h1m-40 1h7m1 0h2m4 0h1m1 0h1m1 0h5m1 0h1m4 0h1m1 0h7m1 0h1"/></svg>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Don't end on "any questions?" Ask the slide's question: "What should I measure next?" It gets people talking, and some of those answers become the next deep dive.</p>
+    <p>If it's quiet, seed it: "Would you want to know how fast your own client's users patch?" (Gossip carries no version string, so that's genuinely hard. Good discussion.)</p>
+    <p>Use digit keys to jump back to any slide during Q&amp;A (e.g. 1 then 4 for slide 14).</p>
+  </aside>
+</section>
+
+<div id="foot"><span>Bitcoin Data Labs · TABConf 2026</span><span id="snum"></span></div>
+<div id="prog"></div>
+</div></div>
+
+<div id="black"></div>
+<div id="notesbar"></div>
+<div id="help">
+→ Space PageDown: next &nbsp;·&nbsp; ← PageUp: back &nbsp;·&nbsp; Home/End &nbsp;·&nbsp; digits: jump to slide<br>
+P: presenter window (notes, timer, pace) &nbsp;·&nbsp; N: notes here &nbsp;·&nbsp; F: fullscreen &nbsp;·&nbsp; B or .: black screen &nbsp;·&nbsp; ?: close help
+</div>
+<div id="panel">
+  <div style="display:flex;align-items:baseline;justify-content:space-between">
+    <div id="ptime" title="Click to restart the timer">00:00</div><div id="ppace"></div>
+  </div>
+  <div id="pblack">■ SCREEN IS BLACK (press B)</div>
+  <div id="ptitle"></div>
+  <div id="pnotes"></div>
+  <div class="pbtns"><button data-a="prev">◀ Back</button><button data-a="next">Next ▶</button><button data-a="reset">Restart timer</button></div>
+</div>
+<div id="nextwrap"></div>
+
+<script>
+(() => {
+  // ── data (from data/processed/*.json, cutoff 2026-10-04) ──
+  // cln_recovery.json: share of the 137 dark CLN nodes still dark, day 1 = Aug 27 … day 39 = Oct 4
+  const REC = [1,.92,.606,.555,.489,.489,.467,.474,.445,.438,.438,.401,.394,.372,.38,.35,.336,.336,.343,.343,.336,.336,.336,.343,.336,.321,.328,.314,.307,.307,.321,.314,.314,.299,.314,.307,.314,.307,.321];
+  // closes_daily.json: [MM-DD, organic force closes, force closes in mass-close events]
+  const SP = [["07-01",69,0],["07-02",39,0],["07-03",65,21],["07-04",42,0],["07-05",17,0],["07-06",32,0],["07-07",59,0],["07-08",41,0],["07-09",57,0],["07-10",90,0],["07-11",78,20],["07-12",85,42],["07-13",98,0],["07-14",77,51],["07-15",46,0],["07-16",31,0],["07-17",57,0],["07-18",66,21],["07-19",54,0],["07-20",49,22],["07-21",98,20],["07-22",45,0],["07-23",40,0],["07-24",64,0],["07-25",70,0],["07-26",37,54],["07-27",59,21],["07-28",54,0],["07-29",40,21],["07-30",61,0],["07-31",76,0],["08-01",86,0],["08-02",72,0],["08-03",43,290],["08-04",54,0],["08-05",31,0],["08-06",107,43],["08-07",139,69],["08-08",77,0],["08-09",28,0],["08-10",38,0],["08-11",72,0],["08-12",65,134],["08-13",38,0],["08-14",36,0],["08-15",31,20],["08-16",39,0],["08-17",33,0],["08-18",22,0],["08-19",44,0],["08-20",24,23],["08-21",21,0],["08-22",29,0],["08-23",24,22],["08-24",43,60],["08-25",25,79],["08-26",30,205],["08-27",42,0],["08-28",38,0],["08-29",42,0],["08-30",52,0],["08-31",76,0],["09-01",35,0],["09-02",35,0],["09-03",37,0],["09-04",37,0],["09-05",66,0],["09-06",46,25],["09-07",43,20],["09-08",45,0],["09-09",28,26],["09-10",52,0],["09-11",33,0],["09-12",48,0],["09-13",39,0],["09-14",80,0],["09-15",100,0],["09-16",36,0],["09-17",41,0],["09-18",52,0],["09-19",39,0],["09-20",22,0],["09-21",33,44],["09-22",33,0],["09-23",64,65],["09-24",81,27],["09-25",21,0],["09-26",27,0],["09-27",28,0],["09-28",31,0],["09-29",32,0],["09-30",64,0]];
+  const SPIKES = [["08-03","NiceHash","226 in one day"],["08-12","Kraken","101"],["08-26","Wallet of Satoshi","205"]];
+
+  // ── tiny SVG helpers ──
+  const NS = "http://www.w3.org/2000/svg";
+  const S = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const T = (txt, a, p) => { const e = S("text", a, p); e.textContent = txt; return e; };
+
+  function drawRecovery() {
+    const svg = document.getElementById("recov");
+    const W = 1000, H = 430, m = { l: 78, r: 40, t: 24, b: 64 };
+    const x = d => m.l + (d - 1) / (REC.length - 1) * (W - m.l - m.r);
+    const y = v => m.t + (1 - v) * (H - m.t - m.b);
+    [0, .25, .5, .75, 1].forEach(v => {
+      S("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), class: "grid" }, svg);
+      T(Math.round(v * 100) + "%", { x: m.l - 14, y: y(v) + 8, "text-anchor": "end", class: "tick" }, svg);
+    });
+    [[1, "Aug 27"], [7, "Sep 2"], [14, "Sep 9"], [21, "Sep 16"], [28, "Sep 23"], [39, "Oct 4"]]
+      .forEach(([d, l]) => T(l, { x: x(d), y: H - m.b + 38, "text-anchor": "middle", class: "tick" }, svg));
+    const pts = REC.map((v, i) => `${x(i + 1).toFixed(1)},${y(v).toFixed(1)}`);
+    S("path", { d: `M${x(1)},${y(0)}L${pts.join("L")}L${x(REC.length)},${y(0)}Z`, fill: "#FBF2ED" }, svg);
+    S("path", { d: `M${pts.join("L")}`, fill: "none", stroke: "#D47355", "stroke-width": 5, "stroke-linejoin": "round" }, svg);
+    S("line", { x1: x(2), x2: x(2), y1: m.t, y2: H - m.b, class: "mark" }, svg);
+    T("← CLN fix released, Aug 28", { x: x(2) + 12, y: H - m.b - 16, class: "mlab" }, svg);
+    S("circle", { cx: x(REC.length), cy: y(REC[REC.length - 1]), r: 8, fill: "#D47355", stroke: "#fff", "stroke-width": 3 }, svg);
+  }
+
+  function drawSpikes() {
+    const svg = document.getElementById("spikes");
+    const W = 1380, H = 440, m = { l: 70, r: 20, t: 70, b: 46 }, ymax = 350;
+    const bw = (W - m.l - m.r) / SP.length;
+    const y = v => m.t + (1 - v / ymax) * (H - m.t - m.b);
+    [0, 100, 200, 300].forEach(v => {
+      S("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), class: "grid" }, svg);
+      T(v, { x: m.l - 12, y: y(v) + 8, "text-anchor": "end", class: "tick" }, svg);
+    });
+    SP.forEach(([d, o, ms], i) => {
+      const x0 = m.l + i * bw + 1.5, w = bw - 3;
+      S("rect", { x: x0, y: y(o), width: w, height: y(0) - y(o), class: "org" }, svg);
+      if (ms) S("rect", { x: x0, y: y(o + ms), width: w, height: y(o) - y(o + ms), class: "mass" }, svg);
+      if (d.endsWith("-01")) T({ "07": "July", "08": "August", "09": "September" }[d.slice(0, 2)],
+        { x: x0, y: H - m.b + 34, class: "tick" }, svg);
+    });
+    const g = S("g", { class: "step" }, svg);
+    SPIKES.forEach(([d, name, sub]) => {
+      const i = SP.findIndex(r => r[0] === d), cx = m.l + (i + .5) * bw, top = y(SP[i][1] + SP[i][2]);
+      T(name, { x: cx, y: top - 36, "text-anchor": "middle", class: "clab" }, g);
+      T(sub, { x: cx, y: top - 10, "text-anchor": "middle", class: "csub" }, g);
+    });
+  }
+
+  function drawGrid() {
+    const g = document.getElementById("g100");
+    for (let i = 0; i < 100; i++) {
+      const e = document.createElement("i");
+      if (i >= 62) { e.className = "gone"; e.style.transitionDelay = (i - 62) * 22 + "ms"; }
+      g.appendChild(e);
+    }
+  }
+
+  drawRecovery(); drawSpikes(); drawGrid();
+
+  // ── deck engine ──
+  const slides = [...document.querySelectorAll(".slide")];
+  const N = slides.length;
+  const presenter = new URLSearchParams(location.search).has("presenter");
+  const stage = document.getElementById("stage"), viewport = document.getElementById("viewport");
+  const stepsOf = s => [...s.querySelectorAll(".step, .key")];
+  let cur = 0, k = 0;
+
+  function fit() {
+    const r = viewport.getBoundingClientRect();
+    const s = Math.min(r.width / 1600, r.height / 900);
+    stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+  }
+
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle("on", i === cur));
+    const s = slides[cur];
+    stepsOf(s).forEach((e, i) => e.classList.toggle("in", i < k));
+    s.dataset.k = k;
+    document.getElementById("snum").textContent = `${cur + 1} / ${N}`;
+    document.getElementById("prog").style.width = `${(cur + 1) / N * 100}%`;
+    document.getElementById("notesbar").innerHTML = notesOf(s);
+    try { history.replaceState(null, "", location.pathname + location.search + "#" + (cur + 1)); } catch (e) {}
+    if (presenter) panel();
+  }
+  const notesOf = s => (s.querySelector(".notes") || { innerHTML: "" }).innerHTML;
+
+  function go(i, step) {
+    cur = Math.max(0, Math.min(N - 1, i));
+    const n = stepsOf(slides[cur]).length;
+    k = step === "end" ? n : Math.max(0, Math.min(step || 0, n));
+    render(); send();
+  }
+  function next() {
+    if (k < stepsOf(slides[cur]).length) { k++; render(); send(); }
+    else if (cur < N - 1) go(cur + 1, 0);
+  }
+  function prev() {
+    if (k > 0) { k--; render(); send(); }
+    else if (cur > 0) go(cur - 1, "end");
+  }
+
+  // keep the audience window and the presenter window in sync
+  let bc = null;
+  try { bc = new BroadcastChannel("bdl-deck-tabconf"); } catch (e) {}
+  function send(extra) { if (bc) bc.postMessage(Object.assign({ t: "state", cur, k, black: document.body.classList.contains("black") }, extra)); }
+  if (bc) bc.onmessage = ({ data: m }) => {
+    if (m.t === "hello") return send();
+    if (m.t === "state") {
+      document.body.classList.toggle("black", !!m.black);
+      if (m.cur !== cur || m.k !== k) { cur = m.cur; k = m.k; render(); } else if (presenter) panel();
+    }
+  };
+
+  function toggleBlack() { document.body.classList.toggle("black"); send(); if (presenter) panel(); }
+  function toggleFS() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+  }
+  function openPresenter() {
+    window.open(location.pathname + "?presenter#" + (cur + 1), "bdl-presenter", "width=1280,height=800");
+  }
+
+  let digits = "", digitTimer = null;
+  addEventListener("keydown", e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const key = e.key;
+    if (["ArrowRight", "ArrowDown", " ", "PageDown", "Enter"].includes(key)) {
+      e.preventDefault();
+      if (digits) { clearTimeout(digitTimer); go(parseInt(digits, 10) - 1, "end"); digits = ""; } else next();
+    }
+    else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(key)) { e.preventDefault(); prev(); }
+    else if (key === "Home") go(0, 0);
+    else if (key === "End") go(N - 1, "end");
+    else if (key === "f" || key === "F") toggleFS();
+    else if (key === "p" || key === "P") openPresenter();
+    else if (key === "b" || key === "B" || key === ".") toggleBlack();
+    else if (key === "n" || key === "N") document.body.classList.toggle("shownotes");
+    else if (key === "?") document.body.classList.toggle("showhelp");
+    else if (/^[0-9]$/.test(key)) {
+      digits += key; clearTimeout(digitTimer);
+      digitTimer = setTimeout(() => { go(parseInt(digits, 10) - 1, "end"); digits = ""; }, 900);
+    }
+  });
+  stage.addEventListener("click", e => { if (!presenter && !e.target.closest("a")) next(); });
+  let tx = null;
+  addEventListener("touchstart", e => { tx = e.touches[0].clientX; }, { passive: true });
+  addEventListener("touchend", e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+
+  // ── presenter panel: notes, timer, pace against each slide's data-min budget ──
+  const budget = slides.map(s => parseFloat(s.dataset.min || "1") * 60);
+  const endAt = budget.map((_, i) => budget.slice(0, i + 1).reduce((a, b) => a + b, 0));
+  let t0 = Date.now();
+  const mmss = sec => { const s = Math.round(Math.abs(sec)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+  function panel() {
+    const s = slides[cur], n = stepsOf(s).length;
+    document.getElementById("ptitle").innerHTML =
+      `${cur + 1}/${N} · ${s.dataset.title} <span>· click ${k}/${n} · budget ${mmss(budget[cur])}, end by ${mmss(endAt[cur])}</span>`;
+    document.getElementById("pnotes").innerHTML = notesOf(s);
+    const nx = slides[cur + 1];
+    document.getElementById("nextwrap").innerHTML = k < n
+      ? `<b>Next:</b> click ${k + 1} of ${n} on this slide`
+      : (nx ? `<b>Next slide:</b> ${nx.dataset.title}` : "<b>Last slide</b>");
+    tick();
+  }
+  function tick() {
+    const el = (Date.now() - t0) / 1000;
+    document.getElementById("ptime").textContent = mmss(el);
+    const startOfSlide = endAt[cur] - budget[cur], diff = el - startOfSlide;
+    const p = document.getElementById("ppace");
+    if (diff > budget[cur]) { p.textContent = `${mmss(el - endAt[cur])} behind`; p.className = "behind"; }
+    else if (diff < -20) { p.textContent = `${mmss(-diff)} ahead`; p.className = "ahead"; }
+    else { p.textContent = "on time · 15:00 talk"; p.className = ""; }
+  }
+
+  if (presenter) {
+    document.body.classList.add("presenter");
+    document.title = "Presenter · " + document.title;
+    setInterval(tick, 1000);
+    document.getElementById("ptime").onclick = () => { t0 = Date.now(); tick(); };
+    document.querySelector(".pbtns").onclick = e => {
+      const a = e.target.dataset.a;
+      if (a === "next") next(); else if (a === "prev") prev(); else if (a === "reset") { t0 = Date.now(); tick(); }
+    };
+  }
+
+  addEventListener("hashchange", () => {
+    const h = parseInt(location.hash.slice(1), 10);
+    if (Number.isFinite(h) && h - 1 !== cur) go(h - 1, 0);
+  });
+  addEventListener("resize", fit);
+  fit();
+  const h = parseInt(location.hash.slice(1), 10);
+  cur = Number.isFinite(h) ? Math.max(0, Math.min(N - 1, h - 1)) : 0;
+  render();
+  if (presenter && bc) bc.postMessage({ t: "hello" });
+})();
+</script>
+</body>
+</html>
