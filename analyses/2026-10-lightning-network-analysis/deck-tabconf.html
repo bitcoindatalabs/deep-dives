@@ -197,28 +197,29 @@ body.black.presenter #pblack { display: block; }
   <div class="quiz key">
     <div class="opt"><b>A</b>51%</div>
     <div class="opt"><b>B</b>70%</div>
-    <div class="opt ok"><b>C</b>89%</div>
+    <div class="opt ok"><b>C</b>84%</div>
     <div class="opt"><b>D</b>99%</div>
   </div>
   <div class="step">
     <div class="stack">
-      <i style="--w:89.1%;background:var(--lnd)"></i><i style="--w:8.9%;background:var(--cln)"></i><i style="--w:1.5%;background:var(--ldk)"></i><i style="--w:0.5%;background:var(--eclair)"></i>
+      <i style="--w:84.0%;background:var(--lnd)"></i><i style="--w:8.5%;background:var(--cln)"></i><i style="--w:1.5%;background:var(--ldk)"></i><i style="--w:0.4%;background:var(--eclair)"></i><i style="--w:5.6%;background:var(--grey)"></i>
     </div>
     <div class="chips">
-      <span style="--c:var(--lnd)"><b>LND</b> 89%</span>
-      <span style="--c:var(--cln)"><b>Core Lightning</b> 9%</span>
+      <span style="--c:var(--lnd)"><b>LND</b> 84%</span>
+      <span style="--c:var(--cln)"><b>Core Lightning</b> 8.5%</span>
       <span style="--c:var(--ldk)"><b>LDK</b> 1.5%</span>
-      <span style="--c:var(--eclair)"><b>Eclair</b> 0.5%</span>
+      <span style="--c:var(--eclair)"><b>Eclair</b> 0.4%</span>
+      <span style="--c:var(--grey)"><b>Unknown</b> 5.6%</span>
     </div>
   </div>
-  <p class="say step" style="margin-top:34px">Eclair is just <b>42 nodes</b>, but they hold <b>6% of the bitcoin</b>. Remember that.</p>
-  <p class="src">Public nodes on Oct 4, 2026 · client inferred from feature bits and defaults</p>
+  <p class="say step" style="margin-top:34px">Eclair is just <b>43 nodes</b>, but they hold <b>6% of the bitcoin</b>. Remember that.</p>
+  <p class="src">Public nodes with channels on Oct 4, 2026 (9,868) · client inferred from feature bits and defaults</p>
   <aside class="notes">
     <p>Read the question and the four options. "Hands up for A… B… C… D." Then click to reveal.</p>
-    <p><b>Answer: 89%</b> (8,265 of ~9,300 public nodes). Core Lightning about 9%, LDK 1.5%, Eclair 0.5%.</p>
+    <p><b>Answer: 84%</b> (8,290 of 9,868 public nodes with channels). Core Lightning 8.5%, LDK 1.5%, Eclair 0.4%, Unknown 5.6%. Counting only high-confidence labels, LND is 77.5%. Of the nodes we can identify, it's 89%.</p>
     <p>"How do I know? Nodes don't announce their software. I fingerprint it from feature bits and default settings."</p>
-    <p>On LDK: "LDK is mostly embedded in apps and wallets, often with private channels, so a public map undercounts it."</p>
-    <p>On Eclair: plant the seed. "42 nodes, 6% of capacity. One of them is ACINQ. We'll come back to it."</p>
+    <p>On LDK: "148 public nodes, yet 5.7% of capacity, about as much as Eclair. Most LDK runs inside apps and wallets like Alby Hub, behind private channels, so a public map undercounts it." (Checked: every public Alby Hub node is labeled LDK. The gap is visibility, not the classifier.)</p>
+    <p>On Eclair: plant the seed. "43 nodes, 6% of capacity. One of them is ACINQ. We'll come back to it."</p>
   </aside>
 </section>
 
