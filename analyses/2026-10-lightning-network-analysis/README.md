@@ -8,7 +8,7 @@
 ## 📌 Investigation Overview
 Between July and October 2026 every Lightning implementation (LND, Core Lightning, Eclair, LDK) shipped security fixes,
 BTCPay Server leaked merchants' LND credentials, a DoS wave hit the Tor network, and Core Lightning's maintainers asked
-operators who could not upgrade to take their nodes off the network. This deep dive measures what the network felt,
+operators to restart their nodes offline until a fix shipped. This deep dive measures what the network felt,
 from daily gossip snapshots and every on-chain channel close.
 
 ### Findings

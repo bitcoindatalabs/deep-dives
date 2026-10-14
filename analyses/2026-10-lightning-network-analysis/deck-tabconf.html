@@ -101,6 +101,8 @@ svg .step { transform: none; }
 .tl .d { font: 700 26px var(--mono); color: var(--ink2); }
 .tl .t { font: 700 19px var(--mono); text-align: center; padding: 6px 0; border-radius: 8px; color: #fff; background: var(--c); }
 .tl .big { background: var(--accent-l); border: 2px solid var(--accent-b); font-weight: 650; }
+.tl.tight { gap: 6px; }
+.tl.tight div { padding: 7px 18px; }
 
 /* ── takeaways ── */
 .take { display: flex; flex-direction: column; gap: 30px; }
@@ -295,17 +297,18 @@ body.black.presenter #pblack { display: block; }
 <!-- 7 · Timeline -->
 <section class="slide" data-title="Summer 2026 timeline" data-min="1">
   <p class="kicker">Summer 2026</p>
-  <h2 style="margin-bottom:26px">Every implementation shipped security fixes</h2>
-  <div class="tl">
+  <h2 style="margin-bottom:22px">Every implementation shipped security fixes</h2>
+  <div class="tl tight">
     <div><span class="d">Jul 10</span><span class="t" style="--c:#5E6977">TOR</span><span>DoS wave on Tor: Tor-only nodes of <i>every</i> client lose peers</span></div>
     <div><span class="d">Jul 19</span><span class="t" style="--c:var(--cln)">CLN</span><span>Memory-exhaustion DoS bugs disclosed (already fixed)</span></div>
+    <div><span class="d">Aug 4</span><span class="t" style="--c:var(--ldk)">LDK</span><span>0.2.5 fixes an on-chain funds-theft bug for forwarding nodes</span></div>
     <div><span class="d">Aug 7</span><span class="t" style="--c:var(--lnd)">BTCPAY</span><span>BTCPay Server bug leaks merchants' LND credentials; funds stolen</span></div>
     <div><span class="d">Aug 11</span><span class="t" style="--c:var(--lnd)">LND</span><span>10 security advisories for older versions</span></div>
-    <div class="big"><span class="d">Aug 26</span><span class="t" style="--c:var(--cln)">CLN</span><span>Devs: “upgrade now, or restart your node offline”</span></div>
-    <div><span class="d">Sep 9–22</span><span class="t" style="--c:#5E6977">ALL</span><span>Fixes: LDK 0.2.6 · Eclair 0.14.3 · CLN 26.06.8 · 8 more LND/btcd advisories</span></div>
-    <div><span class="d">Oct 2</span><span class="t" style="--c:var(--cln)">CLN</span><span>Attackers actively targeting old versions</span></div>
+    <div class="big"><span class="d">Aug 26</span><span class="t" style="--c:var(--cln)">CLN</span><span>Devs: “don’t shut down: restart with --offline until the fix lands”</span></div>
+    <div><span class="d">Sep 9–22</span><span class="t" style="--c:#5E6977">ALL</span><span>Fixes: LDK 0.2.6 · Eclair 0.14.3 · CLN 26.06.8 · 8 LND/btcd advisories</span></div>
+    <div><span class="d">Oct 2</span><span class="t" style="--c:var(--cln)">CLN</span><span>Reports of attackers targeting old versions</span></div>
   </div>
-  <p class="say step" style="margin-top:26px">Different bugs, same summer. <b>So what did the network actually feel?</b></p>
+  <p class="say step" style="margin-top:20px">Different bugs, same summer. <b>So what did the network actually feel?</b></p>
   <aside class="notes">
     <p>Ask first: "Who remembers any of these? Which one hit you?" Take one or two answers; that's your back-and-forth.</p>
     <p>Point at Aug 26: "This one is unusual. A dev team asked operators to <b>take their nodes off the network</b>. That's a natural experiment."</p>
