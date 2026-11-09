@@ -1,68 +1,72 @@
-# 🔬 Deep Dives (`bitcoin-data-labs/deep-dives`)
+# 🔬 Deep Dives
 
-Ad-hoc investigations, incident forensics, node anomaly evaluations, and on-chain curiosities across Bitcoin and Lightning.
+Bitcoin Data Labs measures the Bitcoin and Lightning networks from our own nodes. Each deep dive asks one question
+and answers it with interactive charts, and each one stands on its own.
 
-Hosted publicly via GitHub Pages at:  
-👉 **`https://bitcoindatalabs.github.io/deep-dives/`**
+👉 **Read them at [bitcoindatalabs.github.io/deep-dives](https://bitcoindatalabs.github.io/deep-dives/)**
 
 ---
 
-## 📁 Repository Structure
+## ⚡ Analyses
 
-Each investigation lives in its own self-contained folder under `analyses/`:
+Newest first.
 
-```text
-deep-dives/
-├── index.html                   # Master GitHub Pages Hub & searchable catalog
-├── shared/                      # Shared styling & assets
-├── analyses/
-│   ├── _template/               # Starter template for new analyses
-│   │   ├── index.html           # Public interactive report / visual dashboard
-│   │   ├── README.md            # Technical methodology & executive summary
-│   │   ├── run.py               # Data extraction & aggregation script
-│   │   └── data/
-│   │       ├── raw/             # Git-ignored raw logs/dumps
-│   │       └── processed/       # Lightweight cleaned data (<25MB)
-│   │
-│   ├── YYYY-MM-coldcard-forensics/
-│   ├── YYYY-MM-cln-channel-closures/
-│   └── ...
-└── README.md
+**[Who Patches the Lightning Network?](https://bitcoindatalabs.github.io/deep-dives/analyses/2026-11-who-patches-lightning/)**
+· 2023 – 2026<br>
+A short guide to our paper *Who Patches the Lightning Network? Evidence from Release Lines in Gossip, 2023–2026*.
+Nodes patch when their platform ships an update, not when an advisory comes out. Two months after Lightning Labs'
+August 2026 advisories, 71% of the exposed LND nodes still ran an affected release.<br>
+[arXiv:2610.30350](https://arxiv.org/abs/2610.30350) · [source](analyses/2026-11-who-patches-lightning/)
+
+**[Does Client Diversity Protect Lightning?](https://bitcoindatalabs.github.io/deep-dives/analyses/2026-11-client-diversity-explained/)**
+· Aug – Oct 2026<br>
+A short guide to our paper *Does Client Diversity Protect the Lightning Network? Evidence from the 2026 Core Lightning
+Shutdown*. When a fifth of Core Lightning nodes went offline in August 2026, the rest of the network barely noticed.
+How far a failure spreads depends on the software of a few hubs, and 19 of the 20 most critical run LND.<br>
+[arXiv:2610.20952](https://arxiv.org/abs/2610.20952) · [source](analyses/2026-11-client-diversity-explained/)
+
+**[The Summer Lightning Broke (a Little)](https://bitcoindatalabs.github.io/deep-dives/analyses/2026-10-lightning-network-analysis/)**
+· May – Oct 2026<br>
+Every Lightning implementation shipped security fixes in summer 2026. This deep dive measures what the network felt,
+from daily gossip and every on-chain channel close: a contained Core Lightning outage, force-close spikes from single
+operators, and a Tor DoS wave that cost more reachability than the outage did. Presented at TABConf 2026.<br>
+[talk slides](https://bitcoindatalabs.github.io/deep-dives/analyses/2026-10-lightning-network-analysis/deck-tabconf.html)
+· [source](analyses/2026-10-lightning-network-analysis/)
+
+---
+
+## 📡 Data
+
+* **Sources:** our own Bitcoin Core node, for every on-chain transaction, and our own LND node, for daily snapshots
+  of the public Lightning gossip graph.
+* **In each analysis folder:** the page (`index.html`), the script that builds its data (`run.py`), and the
+  aggregates the charts read (`data/processed/`). Raw data is not stored here.
+* **Aggregates only.** We don't publish lists of vulnerable or unpatched nodes. The nodes we name are large public
+  operators and hubs.
+* **The paper guides add nothing new.** Every number comes from the paper's public repository, and `run.py`
+  rebuilds the data from it.
+
+## 💻 Run locally
+
+```bash
+git clone https://github.com/bitcoindatalabs/deep-dives.git
+cd deep-dives
+python3 -m http.server 8000      # then open http://localhost:8000/
 ```
 
----
+Open the pages over HTTP, not as local files: they load their data with `fetch()`.
 
-## 🚀 Starting a New Deep Dive
+To rebuild a paper guide's data from the paper's repository:
 
-1. **Copy the starter template:**
-   ```bash
-   cp -r analyses/_template analyses/2026-10-my-investigation
-   ```
+```bash
+cd analyses/2026-11-client-diversity-explained
+python3 run.py --paper-repo /path/to/ln-client-diversity
+```
 
-2. **Extract & clean data:**
-   - Put raw queries/scripts in `analyses/2026-10-my-investigation/run.py`
-   - Store processed / aggregated datasets under `data/processed/` (keep files < 25MB).
+## 🔗 Related
 
-3. **Write the report:**
-   - Update `analyses/2026-10-my-investigation/README.md` with methodology and takeaways.
-   - Edit `analyses/2026-10-my-investigation/index.html` to build the interactive visualization.
-
-4. **Register on the Hub:**
-   - Add a new card entry into the root `index.html` pointing to `./analyses/2026-10-my-investigation/index.html`.
-
----
-
-## 📊 Data Management Rules
-- **Repository Size Budget:** Keep the overall Git repository lightweight.
-- **Raw Data vs Processed Data:** Never commit multi-gigabyte block logs or node debug logs. Keep heavy raw files in `data/raw/` (ignored by `.gitignore`).
-- **Heavy Datasets:** If an analysis requires large data distributions, attach them to a GitHub Release or external storage (R2/S3/GCS) and provide a download script.
-
----
-
-## 🌐 GitHub Pages Deployment
-1. Go to repository **Settings** &rarr; **Pages**.
-2. Under **Build and deployment**:
-   - **Source:** Deploy from a branch
-   - **Branch:** `main`
-   - **Folder:** `/ (root)`
-3. Save. GitHub will publish the site at `https://bitcoindatalabs.github.io/deep-dives/`.
+* Paper code and data: [ln-client-diversity](https://github.com/bitcoindatalabs/ln-client-diversity) ·
+  [ln-upgrade-dynamics](https://github.com/bitcoindatalabs/ln-upgrade-dynamics)
+* [Bitcoin Data Labs](https://bitcoindatalabs.org)
+* Questions or corrections: open an issue, or write to
+  [sorukumar@bitcoindatalabs.org](mailto:sorukumar@bitcoindatalabs.org).
