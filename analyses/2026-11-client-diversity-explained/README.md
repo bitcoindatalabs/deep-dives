@@ -7,10 +7,8 @@
 ---
 
 ## 📌 What this page is
-A short guide to the paper for readers who already know Lightning. It reads top to bottom: a summary in plain words
-(the answer, then one line per section, each linked), five claim-first sections with charts, takeaways, common
-misreadings, method and limits. Nothing here is
-new analysis: every number and chart comes from the aggregate data released with the paper.
+A short guide to the paper, with interactive charts. Nothing here is new analysis: every number and chart comes from
+the aggregate data released with the paper.
 
 ### Findings
 1. **LND dominates, and raw node counts hide how much.** LND runs 80% of public nodes (without one operator's managed
@@ -31,7 +29,3 @@ new analysis: every number and chart comes from the aggregate data released with
   `paper/tables/table3_outage_effect.tex`). Run `python run.py --paper-repo /path/to/ln-client-diversity`.
 * **`data/processed/paper01.json`**: the aggregates behind every chart.
 * Shared with the paper 02 page: `../../shared/css/explainer.css`, `../../shared/js/explainer-charts.js`.
-
-## ✍️ Writing rules followed
-* Every number is the paper's (abstract, text, tables or released JSON); rounding follows the paper's tables.
-* Aggregates only. The only node named is ACINQ's, as in the paper; other critical nodes are described by type.

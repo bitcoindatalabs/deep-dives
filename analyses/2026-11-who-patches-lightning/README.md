@@ -7,11 +7,8 @@
 ---
 
 ## 📌 What this page is
-A short guide to the paper for readers who already know Lightning. It reads top to bottom: a summary in plain words
-(the answer, then one line per section, each linked), five claim-first sections with charts, takeaways, common
-misreadings, method and limits. Nothing here is
-new analysis: every number and chart comes from the aggregate data and the generated numbers file released with the
-paper.
+A short guide to the paper, with interactive charts. Nothing here is new analysis: every number and chart comes from
+the aggregate data and the generated numbers file released with the paper.
 
 ### Findings
 1. **A node's release line can be read from gossip,** by matching its announced feature bits against the source of
@@ -34,9 +31,3 @@ paper.
   `paper/numbers.tex`). Run `python run.py --paper-repo /path/to/ln-upgrade-dynamics`.
 * **`data/processed/paper02.json`**: the aggregates behind every chart. Aggregate only; no node is listed.
 * Shared with the paper 01 page: `../../shared/css/explainer.css`, `../../shared/js/explainer-charts.js`.
-
-## ✍️ Writing rules followed
-* Every number is the paper's (its `numbers.tex` or released JSON). The forest plot shows the paper's test (ratios
-  outside platform releases); its tooltips and table also give the all-moves weekly rates of the paper's table.
-* "About 1% at most" in the 24 hours before an Umbrel release: the paper's macro rounds to 1%; one wave's value is 1.2%.
-* Aggregates only: no node is named, ranked or labelled by release, platform or exposure.
