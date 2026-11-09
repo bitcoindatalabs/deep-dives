@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Does Client Diversity Protect Lightning? | Bitcoin Data Labs</title>
+  <meta name="description" content="A short guide to our paper on the August 2026 Core Lightning shutdown: a fifth of CLN nodes went dark, the rest of the Lightning Network barely noticed, and the software on a few hubs decides how far a bug spreads.">
+
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../shared/css/style.css">
+  <link rel="stylesheet" href="../../shared/css/explainer.css">
+</head>
+<body class="has-fixed-header">
+
+  <div class="top-bar app-header-main">
+    <div class="bdl-header-container">
+      <div class="logos-container">
+        <div class="app-logo">
+          <a href="../../index.html" class="app-name">deep-dives</a>
+        </div>
+        <div class="divider"></div>
+        <div class="parent-logo">
+          <a href="https://bitcoindatalabs.org/">
+            <img src="../../logo.svg" alt="Bitcoin Data Labs" class="parent-logo-img" onerror="this.onerror=null; this.src='https://bitcoindatalabs.org/logo.svg';">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <a href="../../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Deep Dives Hub</a>
+
+    <header class="ex-hero">
+      <div class="ex-meta">
+        <span class="dive-badge badge-lightning">Lightning</span>
+        <span class="dive-badge badge-security">Security</span>
+        <span class="mono">Paper 01 · arXiv:2610.20952 · data to 4 Oct 2026</span>
+      </div>
+      <h1 class="ex-title">Does client diversity protect the Lightning Network?</h1>
+      <p class="ex-dek">A short guide to our paper on the August 2026 Core Lightning shutdown, and the data behind it.</p>
+      <ul class="ex-links">
+        <li><a href="https://arxiv.org/abs/2610.20952"><i class="fas fa-file-lines"></i> The paper (arXiv)</a></li>
+        <li><a href="https://github.com/bitcoindatalabs/ln-client-diversity"><i class="fab fa-github"></i> Code and data</a></li>
+        <li><a href="../2026-11-who-patches-lightning/index.html"><i class="fas fa-arrow-right"></i> Companion: who patches Lightning?</a></li>
+      </ul>
+    </header>
+
+    <section class="answer" aria-labelledby="summary-h">
+      <p class="lbl" id="summary-h">Summary in plain words</p>
+      <p><strong>Client diversity protects the network only where it reaches the hubs.</strong></p>
+      <ul class="summary">
+        <li><a class="n" href="#s1">1</a><span>LND runs 80% of public nodes and holds 84% of capacity. One operator's fleet of
+          about 2,000 tiny nodes hides LND's falling node share.</span></li>
+        <li><a class="n" href="#s2">2</a><span>After CLN's 26 August call to upgrade or go <code>--offline</code>, 22% of CLN
+          nodes went dark, about ten times an ordinary day. Other clients didn't move.</span></li>
+        <li><a class="n" href="#s3">3</a><span>The rest of the network lost 7.8 points of reachability: about an unusual but
+          ordinary two days, and half what July's Tor attack cost.</span></li>
+        <li><a class="n" href="#s4">4</a><span>ACINQ's Eclair node alone matters four times more than all 619 routable CLN
+          nodes, and 19 of the 20 most critical nodes run LND.</span></li>
+        <li><a class="n" href="#s5">5</a><span>CLN leans on LND about as much as its size implies; CLN operators peer with
+          each other more than chance would.</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================== STORY -->
+    <section class="report-card" id="s1">
+      <h2><span class="num">1</span> LND dominates, and raw node counts hide how much</h2>
+      <p>Client labels come from each node's announced feature bits. <strong>LND runs 80% of public nodes and holds 84% of
+        public channel capacity.</strong> CLN has many small nodes; Eclair a few very large ones.</p>
+      <div class="two-col">
+        <div>
+          <h3>Share of public nodes</h3>
+          <p class="sub">4 October 2026, without one operator's managed fleet</p>
+          <div class="chart" id="c-nodes"></div>
+        </div>
+        <div>
+          <h3>Share of public channel capacity</h3>
+          <p class="sub">4 October 2026</p>
+          <div class="chart" id="c-cap"></div>
+        </div>
+      </div>
+      <h3>One operator props up LND's node count</h3>
+      <p>From July 2025, one operator ran a fleet of about 2,000 tiny LND nodes, a fifth of all public nodes with 0.02% of
+        the capacity. Without it, LND's node share fell from 85–87% in late 2024 to 80%.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="ln" style="background: var(--c-lnd);"></i> LND share of capacity</span>
+        <span><i class="ln" style="background: var(--ink-mid);"></i> Share of nodes, counting the fleet</span>
+        <span><i class="ln" style="background: var(--ink-mark);"></i> Share of nodes, without the fleet</span>
+      </div>
+      <div class="chart" id="c-lnd-trend"></div>
+      <p class="sub" style="margin-top: 6px;">Monthly from July 2024, when our vantage point last changed.</p>
+      <p class="note"><i class="fas fa-circle-check"></i> Labels are checked against 795 self-identifying aliases and
+        against each node's funding-wallet fingerprint. Both agree for at least 97% of LND and CLN nodes.</p>
+    </section>
+
+    <section class="report-card" id="s2">
+      <h2><span class="num">2</span> On 26 August, a fifth of Core Lightning nodes went dark</h2>
+      <ul class="timeline">
+        <li><span class="d">10 Jul</span><span>Denial-of-service wave against Tor.</span></li>
+        <li><span class="d">11 Aug</span><span>Lightning Labs publishes ten LND advisories.</span></li>
+        <li class="key"><span class="d">26 Aug</span><span>CLN maintainers: upgrade, or restart with <code>--offline</code>.</span></li>
+        <li><span class="d">28 Aug</span><span>CLN 26.06.7 ships.</span></li>
+        <li><span class="d">2 Oct</span><span>CLN warns that attackers target nodes on 26.06.7 or earlier.</span></li>
+      </ul>
+      <p>We measure outages from peers' disabled flags. The disabled share toward CLN nodes rose from 11.8% to 38.1% on
+        27 August; LND, Eclair and LDK stayed flat.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="ring"></i> Average, 1–25 August</span>
+        <span><i class="dot" style="background: var(--text-secondary);"></i> 27 August</span>
+      </div>
+      <div class="chart" id="c-disabled"></div>
+      <div class="two-col" style="margin-top: 22px;">
+        <div>
+          <h3>Nodes that went dark within two days</h3>
+          <p class="sub">After the call, against an ordinary day</p>
+          <div class="chart" id="c-dark"></div>
+        </div>
+        <div>
+          <h3>CLN nodes that went dark, by transport</h3>
+          <p class="sub">25 → 27 August</p>
+          <div class="chart" id="c-transport"></div>
+        </div>
+      </div>
+      <p style="margin-top: 16px;">Half the dark nodes were back within a week, after 26.06.7 shipped; a third were still
+        dark five weeks later. Organic force closes on CLN channels ran at 2.2 times their July–August rate for the next two
+        weeks.</p>
+    </section>
+
+    <section class="report-card" id="s3">
+      <h2><span class="num">3</span> The rest of the network barely noticed</h2>
+      <p>Reachability here is the share of node pairs connected by a path that can carry 100,000 sats. The shutdown cut it
+        by 7.8 points. Of 94 ordinary two-day windows from May to August, 4 lost more; the July Tor attack lost twice as
+        much.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="dot" style="background: var(--ink-mark-light);"></i> Ordinary window</span>
+        <span><i class="dot" style="background: var(--ink-mid);"></i> Early-August closing wave</span>
+        <span><i class="dot" style="background: var(--ink-mark);"></i> July Tor attack</span>
+        <span><i class="dot" style="background: var(--c-cln);"></i> CLN shutdown</span>
+      </div>
+      <div class="chart" id="c-placebo"></div>
+      <p class="sub" style="margin-top: 4px;">Reachability lost over two days, in percentage points. One dot per window, May–August 2026.</p>
+      <div class="callout"><strong>Inside CLN it was different:</strong> pairs of CLN nodes lost 24.5 points, more than in
+        any ordinary window.</div>
+    </section>
+
+    <section class="report-card" id="s4">
+      <h2><span class="num">4</span> Hubs, not cohorts, decide how far a failure reaches</h2>
+      <p>CLN nodes sit mostly at the edges of the graph. Removing the 300 largest nodes one at a time, <strong>ACINQ's
+        Eclair node alone costs the remaining nodes 15.9 points</strong>, four times as much as all 619 routable CLN nodes
+        together.</p>
+      <div class="chart" id="c-hubs"></div>
+      <p style="margin-top: 14px;">Criticality follows role, not size: the two largest nodes, both exchanges, are not among
+        the six most critical.</p>
+      <div class="callout">These bars count only pairs of nodes that are still up, so compare 15.9 with 3.7, not with the
+        7.8 points of section 3.</div>
+    </section>
+
+    <section class="report-card" id="s5">
+      <h2><span class="num">5</span> Minority clients lean on LND about as much as their size implies</h2>
+      <p>76% of CLN's capacity faces LND. Shuffling client labels 200 times among nodes of similar size, chance alone would
+        put 88% there. CLN operators peer with each other about twice as often as chance, but that backbone is too small to
+        stand alone.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="ring"></i> By chance (shuffled labels)</span>
+        <span><i class="dot" style="background: var(--c-cln);"></i> Observed</span>
+        <span><i class="ln" style="background: var(--ink-mid); width: 2px; height: 12px;"></i> 95th percentile by chance</span>
+      </div>
+      <div class="chart" id="c-null"></div>
+    </section>
+
+    <!-- ===================================================================== MEANING, MISREADINGS -->
+    <section class="report-card">
+      <h2><i class="fas fa-compass" style="color: var(--primary);"></i> Takeaways</h2>
+      <ul class="plain">
+        <li><strong>Track which software the hubs run,</strong> not how many nodes run each client.</li>
+        <li><strong>Watch peers' disabled flags</strong> per client and per transport. They are cheap to compute and showed
+          both the CLN shutdown and the Tor attack clearly.</li>
+        <li><strong>Emergency shutdowns cost the operators who follow them.</strong> Scope them by version and duration,
+          and prefer <code>--offline</code>.</li>
+        <li><strong>Beyond Lightning</strong> (our reading): where a few nodes carry most of the traffic, the software those
+          few run likely matters more than the overall mix.</li>
+      </ul>
+    </section>
+
+    <section class="report-card">
+      <h2><i class="fas fa-magnifying-glass" style="color: var(--primary);"></i> Common misreadings</h2>
+      <ul class="dodont">
+        <li><span class="no">"Lightning lost a fifth of its nodes."</span><span class="yes">A fifth of <em>CLN</em> nodes,
+          about one public node in ten.</span></li>
+        <li><span class="no">"The security bugs shrank the network by 38%."</span><span class="yes">Channels of every client
+          fell at similar rates from August to October; large operators' exits drove it.</span></li>
+        <li><span class="no">"ACINQ's node failed."</span><span class="yes">It didn't. The 15.9 points model what its loss
+          would cost.</span></li>
+        <li><span class="no">"Home nodes on Tor obeyed the call."</span><span class="yes">Tor-reachable nodes complied most,
+          but by capacity the largest fifth did (32%). Who ran them is unconfirmed.</span></li>
+        <li><span class="no">"LND runs 84% of nodes."</span><span class="yes">80% without one fleet. It holds 84% of
+          capacity.</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================== METHOD, LIMITS -->
+    <section class="report-card">
+      <h2><i class="fas fa-flask" style="color: var(--primary);"></i> How we measured it</h2>
+      <ul class="plain">
+        <li><strong>Data:</strong> 805 daily gossip snapshots from our own LND node (May 2023 to 4 October 2026); 132,360
+          channel closes and 226,134 funding transactions from our own Bitcoin Core node.</li>
+        <li><strong>Clients:</strong> feature-bit rules, checked against self-identifying aliases and funding wallets.</li>
+        <li><strong>Outage:</strong> peers' disabled flags. A node is dark when at least 80% of the channels toward it are
+          disabled.</li>
+        <li><strong>Reachability:</strong> 100,000-sat paths in the routable graph of 25 August (4,435 nodes).</li>
+      </ul>
+      <h3>What this doesn't show</h3>
+      <ul class="plain">
+        <li>One node's view of the public graph. Private channels, where most LDK and Phoenix use happens, are invisible.</li>
+        <li>Connectivity overstates payment success. Every comparison here uses the same yardstick.</li>
+        <li>Patch versions, or why operators complied. Our <a href="../2026-11-who-patches-lightning/index.html">companion
+          paper</a> adds release lines.</li>
+      </ul>
+      <p>Code, the aggregate data behind every chart, and a script that recomputes every number are in the
+        <a href="https://github.com/bitcoindatalabs/ln-client-diversity">paper's repository</a>.</p>
+    </section>
+
+    <section class="report-card">
+      <h2><i class="fas fa-quote-right" style="color: var(--primary);"></i> The paper</h2>
+      <p>Saurabh Kumar. <em>Does Client Diversity Protect the Lightning Network? Evidence from the 2026 Core Lightning
+        Shutdown.</em> arXiv:2610.20952, 2026. <a href="https://arxiv.org/abs/2610.20952">Abstract</a> ·
+        <a href="https://arxiv.org/html/2610.20952">HTML</a> · <a href="https://github.com/bitcoindatalabs/ln-client-diversity">Code and data</a></p>
+      <details class="tableview"><summary>BibTeX</summary>
+        <pre class="cite">@misc{kumar2026clientdiversity,
+  title         = {Does Client Diversity Protect the Lightning Network? Evidence from the 2026 Core Lightning Shutdown},
+  author        = {Saurabh Kumar},
+  year          = {2026},
+  eprint        = {2610.20952},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR},
+  doi           = {10.48550/arXiv.2610.20952},
+  url           = {https://arxiv.org/abs/2610.20952}
+}</pre>
+      </details>
+      <p style="margin-top: 14px;">Related: <a href="../2026-11-who-patches-lightning/index.html">Who patches the Lightning
+        Network?</a> · <a href="../2026-10-lightning-network-analysis/index.html">The Summer Lightning Broke (a Little)</a></p>
+      <p class="sub">Public data, reported in aggregate; the only node named is ACINQ's, a widely known hub. Writing about
+        this? Contact <a href="mailto:sorukumar@bitcoindatalabs.org">sorukumar@bitcoindatalabs.org</a>.</p>
+    </section>
+  </main>
+
+  <footer class="bdl-global-footer">
+    <div class="bdl-footer-inner">
+      <div class="bdl-footer-copyright">
+        <p style="margin: 0;">© <span id="footer-year">2026</span> <a href="https://bitcoindatalabs.org" target="_blank">Bitcoin Data Labs</a>. All rights reserved.</p>
+      </div>
+      <div class="bdl-footer-socials">
+        <a href="https://github.com/bitcoindatalabs/Bitcoin-Data-Labs" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://x.com/sorukumar" target="_blank" title="X / Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/bitcoin-data-labs" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../shared/js/explainer-charts.js"></script>
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    (async () => {
+      const C = BDLCharts, col = { LND: C.css('--c-lnd'), CLN: C.css('--c-cln'), Eclair: C.css('--c-eclair'), LDK: C.css('--c-ldk') };
+      const pct = (v) => `${v.toFixed(1)}%`;
+      let D;
+      try {
+        D = await (await fetch('data/processed/paper01.json')).json();
+      } catch (e) {
+        document.querySelectorAll('.chart').forEach((el) => { el.textContent = 'Charts need the page to be served over HTTP.'; el.className = 'loading'; });
+        return;
+      }
+
+      // 1. Census
+      C.hbars(document.getElementById('c-nodes'), {
+        aria: 'Share of public nodes by client', max: 100, tickFmt: (v) => v + '%',
+        rows: D.census.map((c) => ({ label: c.client, value: c.node_share_exfleet, color: col[c.client], valueText: pct(c.node_share_exfleet),
+          note: `${pct(c.node_share)} counting the managed fleet` })),
+        tableHeaders: ['Client', 'Share of nodes (without fleet)'],
+      });
+      C.hbars(document.getElementById('c-cap'), {
+        aria: 'Share of public channel capacity by client', max: 100, tickFmt: (v) => v + '%',
+        rows: D.census.map((c) => ({ label: c.client, value: c.cap_share, color: col[c.client], valueText: pct(c.cap_share) })),
+        tableHeaders: ['Client', 'Share of capacity'],
+      });
+      const m = D.lnd_monthly;
+      C.lines(document.getElementById('c-lnd-trend'), {
+        aria: 'LND share of capacity and of nodes, with and without the managed fleet, monthly from July 2024',
+        yMin: 76, yMax: 92, yFmt: (v) => v + '%', valueFmt: pct, height: 200,
+        bands: [{ from: '2025-07-01', to: m[m.length - 1].date, label: 'fleet present' }],
+        series: [
+          { name: 'Capacity', color: col.LND, points: m.map((x) => ({ t: x.date, y: x.cap_share })), endLabel: 'Capacity' },
+          { name: 'Nodes, counting the fleet', color: C.css('--ink-mid'), points: m.map((x) => ({ t: x.date, y: x.node_share })), endLabel: 'Nodes' },
+          { name: 'Nodes, without the fleet', color: C.css('--ink-mark'), points: m.map((x) => ({ t: x.date, y: x.node_share_exfleet })), endLabel: 'Nodes w/o fleet' },
+        ],
+      });
+
+      // 2. Outage
+      const O = D.outage;
+      C.dumbbell(document.getElementById('c-disabled'), {
+        aria: 'Share of channels toward each client disabled by peers, average of 1 to 25 August against 27 August',
+        max: 45, tickFmt: (v) => v + '%', fromName: '1–25 Aug average', toName: '27 Aug',
+        rows: ['CLN', 'LND', 'LDK', 'Eclair'].map((c) => ({ label: c, from: O[c].base, to: O[c].peak, color: col[c],
+          fromText: pct(O[c].base), toText: pct(O[c].peak), text: `${pct(O[c].base)} → ${pct(O[c].peak)}` })),
+      });
+      const W = D.went_dark;
+      C.hbars(document.getElementById('c-dark'), {
+        aria: 'Nodes that went dark within two days', max: 25, tickFmt: (v) => v + '%',
+        rows: [
+          { label: 'CLN, after the call', value: W.cln_event, color: col.CLN, valueText: pct(W.cln_event), note: `${W.dark} of ${W.at_risk} CLN nodes` },
+          { label: 'CLN, ordinary day', value: W.cln_ordinary, color: C.css('--ink-mark-light'), valueText: pct(W.cln_ordinary) },
+          { label: 'LND, same days', value: W.lnd_event, color: col.LND, valueText: pct(W.lnd_event) },
+          { label: 'LND, ordinary day', value: W.lnd_ordinary, color: C.css('--ink-mark-light'), valueText: pct(W.lnd_ordinary) },
+        ],
+        tableHeaders: ['', 'Went dark within two days'],
+      });
+      C.hbars(document.getElementById('c-transport'), {
+        aria: 'CLN nodes that went dark by transport', max: 30, tickFmt: (v) => v + '%',
+        rows: D.transport.map((t) => ({ label: t.label, value: t.share, color: col.CLN, valueText: `${t.share}%`, note: `${t.n} nodes` })),
+        tableHeaders: ['Reached via', 'Went dark'],
+      });
+
+      // 3. Placebo strip
+      const kinds = {
+        ordinary: { color: C.css('--ink-mark-light'), r: 4, name: 'Ordinary window' },
+        'close-wave': { color: C.css('--ink-mid'), r: 4, name: 'Early-August closing wave' },
+        tor: { color: C.css('--ink-mark'), r: 5, name: 'July Tor attack', on_top: true },
+        outage: { color: col.CLN, r: 6, name: 'CLN shutdown', on_top: true },
+      };
+      const day = (s) => C.fmtDay(C.parseDay(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6)}`));
+      const PS = D.placebo_summary;
+      const pts = (key) => D.placebo.map((w) => ({ v: w[key], kind: w.kind, title: `${day(w.from)} + 2 days`, valueText: `${w[key].toFixed(1)} points` }))
+        .concat([{ v: PS[key === 'all' ? 'outage_all' : 'outage_cln'], kind: 'outage', title: '25 → 27 August 2026', valueText: `${PS[key === 'all' ? 'outage_all' : 'outage_cln'].toFixed(1)} points` }]);
+      const tor = D.placebo.filter((w) => w.kind === 'tor').map((w) => w.all);
+      C.strip(document.getElementById('c-placebo'), {
+        aria: 'Reachability lost in each two-day window, all node pairs and CLN pairs', max: 26, tickFmt: (v) => v + ' pts',
+        kinds,
+        rows: [{ label: 'All node pairs', points: pts('all') }, { label: 'Pairs of CLN nodes', points: pts('cln') }],
+        callouts: [
+          { row: 0, v: PS.outage_all, text: `CLN shutdown, ${PS.outage_all} pts` },
+          { row: 0, v: Math.max(...tor), text: `Tor attack, ${Math.min(...tor.filter((x) => x > 10)).toFixed(1)}–${Math.max(...tor).toFixed(1)} pts` },
+          { row: 1, v: PS.outage_cln, text: `CLN shutdown, ${PS.outage_cln} pts` },
+        ],
+        tableHeaders: ['Window', 'Pairs', 'Kind', 'Reachability lost'],
+      });
+
+      // 4. Hubs
+      C.hbars(document.getElementById('c-hubs'), {
+        aria: 'Reachability lost among remaining nodes when one hub, or all CLN nodes, fail', max: 18, tickFmt: (v) => v + ' pts',
+        rows: D.hubs.map((h) => ({ label: h.label, value: h.pp, color: h.client ? col[h.client] : C.css('--ink-mark-light'),
+          valueText: `${h.pp.toFixed(1)} pts`, strong: h.client === 'Eclair' })),
+        tableHeaders: ['Failure', 'Reachability lost among remaining nodes'],
+      });
+
+      // 5. Null model
+      C.dumbbell(document.getElementById('c-null'), {
+        aria: 'CLN connections observed against chance', max: 100, tickFmt: (v) => v + '%',
+        fromName: 'By chance', toName: 'Observed', markerName: '95th percentile by chance',
+        rows: D.null_model.map((r) => ({ label: r.label, from: r.chance, to: r.observed, color: col.CLN,
+          fromText: `${r.chance}%`, toText: `${r.observed}%`, text: `${r.observed}% · chance ${r.chance}%`,
+          marker: r.chance_p95 ? { v: r.chance_p95, text: `${r.chance_p95}%`, label: '95th percentile by chance' } : null })),
+      });
+    })();
+  </script>
+</body>
+</html>

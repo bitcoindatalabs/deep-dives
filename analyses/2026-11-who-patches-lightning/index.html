@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Who Patches the Lightning Network? | Bitcoin Data Labs</title>
+  <meta name="description" content="A short guide to our paper on how Lightning nodes upgrade: release lines read from public gossip show that nodes patch on release and platform schedules, not on security disclosures.">
+
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../shared/css/style.css">
+  <link rel="stylesheet" href="../../shared/css/explainer.css">
+</head>
+<body class="has-fixed-header">
+
+  <div class="top-bar app-header-main">
+    <div class="bdl-header-container">
+      <div class="logos-container">
+        <div class="app-logo">
+          <a href="../../index.html" class="app-name">deep-dives</a>
+        </div>
+        <div class="divider"></div>
+        <div class="parent-logo">
+          <a href="https://bitcoindatalabs.org/">
+            <img src="../../logo.svg" alt="Bitcoin Data Labs" class="parent-logo-img" onerror="this.onerror=null; this.src='https://bitcoindatalabs.org/logo.svg';">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <a href="../../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Deep Dives Hub</a>
+
+    <header class="ex-hero">
+      <div class="ex-meta">
+        <span class="dive-badge badge-lightning">Lightning</span>
+        <span class="dive-badge badge-security">Security</span>
+        <span class="mono">Paper 02 · arXiv:2610.30350 · data to 13 Oct 2026</span>
+      </div>
+      <h1 class="ex-title">Who patches the Lightning Network?</h1>
+      <p class="ex-dek">A short guide to our paper on how Lightning nodes upgrade, and the data behind it.</p>
+      <ul class="ex-links">
+        <li><a href="https://arxiv.org/abs/2610.30350"><i class="fas fa-file-lines"></i> The paper (arXiv)</a></li>
+        <li><a href="https://github.com/bitcoindatalabs/ln-upgrade-dynamics"><i class="fab fa-github"></i> Code and data</a></li>
+        <li><a href="../2026-11-client-diversity-explained/index.html"><i class="fas fa-arrow-right"></i> Companion: does client diversity protect Lightning?</a></li>
+      </ul>
+    </header>
+
+    <section class="answer" aria-labelledby="summary-h">
+      <p class="lbl" id="summary-h">Summary in plain words</p>
+      <p><strong>Nodes patch on release and platform schedules, not on security advisories.</strong></p>
+      <ul class="summary">
+        <li><a class="n" href="#s1">1</a><span>A node's release line can be read from the feature bits it announces. Where
+          CLN nodes state their version, the inferred line is exact for 132 of 136 node–line pairs.</span></li>
+        <li><a class="n" href="#s2">2</a><span>Half of LND nodes move to a new release line within 88 days. Small nodes and
+          nodes already behind lag.</span></li>
+        <li><a class="n" href="#s3">3</a><span>The three largest LND upgrade waves came about a day after Umbrel shipped the
+          new version, 19–41 days after LND's own release.</span></li>
+        <li><a class="n" href="#s4">4</a><span>Fixes ship a median 256 days before the advisory. Of 12 disclosures we could
+          test, only CLN's of July 2026 sped up upgrades.</span></li>
+        <li><a class="n" href="#s5">5</a><span>Two months after Lightning Labs' August batch, 71% of exposed LND nodes still
+          ran an affected release. CLN's offline call was followed mostly by nodes already up to date.</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================== STORY -->
+    <section class="report-card" id="s1">
+      <h2><span class="num">1</span> A node's release line can be read from gossip</h2>
+      <p>We read the default, optional and removable feature bits of every LND, CLN, Eclair and LDK release since 2019 from
+        source. Releases with identical defaults form a <strong>release line</strong> (LND has 10). A node's announced bits
+        identify its line; patch releases within a line are invisible.</p>
+      <div class="schematic" role="img" aria-label="Illustration: a node's announced feature bits match exactly one release line">
+        <div class="r node"><span class="n">A node announces</span><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b on"></i><i class="b"></i><span class="m"></span></div>
+        <div class="r"><span class="n">Release line A</span><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b on"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i><span class="m">too old</span></div>
+        <div class="r"><span class="n">Release line B</span><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b"></i><i class="b"></i><span class="m">too old</span></div>
+        <div class="r match"><span class="n">Release line C</span><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b on"></i><i class="b"></i><span class="m">match</span></div>
+        <div class="r"><span class="n">Release line D</span><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b on"></i><i class="b on"></i><i class="b"></i><i class="b on"></i><i class="b on"></i><span class="m">newer</span></div>
+      </div>
+      <p class="sub">Illustration: each square is one feature bit.</p>
+      <div class="mini-stats" id="m-validation"></div>
+      <div class="callout"><strong>Liveness matters.</strong> Of 2,689 announced LND nodes on lines older than 0.19, only
+        434 were live: 12.5% of live LND nodes, not the 42.3% a raw count gives.</div>
+    </section>
+
+    <section class="report-card" id="s2">
+      <h2><span class="num">2</span> Most operators upgrade within months; small and lagging nodes are slowest</h2>
+      <p>Following each node from release day, <strong>half of LND nodes reached the new line within 88 days</strong> and
+        76% within a year (CLN: 137 days). A node more than one line behind has about five times lower odds of upgrading
+        in any week.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw" style="background: var(--c-lnd);"></i> LND</span>
+        <span><i class="sw" style="background: var(--c-cln);"></i> Core Lightning</span>
+      </div>
+      <div class="two-col">
+        <div>
+          <h3>Median days to upgrade</h3>
+          <p class="sub">By quarter of node capacity</p>
+          <div class="chart" id="c-ttu-median"></div>
+        </div>
+        <div>
+          <h3>Upgraded within a year</h3>
+          <p class="sub">By quarter of node capacity</p>
+          <div class="chart" id="c-ttu-year"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="report-card" id="s3">
+      <h2><span class="num">3</span> Platforms set the pace</h2>
+      <p>No large LND upgrade wave came on LND's release day. <strong>The three largest, 262–385 nodes each, followed Umbrel
+        shipping LND 0.19.1, 0.20.0 and 0.21.1</strong>, 19–41 days after LND's release. At least 87% of each wave
+        re-signed its announcement within 48 hours of Umbrel's merge.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw" style="background: var(--c-lnd);"></i> LND nodes moving to a newer line</span>
+        <span><i class="tri" style="border-bottom-color: var(--ink-mark);"></i> Umbrel ships a new LND line</span>
+        <span><i class="tri" style="border-bottom-color: var(--c-gold);"></i> BTCPay Server 2.4.2</span>
+        <span><i class="sw" style="background: var(--gap-band); border: 1px solid var(--border);"></i> No snapshot</span>
+      </div>
+      <div class="chart" id="c-waves"></div>
+      <p class="sub" style="margin-top: 4px;">Per day, July 2024 to October 2026. Vertical lines: LND's own releases.</p>
+      <div class="mini-stats">
+        <div><b>17% in 4.4%</b><span>Share of LND upgrades in the 48 hours after an Umbrel or BTCPay release, against the share of time those windows cover (since June 2025; a lower bound).</span></div>
+        <div><b>114 in a day</b><span>LND nodes that moved after BTCPay's security release 2.4.2; 48 had skipped at least one line.</span></div>
+      </div>
+    </section>
+
+    <section class="report-card" id="s4">
+      <h2><span class="num">4</span> Advisories come late, and move few of the nodes still behind</h2>
+      <p>Fixes shipped a median <strong>256 days</strong> before the advisory.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="dot" style="background: var(--c-lnd);"></i> LND advisory</span>
+        <span><i class="dot" style="background: var(--c-cln);"></i> CLN advisory</span>
+      </div>
+      <div class="chart" id="c-fixdisc"></div>
+      <p class="sub" style="margin-top: 4px;">Days from the fix to public disclosure, one dot per advisory, 2023–2026.</p>
+      <p style="margin-top: 16px;">For 12 disclosures we compared the weekly rate at which nodes left affected lines in the
+        8 weeks before and the 4 weeks after (1 = no change). <strong>Only CLN's of 19 July 2026 clearly raised it</strong>,
+        and only among nodes one line behind.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="dot" style="background: var(--c-lnd);"></i> LND</span>
+        <span><i class="dot" style="background: var(--c-cln);"></i> CLN</span>
+        <span><i class="ln" style="background: var(--ink-mid);"></i> 95% confidence interval</span>
+      </div>
+      <div class="chart" id="c-forest"></div>
+      <div class="callout">Intervals are wide: a ratio near 1 rules out a big response, not a small one. Moves right after
+        platform releases are left out, and the "one line behind" split was chosen after seeing the data.</div>
+    </section>
+
+    <section class="report-card" id="s5">
+      <h2><span class="num">5</span> Most exposed LND nodes stayed exposed</h2>
+      <p>At Lightning Labs' 11 August disclosure, 14.9% of live LND nodes (6.4% of live LND capacity) ran an affected line.
+        <strong>Two months later, 71% of them still did.</strong> CLN's exposure fell further, but much of that fall was
+        nodes leaving.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw" style="background: var(--c-lnd);"></i> Still exposed (LND)</span>
+        <span><i class="sw" style="background: var(--c-cln);"></i> Still exposed (CLN)</span>
+        <span><i class="sw" style="background: var(--ink-mid);"></i> Upgraded</span>
+        <span><i class="sw" style="background: var(--ink-faint);"></i> No longer live</span>
+      </div>
+      <div class="chart" id="c-fates"></div>
+      <h3>Who answered CLN's call to go offline</h3>
+      <p>Mostly operators already up to date. Of the live nodes on the newest CLN line the day before the 26 August call,
+        23.4% were no longer live two days later, against 11.0% on older lines.</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw" style="background: var(--c-cln);"></i> Newest line (26.04–26.06)</span>
+        <span><i class="sw" style="background: var(--ink-mid);"></i> Older lines</span>
+      </div>
+      <div class="chart" id="c-offline"></div>
+    </section>
+
+    <!-- ===================================================================== MEANING, MISREADINGS -->
+    <section class="report-card">
+      <h2><i class="fas fa-compass" style="color: var(--primary);"></i> Takeaways</h2>
+      <ul class="plain">
+        <li><strong>The platform's schedule is part of the patch window.</strong> A fix reaches most small nodes when
+          their platform ships it.</li>
+        <li><strong>Platform prompts reach laggards; advisories reach those already keeping up.</strong></li>
+        <li><strong>Exposure can be measured before disclosure.</strong> Maintainers can read, in aggregate, how many live
+          nodes and how much capacity sit on an affected line.</li>
+        <li><strong>Beyond Lightning</strong> (the paper's reading): wherever packagers stand between a project and its
+          users, the packager's schedule likely sets the patch level.</li>
+      </ul>
+    </section>
+
+    <section class="report-card">
+      <h2><i class="fas fa-magnifying-glass" style="color: var(--primary);"></i> Common misreadings</h2>
+      <ul class="dodont">
+        <li><span class="no">"71% of Lightning nodes are vulnerable."</span><span class="yes">71% of the exposed LND nodes,
+          which were 14.9% of live LND nodes and 6.4% of live LND capacity.</span></li>
+        <li><span class="no">"Exposed nodes can be exploited."</span><span class="yes">Exposed means running an affected
+          line. Several bugs also need a channel with the victim.</span></li>
+        <li><span class="no">"Advisories don't work."</span><span class="yes">The tests rule out a big response, not a
+          small one, and fixing first works for operators who follow releases.</span></li>
+        <li><span class="no">"Only patched nodes went offline."</span><span class="yes">Both groups did, at 23.4% and
+          11.0%.</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================== METHOD, LIMITS -->
+    <section class="report-card">
+      <h2><i class="fas fa-flask" style="color: var(--primary);"></i> How we measured it</h2>
+      <ul class="plain">
+        <li><strong>Data:</strong> 814 daily gossip snapshots from our own node, May 2023 to 13 October 2026.</li>
+        <li><strong>Live nodes only:</strong> a peer keeps an enabled channel toward the node, updated in the last 14 days.
+          One managed fleet, which peaked at 1,781 live nodes, is left out.</li>
+        <li><strong>Platforms:</strong> Umbrel releases dated to the minute from its public app store, and BTCPay's 2.4.2.</li>
+        <li><strong>Advisories:</strong> 30 public LND and CLN advisories whose fix boundary gossip can see.</li>
+      </ul>
+      <h3>What this doesn't show</h3>
+      <ul class="plain">
+        <li>Patch releases within a line, including all of CLN's 2026 fixes.</li>
+        <li>Ground truth for LND, which never states its version; LND rests on consistency checks.</li>
+        <li>Other platforms (Start9, RaspiBlitz, myNode, hosted services), so platform shares are lower bounds.</li>
+        <li>Private nodes, including most mobile wallets.</li>
+      </ul>
+      <p>Code, the release table and the aggregate data behind every chart are in the
+        <a href="https://github.com/bitcoindatalabs/ln-upgrade-dynamics">paper's repository</a>.</p>
+    </section>
+
+    <section class="report-card">
+      <h2><i class="fas fa-quote-right" style="color: var(--primary);"></i> The paper</h2>
+      <p>Saurabh Kumar. <em>Who Patches the Lightning Network? Evidence from Release Lines in Gossip, 2023–2026.</em>
+        arXiv:2610.30350, 2026. <a href="https://arxiv.org/abs/2610.30350">Abstract</a> ·
+        <a href="https://arxiv.org/html/2610.30350">HTML</a> · <a href="https://github.com/bitcoindatalabs/ln-upgrade-dynamics">Code and data</a></p>
+      <details class="tableview"><summary>BibTeX</summary>
+        <pre class="cite">@misc{kumar2026upgradedynamics,
+  title         = {Who Patches the Lightning Network? Evidence from Release Lines in Gossip, 2023--2026},
+  author        = {Saurabh Kumar},
+  year          = {2026},
+  eprint        = {2610.30350},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR},
+  doi           = {10.48550/arXiv.2610.30350},
+  url           = {https://arxiv.org/abs/2610.30350}
+}</pre>
+      </details>
+      <p style="margin-top: 14px;">Related: <a href="../2026-11-client-diversity-explained/index.html">Does client diversity
+        protect the Lightning Network?</a> · <a href="../2026-10-lightning-network-analysis/index.html">The Summer Lightning
+        Broke (a Little)</a></p>
+      <p class="sub">Public data, reported in aggregate: no node is named, ranked or labelled by release, platform or
+        exposure. Writing about this? Contact <a href="mailto:sorukumar@bitcoindatalabs.org">sorukumar@bitcoindatalabs.org</a>.</p>
+    </section>
+  </main>
+
+  <footer class="bdl-global-footer">
+    <div class="bdl-footer-inner">
+      <div class="bdl-footer-copyright">
+        <p style="margin: 0;">© <span id="footer-year">2026</span> <a href="https://bitcoindatalabs.org" target="_blank">Bitcoin Data Labs</a>. All rights reserved.</p>
+      </div>
+      <div class="bdl-footer-socials">
+        <a href="https://github.com/bitcoindatalabs/Bitcoin-Data-Labs" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://x.com/sorukumar" target="_blank" title="X / Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/bitcoin-data-labs" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../shared/js/explainer-charts.js"></script>
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    (async () => {
+      const C = BDLCharts, col = { LND: C.css('--c-lnd'), CLN: C.css('--c-cln') };
+      let D;
+      try {
+        D = await (await fetch('data/processed/paper02.json')).json();
+      } catch (e) {
+        document.querySelectorAll('.chart').forEach((el) => { el.textContent = 'Charts need the page to be served over HTTP.'; el.className = 'loading'; });
+        return;
+      }
+      const N = D.numbers;
+      const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const short = (d) => { const x = new Date(C.parseDay(d)); return `${x.getUTCDate()} ${MON[x.getUTCMonth()]} ${x.getUTCFullYear()}`; };
+
+      // 1. Validation tiles (values from the paper's numbers file)
+      const tiles = [
+        [`${N.NVerNodeLinesExact} of ${N.NVerNodeLines}`, 'CLN node–line pairs exact on every day, where the node states its version'],
+        [`${N.PlatLineMin}–${N.PlatLineMax}%`, 'of LND nodes moving right after a platform release landed on the line it shipped'],
+      ];
+      const mv = document.getElementById('m-validation');
+      tiles.forEach(([b, s]) => { const d = document.createElement('div'); const bb = document.createElement('b'); bb.textContent = b; const ss = document.createElement('span'); ss.textContent = s; d.append(bb, ss); mv.appendChild(d); });
+
+      // 2. Time to upgrade
+      const T = D.time_to_upgrade, quarters = ['Smallest quarter', 'Second quarter', 'Third quarter', 'Largest quarter'];
+      const get = (client, q) => T.find((x) => x.client === client && x.quartile === q);
+      const series = [{ name: 'LND', color: col.LND }, { name: 'Core Lightning', color: col.CLN }];
+      C.groupedH(document.getElementById('c-ttu-median'), {
+        aria: 'Median days to upgrade by quarter of node capacity', max: 180, series, tickFmt: (v) => v + ' d',
+        groups: quarters.map((q) => ({ label: q, values: [get('LND', q).median_days, get('CLN', q).median_days], texts: [`${get('LND', q).median_days} days`, `${get('CLN', q).median_days} days`] })),
+      });
+      C.groupedH(document.getElementById('c-ttu-year'), {
+        aria: 'Share upgraded within a year by quarter of node capacity', max: 100, series, tickFmt: (v) => v + '%',
+        groups: quarters.map((q) => ({ label: q, values: [get('LND', q).within_year, get('CLN', q).within_year], texts: [`${get('LND', q).within_year}%`, `${get('CLN', q).within_year}%`] })),
+      });
+
+      // 3. Waves
+      const start = D.waves[0].d;
+      C.columns(document.getElementById('c-waves'), {
+        aria: 'LND nodes first seen on a newer release line per day, with LND and platform releases',
+        days: D.waves, color: col.LND, valueLabel: 'nodes moved to a newer LND line', height: 200,
+        vlines: D.lnd_releases.filter((r) => r.date >= start).map((r) => ({ t: r.date, label: `LND ${r.line}`, tip: `LND ${r.line} released` })),
+        markers: D.platform_releases.map((p) => ({ t: p.utc, color: p.platform === 'Umbrel' ? C.css('--ink-mark') : C.css('--c-gold'),
+          label: `${p.platform} ships LND ${p.version}`, tip: `${p.platform} ships LND ${p.version}` })),
+      });
+
+      // 4a. Fix to disclosure
+      const kinds = { LND: { color: col.LND, r: 5, name: 'LND' }, CLN: { color: col.CLN, r: 5, name: 'CLN' } };
+      const fd = D.fix_to_disclosure;
+      const ll = fd.find((a) => a.client === 'LND' && a.days === Number(N.FixToDiscLLBatch) && a.count > 1);
+      C.strip(document.getElementById('c-fixdisc'), {
+        aria: 'Days from fix to disclosure for each advisory', max: 800, tickFmt: (v) => v + ' d', kinds,
+        rows: ['LND', 'CLN'].map((c) => ({ label: c, points: fd.filter((a) => a.client === c).map((a) => ({
+          v: a.days, kind: c, title: `${a.title}${a.count > 1 ? ` (${a.count} advisories)` : ''}, disclosed ${short(a.disclosed)}`, valueText: `${a.days} days` })) })),
+        callouts: ll ? [{ row: 0, v: ll.days, text: `Lightning Labs' August 2026 batch, ${ll.days} days` }] : [],
+        tableHeaders: ['Advisory', 'Implementation', '', 'Fix to disclosure'],
+      });
+
+      // 4b. Response forest plot (the paper's test: ratios outside platform releases)
+      C.forest(document.getElementById('c-forest'), {
+        aria: 'Upgrade rate after disclosure divided by the rate before, with 95% confidence intervals', min: 0.1, max: 10,
+        leftNote: '← slower after disclosure', rightNote: 'faster after →',
+        rows: D.response.map((r) => ({
+          label: r.subset ? `of which one line behind (${r.affected})` : `${r.client}, ${short(r.disclosed)} (${r.affected})`,
+          sub: r.subset, strong: !r.subset && r.p < 0.05 / 12,
+          est: r.rr, lo: r.lo, hi: r.hi, color: col[r.client],
+          valueText: `${r.rr.toFixed(2)} (${r.lo.toFixed(2)}–${r.hi.toFixed(2)})`,
+          note: `${r.title}. Weekly rate ${r.before}% → ${r.after}% (all moves; ratio ${r.rr_all.toFixed(2)}). Outside platform releases: permutation p = ${r.p}${r.subset ? '. Split chosen after seeing the data.' : ''}`,
+          tableRow: [`${r.client} ${short(r.disclosed)}${r.subset ? ' (one line behind)' : ''}`, r.title, r.affected, `${r.before}%`, `${r.after}%`, r.rr_all.toFixed(2), r.rr.toFixed(2), `${r.lo.toFixed(2)}–${r.hi.toFixed(2)}`, String(r.p)],
+        })),
+        tableHeaders: ['Disclosure', 'Advisory', 'Affected lines', 'Weekly rate before (all moves)', 'After', 'Ratio, all moves', 'Ratio outside platform releases', '95% CI', 'p'],
+      });
+
+      // 5. Fates and the offline call
+      C.stack100(document.getElementById('c-fates'), {
+        aria: 'What became of the nodes exposed at three disclosures',
+        rows: D.fates.map((f) => ({ label: `${f.label}: ${f.when}`, parts: [
+          { name: 'Still exposed', short: 'still exposed', value: f.still, color: f.label.startsWith('CLN') ? col.CLN : col.LND },
+          { name: 'Upgraded', short: 'upgraded', value: f.upgraded, color: C.css('--ink-mid') },
+          { name: 'No longer live', short: 'no longer live', value: f.left, color: C.css('--ink-faint'), textClass: 'val-in-dark' },
+        ] })),
+      });
+      C.groupedH(document.getElementById('c-offline'), {
+        aria: 'CLN nodes no longer live two days after 25 August, newest line against older lines', max: 40, tickFmt: (v) => v + '%',
+        series: [{ name: 'Newest line (26.04–26.06)', color: col.CLN }, { name: 'Older lines', color: C.css('--ink-mid') }],
+        groups: D.offline_call.map((g, i) => ({ label: g.group, values: [g.newest, g.behind], texts: [g.newest, g.behind].map((v) => (i === 0 ? v.toFixed(1) : String(v)) + '%') })),
+      });
+    })();
+  </script>
+</body>
+</html>

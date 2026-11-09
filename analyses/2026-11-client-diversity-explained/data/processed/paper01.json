@@ -1,0 +1,965 @@
+{
+ "paper": {
+  "arxiv": "2610.20952",
+  "version": "v2",
+  "cutoff": "2026-10-04",
+  "repo": "https://github.com/bitcoindatalabs/ln-client-diversity"
+ },
+ "fleet": {
+  "nodes_latest": 1972,
+  "nodes_peak": 1980,
+  "cap_btc": 1.4,
+  "cap_share": 0.02,
+  "node_share": 20.0
+ },
+ "census": [
+  {
+   "client": "LND",
+   "node_share": 84.0,
+   "node_share_exfleet": 80.1,
+   "cap_share": 84.4
+  },
+  {
+   "client": "CLN",
+   "node_share": 8.5,
+   "node_share_exfleet": 10.6,
+   "cap_share": 3.7
+  },
+  {
+   "client": "Eclair",
+   "node_share": 0.4,
+   "node_share_exfleet": 0.5,
+   "cap_share": 6.1
+  },
+  {
+   "client": "LDK",
+   "node_share": 1.2,
+   "node_share_exfleet": 1.4,
+   "cap_share": 5.7
+  }
+ ],
+ "lnd_monthly": [
+  {
+   "date": "2024-07-01",
+   "node_share": 85.1,
+   "node_share_exfleet": 85.1,
+   "cap_share": 88.0,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2024-08-07",
+   "node_share": 87.2,
+   "node_share_exfleet": 87.2,
+   "cap_share": 88.3,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2024-09-01",
+   "node_share": 87.1,
+   "node_share_exfleet": 87.1,
+   "cap_share": 86.5,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2024-10-01",
+   "node_share": 86.7,
+   "node_share_exfleet": 86.7,
+   "cap_share": 86.2,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2024-11-01",
+   "node_share": 85.9,
+   "node_share_exfleet": 85.9,
+   "cap_share": 86.2,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2024-12-01",
+   "node_share": 85.2,
+   "node_share_exfleet": 85.2,
+   "cap_share": 85.8,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2025-01-01",
+   "node_share": 85.0,
+   "node_share_exfleet": 85.0,
+   "cap_share": 85.0,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2025-02-07",
+   "node_share": 84.8,
+   "node_share_exfleet": 84.8,
+   "cap_share": 84.8,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2025-03-01",
+   "node_share": 84.4,
+   "node_share_exfleet": 84.4,
+   "cap_share": 84.7,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2025-04-09",
+   "node_share": 84.0,
+   "node_share_exfleet": 84.0,
+   "cap_share": 84.9,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2025-05-24",
+   "node_share": 83.4,
+   "node_share_exfleet": 83.4,
+   "cap_share": 85.0,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2025-06-01",
+   "node_share": 82.1,
+   "node_share_exfleet": 82.1,
+   "cap_share": 85.0,
+   "fleet_nodes": 0
+  },
+  {
+   "date": "2025-07-01",
+   "node_share": 81.9,
+   "node_share_exfleet": 81.9,
+   "cap_share": 86.1,
+   "fleet_nodes": 43
+  },
+  {
+   "date": "2025-08-01",
+   "node_share": 82.3,
+   "node_share_exfleet": 81.1,
+   "cap_share": 84.7,
+   "fleet_nodes": 722
+  },
+  {
+   "date": "2025-09-01",
+   "node_share": 84.1,
+   "node_share_exfleet": 82.3,
+   "cap_share": 84.3,
+   "fleet_nodes": 1193
+  },
+  {
+   "date": "2025-10-06",
+   "node_share": 84.3,
+   "node_share_exfleet": 81.8,
+   "cap_share": 85.8,
+   "fleet_nodes": 1655
+  },
+  {
+   "date": "2025-11-01",
+   "node_share": 84.5,
+   "node_share_exfleet": 81.8,
+   "cap_share": 86.3,
+   "fleet_nodes": 1750
+  },
+  {
+   "date": "2025-12-01",
+   "node_share": 84.4,
+   "node_share_exfleet": 81.5,
+   "cap_share": 89.1,
+   "fleet_nodes": 1847
+  },
+  {
+   "date": "2026-01-01",
+   "node_share": 84.2,
+   "node_share_exfleet": 81.0,
+   "cap_share": 89.6,
+   "fleet_nodes": 1951
+  },
+  {
+   "date": "2026-02-01",
+   "node_share": 83.9,
+   "node_share_exfleet": 80.6,
+   "cap_share": 87.7,
+   "fleet_nodes": 1977
+  },
+  {
+   "date": "2026-03-01",
+   "node_share": 84.0,
+   "node_share_exfleet": 80.8,
+   "cap_share": 87.0,
+   "fleet_nodes": 1980
+  },
+  {
+   "date": "2026-04-01",
+   "node_share": 83.7,
+   "node_share_exfleet": 80.5,
+   "cap_share": 87.2,
+   "fleet_nodes": 1931
+  },
+  {
+   "date": "2026-05-01",
+   "node_share": 83.7,
+   "node_share_exfleet": 80.5,
+   "cap_share": 87.3,
+   "fleet_nodes": 1959
+  },
+  {
+   "date": "2026-06-01",
+   "node_share": 83.7,
+   "node_share_exfleet": 80.4,
+   "cap_share": 87.6,
+   "fleet_nodes": 1975
+  },
+  {
+   "date": "2026-07-01",
+   "node_share": 83.6,
+   "node_share_exfleet": 80.3,
+   "cap_share": 87.4,
+   "fleet_nodes": 1976
+  },
+  {
+   "date": "2026-08-01",
+   "node_share": 83.6,
+   "node_share_exfleet": 80.2,
+   "cap_share": 86.2,
+   "fleet_nodes": 1979
+  },
+  {
+   "date": "2026-09-01",
+   "node_share": 84.3,
+   "node_share_exfleet": 80.6,
+   "cap_share": 85.5,
+   "fleet_nodes": 1978
+  },
+  {
+   "date": "2026-10-01",
+   "node_share": 84.2,
+   "node_share_exfleet": 80.3,
+   "cap_share": 84.7,
+   "fleet_nodes": 1972
+  }
+ ],
+ "outage": {
+  "LND": {
+   "base": 16.4,
+   "peak": 16.6,
+   "z": 0.3,
+   "base_cap": 3.5,
+   "peak_cap": 2.4
+  },
+  "CLN": {
+   "base": 11.8,
+   "peak": 38.1,
+   "z": 29.4,
+   "base_cap": 7.4,
+   "peak_cap": 35.2
+  },
+  "Eclair": {
+   "base": 3.2,
+   "peak": 3.5,
+   "z": 1.2,
+   "base_cap": 0.8,
+   "peak_cap": 1.7
+  },
+  "LDK": {
+   "base": 6.3,
+   "peak": 5.5,
+   "z": -1.3,
+   "base_cap": 1.5,
+   "peak_cap": 1.2
+  }
+ },
+ "went_dark": {
+  "cln_event": 22.0,
+  "cln_ordinary": 2.3,
+  "lnd_event": 6.4,
+  "lnd_ordinary": 5.2,
+  "at_risk": 624,
+  "dark": 137
+ },
+ "transport": [
+  {
+   "label": "Tor only",
+   "share": 28.0,
+   "n": 310
+  },
+  {
+   "label": "Tor and clearnet",
+   "share": 21.0,
+   "n": 150
+  },
+  {
+   "label": "Clearnet only",
+   "share": 7.0,
+   "n": 90
+  }
+ ],
+ "recovery": {
+  "back_3d": 39.0,
+  "back_7d": 53.0,
+  "dark_oct4": 32.0,
+  "never": 22.0
+ },
+ "placebo": [
+  {
+   "from": "20260501",
+   "kind": "ordinary",
+   "all": 2.8,
+   "cln": 1.6
+  },
+  {
+   "from": "20260502",
+   "kind": "ordinary",
+   "all": 3.0,
+   "cln": 0.9
+  },
+  {
+   "from": "20260503",
+   "kind": "ordinary",
+   "all": 2.9,
+   "cln": 2.5
+  },
+  {
+   "from": "20260504",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 3.7
+  },
+  {
+   "from": "20260505",
+   "kind": "ordinary",
+   "all": 3.4,
+   "cln": 3.7
+  },
+  {
+   "from": "20260506",
+   "kind": "ordinary",
+   "all": 3.8,
+   "cln": 3.0
+  },
+  {
+   "from": "20260507",
+   "kind": "ordinary",
+   "all": 3.4,
+   "cln": 2.1
+  },
+  {
+   "from": "20260508",
+   "kind": "ordinary",
+   "all": 2.4,
+   "cln": 1.9
+  },
+  {
+   "from": "20260509",
+   "kind": "ordinary",
+   "all": 3.1,
+   "cln": 1.2
+  },
+  {
+   "from": "20260510",
+   "kind": "ordinary",
+   "all": 2.5,
+   "cln": 1.2
+  },
+  {
+   "from": "20260511",
+   "kind": "ordinary",
+   "all": 2.6,
+   "cln": 2.3
+  },
+  {
+   "from": "20260512",
+   "kind": "ordinary",
+   "all": 2.9,
+   "cln": 3.0
+  },
+  {
+   "from": "20260513",
+   "kind": "ordinary",
+   "all": 2.8,
+   "cln": 2.8
+  },
+  {
+   "from": "20260514",
+   "kind": "ordinary",
+   "all": 2.8,
+   "cln": 2.1
+  },
+  {
+   "from": "20260515",
+   "kind": "ordinary",
+   "all": 3.0,
+   "cln": 2.5
+  },
+  {
+   "from": "20260516",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 3.9
+  },
+  {
+   "from": "20260517",
+   "kind": "ordinary",
+   "all": 3.1,
+   "cln": 2.8
+  },
+  {
+   "from": "20260525",
+   "kind": "ordinary",
+   "all": 2.8,
+   "cln": 3.7
+  },
+  {
+   "from": "20260526",
+   "kind": "ordinary",
+   "all": 2.9,
+   "cln": 4.6
+  },
+  {
+   "from": "20260527",
+   "kind": "ordinary",
+   "all": 2.9,
+   "cln": 2.6
+  },
+  {
+   "from": "20260528",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 3.5
+  },
+  {
+   "from": "20260529",
+   "kind": "ordinary",
+   "all": 2.7,
+   "cln": 3.0
+  },
+  {
+   "from": "20260530",
+   "kind": "ordinary",
+   "all": 3.1,
+   "cln": 2.1
+  },
+  {
+   "from": "20260531",
+   "kind": "ordinary",
+   "all": 3.8,
+   "cln": 2.8
+  },
+  {
+   "from": "20260601",
+   "kind": "ordinary",
+   "all": 2.9,
+   "cln": 2.5
+  },
+  {
+   "from": "20260602",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 2.7
+  },
+  {
+   "from": "20260603",
+   "kind": "ordinary",
+   "all": 3.8,
+   "cln": 4.1
+  },
+  {
+   "from": "20260604",
+   "kind": "ordinary",
+   "all": 3.8,
+   "cln": 5.5
+  },
+  {
+   "from": "20260605",
+   "kind": "ordinary",
+   "all": 3.2,
+   "cln": 3.2
+  },
+  {
+   "from": "20260606",
+   "kind": "ordinary",
+   "all": 3.5,
+   "cln": 4.4
+  },
+  {
+   "from": "20260607",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 2.8
+  },
+  {
+   "from": "20260608",
+   "kind": "ordinary",
+   "all": 2.7,
+   "cln": 2.3
+  },
+  {
+   "from": "20260609",
+   "kind": "ordinary",
+   "all": 3.5,
+   "cln": 2.1
+  },
+  {
+   "from": "20260610",
+   "kind": "ordinary",
+   "all": 3.4,
+   "cln": 3.2
+  },
+  {
+   "from": "20260612",
+   "kind": "ordinary",
+   "all": 2.2,
+   "cln": 1.6
+  },
+  {
+   "from": "20260617",
+   "kind": "ordinary",
+   "all": 3.1,
+   "cln": 3.2
+  },
+  {
+   "from": "20260618",
+   "kind": "ordinary",
+   "all": 3.2,
+   "cln": 3.4
+  },
+  {
+   "from": "20260619",
+   "kind": "ordinary",
+   "all": 3.5,
+   "cln": 2.1
+  },
+  {
+   "from": "20260620",
+   "kind": "ordinary",
+   "all": 3.6,
+   "cln": 3.0
+  },
+  {
+   "from": "20260621",
+   "kind": "ordinary",
+   "all": 3.7,
+   "cln": 2.3
+  },
+  {
+   "from": "20260622",
+   "kind": "ordinary",
+   "all": 4.0,
+   "cln": 3.5
+  },
+  {
+   "from": "20260623",
+   "kind": "ordinary",
+   "all": 3.4,
+   "cln": 2.3
+  },
+  {
+   "from": "20260624",
+   "kind": "ordinary",
+   "all": 3.5,
+   "cln": 3.9
+  },
+  {
+   "from": "20260625",
+   "kind": "ordinary",
+   "all": 4.3,
+   "cln": 5.1
+  },
+  {
+   "from": "20260626",
+   "kind": "ordinary",
+   "all": 4.2,
+   "cln": 3.4
+  },
+  {
+   "from": "20260627",
+   "kind": "ordinary",
+   "all": 4.4,
+   "cln": 4.0
+  },
+  {
+   "from": "20260628",
+   "kind": "ordinary",
+   "all": 4.2,
+   "cln": 4.3
+  },
+  {
+   "from": "20260629",
+   "kind": "ordinary",
+   "all": 4.3,
+   "cln": 3.2
+  },
+  {
+   "from": "20260630",
+   "kind": "ordinary",
+   "all": 3.8,
+   "cln": 2.1
+  },
+  {
+   "from": "20260701",
+   "kind": "ordinary",
+   "all": 4.1,
+   "cln": 4.7
+  },
+  {
+   "from": "20260702",
+   "kind": "ordinary",
+   "all": 3.7,
+   "cln": 3.6
+  },
+  {
+   "from": "20260703",
+   "kind": "ordinary",
+   "all": 2.9,
+   "cln": 2.5
+  },
+  {
+   "from": "20260704",
+   "kind": "ordinary",
+   "all": 3.7,
+   "cln": 2.3
+  },
+  {
+   "from": "20260705",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 1.9
+  },
+  {
+   "from": "20260706",
+   "kind": "ordinary",
+   "all": 3.4,
+   "cln": 2.8
+  },
+  {
+   "from": "20260707",
+   "kind": "ordinary",
+   "all": 3.9,
+   "cln": 2.7
+  },
+  {
+   "from": "20260708",
+   "kind": "tor",
+   "all": 15.6,
+   "cln": 8.6
+  },
+  {
+   "from": "20260709",
+   "kind": "tor",
+   "all": 16.0,
+   "cln": 7.7
+  },
+  {
+   "from": "20260710",
+   "kind": "tor",
+   "all": 5.8,
+   "cln": 2.4
+  },
+  {
+   "from": "20260711",
+   "kind": "ordinary",
+   "all": 4.1,
+   "cln": 3.3
+  },
+  {
+   "from": "20260712",
+   "kind": "ordinary",
+   "all": 4.5,
+   "cln": 2.8
+  },
+  {
+   "from": "20260713",
+   "kind": "ordinary",
+   "all": 4.3,
+   "cln": 2.6
+  },
+  {
+   "from": "20260714",
+   "kind": "ordinary",
+   "all": 3.6,
+   "cln": 4.7
+  },
+  {
+   "from": "20260715",
+   "kind": "ordinary",
+   "all": 4.0,
+   "cln": 5.2
+  },
+  {
+   "from": "20260716",
+   "kind": "ordinary",
+   "all": 4.5,
+   "cln": 3.3
+  },
+  {
+   "from": "20260717",
+   "kind": "ordinary",
+   "all": 3.6,
+   "cln": 2.3
+  },
+  {
+   "from": "20260718",
+   "kind": "ordinary",
+   "all": 3.7,
+   "cln": 3.7
+  },
+  {
+   "from": "20260719",
+   "kind": "ordinary",
+   "all": 3.7,
+   "cln": 3.5
+  },
+  {
+   "from": "20260721",
+   "kind": "ordinary",
+   "all": 3.9,
+   "cln": 4.0
+  },
+  {
+   "from": "20260723",
+   "kind": "ordinary",
+   "all": 3.4,
+   "cln": 3.3
+  },
+  {
+   "from": "20260724",
+   "kind": "ordinary",
+   "all": 3.7,
+   "cln": 5.0
+  },
+  {
+   "from": "20260725",
+   "kind": "ordinary",
+   "all": 3.8,
+   "cln": 3.5
+  },
+  {
+   "from": "20260726",
+   "kind": "ordinary",
+   "all": 5.5,
+   "cln": 4.6
+  },
+  {
+   "from": "20260727",
+   "kind": "ordinary",
+   "all": 5.0,
+   "cln": 5.1
+  },
+  {
+   "from": "20260728",
+   "kind": "ordinary",
+   "all": 4.2,
+   "cln": 4.6
+  },
+  {
+   "from": "20260729",
+   "kind": "ordinary",
+   "all": 6.2,
+   "cln": 4.9
+  },
+  {
+   "from": "20260730",
+   "kind": "ordinary",
+   "all": 6.3,
+   "cln": 3.7
+  },
+  {
+   "from": "20260731",
+   "kind": "ordinary",
+   "all": 5.1,
+   "cln": 6.0
+  },
+  {
+   "from": "20260801",
+   "kind": "close-wave",
+   "all": 5.3,
+   "cln": 5.6
+  },
+  {
+   "from": "20260802",
+   "kind": "close-wave",
+   "all": 5.3,
+   "cln": 4.5
+  },
+  {
+   "from": "20260803",
+   "kind": "close-wave",
+   "all": 3.9,
+   "cln": 4.4
+  },
+  {
+   "from": "20260804",
+   "kind": "close-wave",
+   "all": 7.6,
+   "cln": 10.6
+  },
+  {
+   "from": "20260805",
+   "kind": "ordinary",
+   "all": 14.5,
+   "cln": 17.7
+  },
+  {
+   "from": "20260806",
+   "kind": "ordinary",
+   "all": 14.5,
+   "cln": 17.3
+  },
+  {
+   "from": "20260807",
+   "kind": "ordinary",
+   "all": 10.0,
+   "cln": 10.0
+  },
+  {
+   "from": "20260808",
+   "kind": "ordinary",
+   "all": 5.4,
+   "cln": 4.9
+  },
+  {
+   "from": "20260809",
+   "kind": "ordinary",
+   "all": 5.5,
+   "cln": 7.6
+  },
+  {
+   "from": "20260810",
+   "kind": "ordinary",
+   "all": 8.8,
+   "cln": 9.7
+  },
+  {
+   "from": "20260811",
+   "kind": "ordinary",
+   "all": 6.9,
+   "cln": 4.4
+  },
+  {
+   "from": "20260812",
+   "kind": "ordinary",
+   "all": 3.4,
+   "cln": 2.0
+  },
+  {
+   "from": "20260813",
+   "kind": "ordinary",
+   "all": 3.8,
+   "cln": 2.5
+  },
+  {
+   "from": "20260814",
+   "kind": "ordinary",
+   "all": 4.3,
+   "cln": 2.8
+  },
+  {
+   "from": "20260815",
+   "kind": "ordinary",
+   "all": 5.1,
+   "cln": 2.5
+  },
+  {
+   "from": "20260816",
+   "kind": "ordinary",
+   "all": 4.2,
+   "cln": 3.6
+  },
+  {
+   "from": "20260817",
+   "kind": "ordinary",
+   "all": 4.0,
+   "cln": 4.0
+  },
+  {
+   "from": "20260818",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 4.3
+  },
+  {
+   "from": "20260819",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 3.1
+  },
+  {
+   "from": "20260820",
+   "kind": "ordinary",
+   "all": 4.0,
+   "cln": 2.8
+  },
+  {
+   "from": "20260821",
+   "kind": "ordinary",
+   "all": 3.2,
+   "cln": 2.3
+  },
+  {
+   "from": "20260822",
+   "kind": "ordinary",
+   "all": 3.3,
+   "cln": 2.0
+  },
+  {
+   "from": "20260823",
+   "kind": "ordinary",
+   "all": 3.9,
+   "cln": 1.2
+  }
+ ],
+ "placebo_summary": {
+  "ordinary_windows": 94,
+  "ordinary_median_all": 3.6,
+  "ordinary_worse_all": 4,
+  "outage_all": 7.8,
+  "outage_cln": 24.5,
+  "ordinary_max_cln": 17.7
+ },
+ "hubs": [
+  {
+   "label": "ACINQ's Eclair node",
+   "client": "Eclair",
+   "pp": 15.9
+  },
+  {
+   "label": "2nd most critical: an LSP (LND)",
+   "client": "LND",
+   "pp": 2.8
+  },
+  {
+   "label": "3rd: a payment processor (LND)",
+   "client": "LND",
+   "pp": 1.9
+  },
+  {
+   "label": "Typical top-20 hub (median)",
+   "client": null,
+   "pp": 0.6
+  },
+  {
+   "label": "All 619 routable CLN nodes at once",
+   "client": "CLN",
+   "pp": 3.7
+  }
+ ],
+ "top20_by_client": {
+  "LND": 19,
+  "Eclair": 1
+ },
+ "null_model": [
+  {
+   "label": "CLN capacity on channels to LND",
+   "observed": 76.0,
+   "chance": 88.0
+  },
+  {
+   "label": "CLN capacity on channels to CLN",
+   "observed": 15.0,
+   "chance": 8.0
+  },
+  {
+   "label": "CLN pairs still connected without LND",
+   "observed": 32.0,
+   "chance": 9.0,
+   "chance_p95": 25.0
+  }
+ ]
+}
