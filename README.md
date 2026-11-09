@@ -30,8 +30,7 @@ How far a failure spreads depends on the software of a few hubs, and 19 of the 2
 Every Lightning implementation shipped security fixes in summer 2026. This deep dive measures what the network felt,
 from daily gossip and every on-chain channel close: a contained Core Lightning outage, force-close spikes from single
 operators, and a Tor DoS wave that cost more reachability than the outage did. Presented at TABConf 2026.<br>
-[talk slides](https://bitcoindatalabs.github.io/deep-dives/analyses/2026-10-lightning-network-analysis/deck-tabconf.html)
-· [source](analyses/2026-10-lightning-network-analysis/)
+[source](analyses/2026-10-lightning-network-analysis/)
 
 ---
 
