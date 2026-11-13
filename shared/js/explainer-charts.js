@@ -384,8 +384,14 @@
       });
       const gx = el('g', { class: 'tick' }, svg);
       const startYear = new Date(tMin).getUTCFullYear();
-      for (let yr = startYear; yr <= new Date(tMax).getUTCFullYear(); yr++) {
+      const endYear = new Date(tMax).getUTCFullYear();
+      const pxPerYear = (x1 - x0) / Math.max(1, endYear - startYear + 1);
+      const showHalf = pxPerYear >= 85;
+      const yearStep = pxPerYear < 38 ? 2 : 1;
+      for (let yr = startYear; yr <= endYear; yr++) {
         [0, 6].forEach((mo) => {
+          if (mo === 6 && !showHalf) return;
+          if (mo === 0 && (yr - startYear) % yearStep !== 0) return;
           const t = Date.UTC(yr, mo, 1);
           if (t < tMin || t > tMax) return;
           el('line', { x1: sx(t), x2: sx(t), y1: y1, y2: y1 + 4, stroke: css('--axis') }, gx);
@@ -541,7 +547,8 @@
       const h = top + o.rows.length * rowH + 26;
       const svg = root(container, w, h, o.aria);
       const g0 = el('g', { class: 'tick' }, svg);
-      const tk = (o.ticks || [0.1, 0.3, 1, 3, 10]).filter((v) => (x1 - x0) > 260 || [0.1, 1, 10].includes(v));
+      const allTk = o.ticks || [0.1, 0.3, 1, 3, 10];
+      const tk = (x1 - x0) > 260 ? allTk : (o.ticks ? [allTk[0], ...(allTk.includes(1) ? [1] : []), allTk[allTk.length - 1]].filter((v, i, a) => a.indexOf(v) === i) : allTk.filter((v) => [0.1, 1, 10].includes(v)));
       tk.forEach((v) => {
         el('line', { x1: sx(v), x2: sx(v), y1: top - 4, y2: top + o.rows.length * rowH, stroke: v === 1 ? css('--ink-mid') : css('--grid'), 'stroke-width': 1 }, g0);
         text(g0, sx(v), top + o.rows.length * rowH + 15, String(v), '', { 'text-anchor': 'middle' });
@@ -557,7 +564,7 @@
         el('circle', { cx: sx(r.est), cy, r: 5, fill: r.color, stroke: '#fff', 'stroke-width': 2, class: 'mark' }, g);
         text(g, x1 + 8, cy + 4, r.valueText, 'val');
         const hit = el('rect', { x: 0, y: top + i * rowH, width: w, height: rowH, class: 'hit' }, g);
-        hover(hit, () => ({ title: r.label, rows: [{ value: r.valueText, label: 'rate ratio', color: r.color }], note: r.note }), `${r.label}: ${r.valueText}. ${r.note || ''}`);
+        hover(hit, () => ({ title: r.label, rows: [{ value: r.valueText, label: o.tooltipLabel || 'rate ratio', color: r.color }], note: r.note }), `${r.label}: ${r.valueText}. ${r.note || ''}`);
       });
     });
     if (o.table !== false) tableView(o.tableHost || container, o.tableHeaders, o.rows.map((r) => r.tableRow));
@@ -597,16 +604,18 @@
           if (textW(label, 11.5, 600) + 12 < segW) text(g, x + 8, y + barH / 2 + 4, label, p.textClass || 'val-in');
           else if (textW(share, 11.5, 600) + 10 < segW) text(g, x + 6, y + barH / 2 + 4, share, p.textClass || 'val-in');
           const hit = el('rect', { x, y: y - 2, width: Math.max(segW, 8), height: barH + 4, class: 'hit' }, g);
-          hover(hit, () => ({ title: r.label, rows: [{ value: `${share} (${p.value.toLocaleString('en-US')} nodes)`, label: p.name, color: p.color }] }), `${r.label}, ${p.name}: ${share}`);
+          const unit = o.unit === undefined ? ' nodes' : (o.unit ? ' ' + o.unit : '');
+          const tipVal = p.valueText ? `${share} (${p.valueText})` : `${share} (${p.value.toLocaleString('en-US')}${unit})`;
+          hover(hit, () => ({ title: r.label, rows: [{ value: tipVal, label: p.name, color: p.color }] }), `${r.label}, ${p.name}: ${share}`);
           x += pw;
         });
       });
     });
     if (o.table !== false) {
       const names = o.rows[0].parts.map((p) => p.name);
-      tableView(o.tableHost || container, ['Cohort'].concat(names), o.rows.map((r) => {
+      tableView(o.tableHost || container, [o.cohortLabel || 'Cohort'].concat(names), o.rows.map((r) => {
         const total = r.parts.reduce((s, p) => s + p.value, 0);
-        return [r.label].concat(r.parts.map((p) => `${Math.round((p.value / total) * 100)}% (${p.value.toLocaleString('en-US')})`));
+        return [r.label].concat(r.parts.map((p) => `${Math.round((p.value / total) * 100)}% (${p.valueText || p.value.toLocaleString('en-US')})`));
       }));
     }
   }

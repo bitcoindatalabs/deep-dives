@@ -1,0 +1,603 @@
+{
+ "paper": {
+  "arxiv": null,
+  "cutoff": "2026-10-31",
+  "cutoff_height": 974041,
+  "repo": "https://github.com/bitcoindatalabs/ln-force-close-costs"
+ },
+ "numbers": {
+  "CutoffDate": "31 October 2026",
+  "CutoffHeight": "974,041",
+  "ScanStartDate": "12 January 2018",
+  "NClosesTitle": "974,000",
+  "NClosesAll": "973,581",
+  "NPublicCloses": "699,049",
+  "NPublicMutual": "449,707",
+  "NPublicForce": "249,283",
+  "NUnlistedForce": "274,532",
+  "NAllForce": "523,815",
+  "NOutputs": "1,346,588",
+  "NOutputsSpent": "1,212,596",
+  "ValLakeCompared": "698,476",
+  "ValCompared": "480,440",
+  "ValAgreePct": "100.00",
+  "NSpikes": "9",
+  "NSpikesUp": "4",
+  "NSpikesDown": "5",
+  "PlEvAllNow": "0.97",
+  "PlEvAllNowMed": "1.02",
+  "PlEvLegacyNow": "0.98",
+  "PlEvAnchorNow": "0.94",
+  "PlEvAllLater": "1.10",
+  "PlFwPCirc": "0.420",
+  "PlFwPBlock": "0.359",
+  "SpikeMayTwentyThreePct": "29",
+  "SpikeMayTwentyThreeFee": "84",
+  "SpikeMayTwentyThreeFeeBefore": "13",
+  "SpikeAprTwentyFourPct": "50",
+  "SpikeMarNineteenPct": "26",
+  "CostMedTwentySix": "925",
+  "CostMedTwenty": "14,318",
+  "CostMedTwentyThree": "7,346",
+  "CostRatioMin": "2",
+  "CostRatioMax": "6",
+  "CostRatioTwentySix": "4.7",
+  "CostTotalBtcAll": "31.1",
+  "CostTotalBtcTwentyThree": "11.97",
+  "ToLocalMedDays": "1.7",
+  "ToLocalPNinetyMax": "22",
+  "DelayOneDayPct": "49",
+  "DelayTwoWeeksPct": "10",
+  "BtcDaysLockedAll": "68,036",
+  "VbRatioMin": "3.0",
+  "VbRatioMax": "3.1",
+  "LegacyVbMed": "292",
+  "AnchorVbMed": "639",
+  "LcMed": "3,435",
+  "LcOpenMed": "723",
+  "LcCloseMed": "1,411",
+  "LcCapPct": "0.15",
+  "LcCoopMed": "1,970",
+  "LcForceMed": "6,645",
+  "LcForceCoopRatio": "3.4",
+  "LcForceCoopRatioMin": "1.3",
+  "LcForceCoopRatioMax": "3.9",
+  "LcOpensPct": "40",
+  "LcOpensPctLowRegime": "63",
+  "LcOpenBtc": "28.2",
+  "LcTotalBtc": "70.9",
+  "PenaltyTxsAll": "950",
+  "PenaltyBtcAll": "11.4",
+  "PenaltyTxsTwentySix": "321",
+  "PenaltyWaveMaxBlocks": "120",
+  "BreachWavePenalised": "306",
+  "BreachWaveChannels": "305",
+  "BreachWaveBtc": "3.18",
+  "BreachOpenToSpliceMed": "5",
+  "BreachSpliceToCloseMed": "3",
+  "BreachLookAlikesWeek": "90",
+  "BreachRevokedSharePct": "77",
+  "HtlcTimeoutTxs": "70,808",
+  "HtlcMarginTight": "40",
+  "HtlcLateTwentyThree": "18.2",
+  "HtlcLateTwentyFour": "16.4",
+  "HtlcLateSpikeLegacy": "30.5",
+  "HtlcLateSpikeAnchor": "20.6",
+  "CascadePct": "25",
+  "CascadePayments": "6,951",
+  "CascadeMaxCloses": "18",
+  "CascadeAllTimeoutPct": "96",
+  "SplitResPayments": "40",
+  "SplitResBtc": "0.48",
+  "SplitResForwarderPayments": "38",
+  "SplitResForwarderBtc": "0.44",
+  "SplitResGapMed": "58",
+  "SplitResStagedPairs": "7",
+  "SplitResStagedBtc": "0.0016",
+  "SplitResStagedToSelfDelay": "6",
+  "LegacyOverTwoPctTwentySix": "52",
+  "LegacyOverBtcAll": "10.9",
+  "PubForceTwentyTwo": "57,896",
+  "PubForceTwentySix": "15,440",
+  "UnlForceTwentySix": "53,023",
+  "UnlOverPubTwentySix": "3.4",
+  "OrganicRateTwentyTwo": "44",
+  "OrganicRateTwentySix": "26",
+  "RateAugTwentySix": "51",
+  "RateOrganicAugTwentySix": "31",
+  "OpenAtCutoff": "40,353",
+  "OpenPeak": "90,340",
+  "SepEventCloses": "8,990",
+  "SepEventBtc": "36.7",
+  "SepEventLegacy": "6,910",
+  "PubLegacyPctTwentyOne": "87",
+  "PubLegacyPctTwentySix": "26",
+  "LegacyTopFivePct": "74",
+  "LegacyClusterAgeDays": "4",
+  "LegacyPctExClusterTwentySix": "8",
+  "LegacyOldAgeYears": "3.9",
+  "AnchorsAll": "387,502",
+  "OwnerPctTwentyTwo": "81",
+  "OwnerPctTwentySix": "5",
+  "NotRaisedPctTwentySix": "70",
+  "SweepOperators": "332",
+  "SweepLargestPct": "41",
+  "SweepLargestPctTwentySix": "58",
+  "SweepLargestFirst": "27 July 2024",
+  "SweepLargestNetBtc": "0.070",
+  "SweepBurnPct": "10",
+  "SweepValueBtc": "0.95",
+  "SweepMinersBtc": "0.75",
+  "SweepSweepersBtc": "0.20",
+  "MinersShareTwentyTwo": "24",
+  "MinersShareLateMin": "83",
+  "MinersShareLateMax": "87",
+  "BreakEven": "6.38",
+  "TaprootAnchors": "23,864",
+  "TaprootAnchorsSpent": "1,706",
+  "TaprootAnchorsUnspent": "22,158",
+  "TaprootAnchorsSpentPct": "7",
+  "TaprootKeyExposedUnspent": "14,828",
+  "TaprootKeyExposedDaysMed": "101",
+  "TaprootKeyPublicBtc": "0.049",
+  "TaprootCosweepToRemotePctEarly": "96",
+  "TaprootCosweepToRemotePctLate": "0.2",
+  "TaprootOwnerSweepFrEarly": "2.0",
+  "TaprootOwnerSweepFrLate": "0.9",
+  "ZfCloses": "31",
+  "ZfUnlisted": "18",
+  "ZfPublic": "13",
+  "ZfPublicNodes": "10",
+  "ZfFirst": "29 October 2025",
+  "ZfFirstPublic": "28 September 2026",
+  "ZfBeforeMerge": "6",
+  "ZfPkgFr": "1.6",
+  "CfCloses": "223,587",
+  "CfAnchorVb": "173",
+  "CfPtwoaVb": "152",
+  "CfSavingPct": "12",
+  "CfNotBumpedPct": "88",
+  "CfAnchorBtc": "1.28",
+  "BillBtcTwentyThree": "16.8",
+  "BillBtcTwentySix": "1.5",
+  "BillFeePctMin": "0.03",
+  "BillFeePctMax": "0.18",
+  "BillVbPctMax": "0.12",
+  "BreakEvenRateAll": "16.7",
+  "BreakEvenRateTwentyFive": "2.7",
+  "BreakEvenRateTwentySix": "1.2",
+  "BreakEvenRateEarlyMin": "6.1",
+  "BreakEvenRateEarlyMax": "54.1",
+  "SplitResStagedPreimageAfterMed": "4",
+  "SplitResPreimageFirstPct": "100",
+  "SplitResFromYear": "2021",
+  "CohortOneYearNineteen": "35",
+  "CohortOneYearTwentyThree": "31",
+  "CohortOneYearTwentyFive": "17",
+  "HtlcTimeoutMedMin": "1",
+  "HtlcTimeoutMedMax": "3"
+ },
+ "spikes": [
+  {
+   "week": "2019-03-04",
+   "p50": 20,
+   "p50_before": 11,
+   "ratio_all": 1.265,
+   "ratio_legacy": 1.265,
+   "ratio_anchor": null
+  },
+  {
+   "week": "2019-10-28",
+   "p50": 23,
+   "p50_before": 10,
+   "ratio_all": 1.027,
+   "ratio_legacy": 1.027,
+   "ratio_anchor": null
+  },
+  {
+   "week": "2020-02-10",
+   "p50": 20,
+   "p50_before": 10,
+   "ratio_all": 0.826,
+   "ratio_legacy": 0.826,
+   "ratio_anchor": null
+  },
+  {
+   "week": "2020-10-26",
+   "p50": 187,
+   "p50_before": 54,
+   "ratio_all": 0.71,
+   "ratio_legacy": 0.71,
+   "ratio_anchor": null
+  },
+  {
+   "week": "2021-04-19",
+   "p50": 182,
+   "p50_before": 66,
+   "ratio_all": 0.973,
+   "ratio_legacy": 0.971,
+   "ratio_anchor": null
+  },
+  {
+   "week": "2022-05-09",
+   "p50": 14,
+   "p50_before": 5,
+   "ratio_all": 1.065,
+   "ratio_legacy": 0.941,
+   "ratio_anchor": 1.184
+  },
+  {
+   "week": "2023-05-01",
+   "p50": 84,
+   "p50_before": 13,
+   "ratio_all": 1.294,
+   "ratio_legacy": 1.217,
+   "ratio_anchor": 1.334
+  },
+  {
+   "week": "2023-09-04",
+   "p50": 16,
+   "p50_before": 8,
+   "ratio_all": 0.735,
+   "ratio_legacy": 0.73,
+   "ratio_anchor": 0.738
+  },
+  {
+   "week": "2024-04-08",
+   "p50": 39,
+   "p50_before": 15,
+   "ratio_all": 0.502,
+   "ratio_legacy": 0.77,
+   "ratio_anchor": 0.369
+  }
+ ],
+ "spike_placebo": [
+  {
+   "label": "All public, weeks 0 to +1",
+   "sub": false,
+   "est": 0.97,
+   "ord_med": 1.02,
+   "lo": 0.9,
+   "hi": 1.17,
+   "pctl": 23
+  },
+  {
+   "label": "Pre-anchor, weeks 0 to +1",
+   "sub": false,
+   "est": 0.98,
+   "ord_med": 1.0,
+   "lo": 0.89,
+   "hi": 1.19,
+   "pctl": 42
+  },
+  {
+   "label": "Anchor, weeks 0 to +1",
+   "sub": false,
+   "est": 0.94,
+   "ord_med": 1.04,
+   "lo": 0.86,
+   "hi": 1.26,
+   "pctl": 17
+  },
+  {
+   "label": "All public, weeks +2 to +3",
+   "sub": true,
+   "est": 1.1,
+   "ord_med": 1.01,
+   "lo": 0.9,
+   "hi": 1.14,
+   "pctl": 88
+  }
+ ],
+ "close_fees": [
+  {
+   "y": 2019,
+   "force": 7460,
+   "coop": 3485,
+   "ratio": 2.1,
+   "force_vb": 270,
+   "coop_vb": 138,
+   "days": 1.0
+  },
+  {
+   "y": 2020,
+   "force": 14318,
+   "coop": 3994,
+   "ratio": 3.6,
+   "force_vb": 271,
+   "coop_vb": 168,
+   "days": 1.0
+  },
+  {
+   "y": 2021,
+   "force": 3984,
+   "coop": 697,
+   "ratio": 5.7,
+   "force_vb": 302,
+   "coop_vb": 168,
+   "days": 1.0
+  },
+  {
+   "y": 2022,
+   "force": 3342,
+   "coop": 551,
+   "ratio": 6.1,
+   "force_vb": 521,
+   "coop_vb": 169,
+   "days": 1.7
+  },
+  {
+   "y": 2023,
+   "force": 7346,
+   "coop": 2005,
+   "ratio": 3.7,
+   "force_vb": 595,
+   "coop_vb": 192,
+   "days": 2.1
+  },
+  {
+   "y": 2024,
+   "force": 6332,
+   "coop": 2124,
+   "ratio": 3.0,
+   "force_vb": 581,
+   "coop_vb": 192,
+   "days": 2.0
+  },
+  {
+   "y": 2025,
+   "force": 1292,
+   "coop": 262,
+   "ratio": 4.9,
+   "force_vb": 598,
+   "coop_vb": 192,
+   "days": 1.7
+  },
+  {
+   "y": 2026,
+   "force": 925,
+   "coop": 197,
+   "ratio": 4.7,
+   "force_vb": 585,
+   "coop_vb": 192,
+   "days": 2.5
+  }
+ ],
+ "breakeven": [
+  {
+   "y": 2019,
+   "rate": 36.1,
+   "fees_btc": 3.36,
+   "btc_days": 3395
+  },
+  {
+   "y": 2020,
+   "rate": 54.1,
+   "fees_btc": 3.3,
+   "btc_days": 2229
+  },
+  {
+   "y": 2021,
+   "rate": 21.3,
+   "fees_btc": 3.17,
+   "btc_days": 5420
+  },
+  {
+   "y": 2022,
+   "rate": 6.1,
+   "fees_btc": 2.51,
+   "btc_days": 14951
+  },
+  {
+   "y": 2023,
+   "rate": 28.7,
+   "fees_btc": 11.97,
+   "btc_days": 15201
+  },
+  {
+   "y": 2024,
+   "rate": 18.7,
+   "fees_btc": 5.96,
+   "btc_days": 11650
+  },
+  {
+   "y": 2025,
+   "rate": 2.7,
+   "fees_btc": 0.64,
+   "btc_days": 8477
+  },
+  {
+   "y": 2026,
+   "rate": 1.2,
+   "fees_btc": 0.23,
+   "btc_days": 6712
+  }
+ ],
+ "htlc_by_fee": [
+  {
+   "label": "Under 5 sat/vB",
+   "legacy": 6.3,
+   "anchor": 5.6,
+   "n_legacy": 4505,
+   "n_anchor": 8835
+  },
+  {
+   "label": "5–20 sat/vB",
+   "legacy": 13.2,
+   "anchor": 4.7,
+   "n_legacy": 7110,
+   "n_anchor": 8589
+  },
+  {
+   "label": "20–50 sat/vB",
+   "legacy": 12.8,
+   "anchor": 9.4,
+   "n_legacy": 3196,
+   "n_anchor": 3099
+  },
+  {
+   "label": "50+ sat/vB",
+   "legacy": 30.5,
+   "anchor": 20.6,
+   "n_legacy": 2157,
+   "n_anchor": 1860
+  }
+ ],
+ "cohort_one_year": [
+  {
+   "y": 2019,
+   "pct": 35
+  },
+  {
+   "y": 2020,
+   "pct": 27
+  },
+  {
+   "y": 2021,
+   "pct": 24
+  },
+  {
+   "y": 2022,
+   "pct": 30
+  },
+  {
+   "y": 2023,
+   "pct": 31
+  },
+  {
+   "y": 2024,
+   "pct": 24
+  },
+  {
+   "y": 2025,
+   "pct": 17
+  }
+ ],
+ "legacy_share": [
+  {
+   "label": "2021",
+   "pct": 87.0,
+   "kind": "year"
+  },
+  {
+   "label": "2022",
+   "pct": 45.0,
+   "kind": "year"
+  },
+  {
+   "label": "2023",
+   "pct": 40.0,
+   "kind": "year"
+  },
+  {
+   "label": "2024",
+   "pct": 34.0,
+   "kind": "year"
+  },
+  {
+   "label": "2025",
+   "pct": 23.0,
+   "kind": "year"
+  },
+  {
+   "label": "2026, all public",
+   "pct": 26.0,
+   "kind": "all26",
+   "note": "3,954 of 15,440 closes"
+  },
+  {
+   "label": "2026, excl. 5 nodes",
+   "pct": 8.0,
+   "kind": "ex5",
+   "note": "1,019 of 12,494 closes (median age 3.9 yr)"
+  }
+ ],
+ "anchor_fates": [
+  {
+   "label": "P2WSH 2021",
+   "owner": 6256,
+   "third_fast": 0,
+   "third_late": 418,
+   "unspent": 0
+  },
+  {
+   "label": "P2WSH 2022",
+   "owner": 51055,
+   "third_fast": 677,
+   "third_late": 11094,
+   "unspent": 0
+  },
+  {
+   "label": "P2WSH 2023",
+   "owner": 24689,
+   "third_fast": 322,
+   "third_late": 45120,
+   "unspent": 0
+  },
+  {
+   "label": "P2WSH 2024",
+   "owner": 10515,
+   "third_fast": 18685,
+   "third_late": 39431,
+   "unspent": 0
+  },
+  {
+   "label": "P2WSH 2025",
+   "owner": 12192,
+   "third_fast": 72225,
+   "third_late": 18246,
+   "unspent": 0
+  },
+  {
+   "label": "P2WSH 2026",
+   "owner": 3695,
+   "third_fast": 65645,
+   "third_late": 7237,
+   "unspent": 0
+  },
+  {
+   "label": "Simple taproot 2023–26",
+   "owner": 1706,
+   "third_fast": 0,
+   "third_late": 0,
+   "unspent": 22158
+  }
+ ],
+ "sweeper_value": [
+  {
+   "label": "2022",
+   "miners_sat": 960369,
+   "sweepers_sat": 3051771,
+   "miners_btc": 0.01,
+   "sweepers_btc": 0.031
+  },
+  {
+   "label": "2023",
+   "miners_sat": 8976790,
+   "sweepers_sat": 4776290,
+   "miners_btc": 0.09,
+   "sweepers_btc": 0.048
+  },
+  {
+   "label": "2024",
+   "miners_sat": 18178850,
+   "sweepers_sat": 3438460,
+   "miners_btc": 0.182,
+   "sweepers_btc": 0.034
+  },
+  {
+   "label": "2025",
+   "miners_sat": 24664895,
+   "sweepers_sat": 5191525,
+   "miners_btc": 0.247,
+   "sweepers_btc": 0.052
+  },
+  {
+   "label": "2026",
+   "miners_sat": 22154699,
+   "sweepers_sat": 3298861,
+   "miners_btc": 0.222,
+   "sweepers_btc": 0.033
+  }
+ ]
+}

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Does It Cost to Force-Close a Lightning Channel? | Bitcoin Data Labs</title>
+  <meta name="description" content="A short guide to our third paper: 973,581 Lightning channel closes from 2018 to October 2026. Fee spikes do not bring waves of force closes; a force close costs two to six times a cooperative close and days of locked funds; HTLC timeouts run late when fees spike, yet few payments were lost.">
+
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../shared/css/style.css">
+  <link rel="stylesheet" href="../../shared/css/explainer.css">
+</head>
+<body class="has-fixed-header">
+
+  <div class="top-bar app-header-main">
+    <div class="bdl-header-container">
+      <div class="logos-container">
+        <div class="app-logo">
+          <a href="../../index.html" class="app-name">deep-dives</a>
+        </div>
+        <div class="divider"></div>
+        <div class="parent-logo">
+          <a href="https://bitcoindatalabs.org/">
+            <img src="../../logo.svg" alt="Bitcoin Data Labs" class="parent-logo-img" onerror="this.onerror=null; this.src='https://bitcoindatalabs.org/logo.svg';">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <a href="../../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Deep Dives Hub</a>
+
+    <header class="ex-hero">
+      <div class="ex-meta">
+        <span class="dive-badge badge-lightning">Lightning</span>
+        <span class="dive-badge badge-onchain">On-chain</span>
+        <span class="mono">Paper 03 · arXiv:2611.16311 · data to 31 Oct 2026</span>
+      </div>
+      <h1 class="ex-title">What does it cost to force-close a Lightning channel?</h1>
+      <p class="ex-dek">A short guide to our paper on 973,581 Lightning channel closes from 2018 to October 2026, and the data behind it.</p>
+      <ul class="ex-links">
+        <li><a href="https://arxiv.org/abs/2611.16311"><i class="fas fa-file-lines"></i> The paper (arXiv)</a></li>
+        <li><a href="https://github.com/bitcoindatalabs/ln-force-close-costs"><i class="fab fa-github"></i> Code and data</a></li>
+        <li><a href="../2026-11-client-diversity-explained/index.html"><i class="fas fa-arrow-right"></i> Paper 01: client diversity</a></li>
+        <li><a href="../2026-11-who-patches-lightning/index.html"><i class="fas fa-arrow-right"></i> Paper 02: who patches Lightning?</a></li>
+      </ul>
+    </header>
+
+    <section class="answer" aria-labelledby="summary-h">
+      <p class="lbl" id="summary-h">Summary in plain words</p>
+      <p><strong>Fee spikes do not bring waves of force closes. A force close costs a multiple of a cooperative close and days of locked funds; when fees spike, payments run late, but few are lost.</strong></p>
+      <ul class="summary">
+        <li><a href="#s1" class="n">1</a><span><strong>Fee spikes do not bring a wave of force closes.</strong> In a spike week and the next, public force closes were 0.97 times the four weeks before, against 1.02 after ordinary weeks.</span></li>
+        <li><a href="#s2" class="n">2</a><span><strong>A force close costs two to six times a cooperative close, and days of locked funds.</strong> The closer waits a median 1.7 days; the wait outweighs the fees only in low-fee years.</span></li>
+        <li><a href="#s3" class="n">3</a><span><strong>When fees spike, HTLC timeouts run late, but few payments were lost.</strong> In 2023, 18.2% confirmed over 40 blocks late; since 2021, forwarding nodes lost 38 payments.</span></li>
+        <li><a href="#s4" class="n">4</a><span><strong>Owners abandoned their anchors, and no third party sweeps taproot ones.</strong> Owners spent 5% of 2026's P2WSH anchors; sweepers took the rest, and miners most of its value.</span></li>
+        <li><a href="#s5" class="n">5</a><span><strong>Force closes became rarer per channel, and most now happen off the public graph.</strong> 35% of public channels funded in 2019 were force-closed within a year; 17% of 2025's.</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================== 1. FEE SPIKES -->
+    <section class="report-card" id="s1">
+      <h2><span class="num">1</span> Fee spikes do not bring a wave of force closes</h2>
+      <p>A spike week has a median block fee rate at least twice that of the previous eight weeks, and at least 10 sat/vB. In the nine spike weeks and the weeks after, organic public force closes were <strong>0.97 times</strong> their level in the four weeks before. After ordinary weeks of the same years the ratio is typically 1.02, so the spikes sit at the 23rd percentile, below a typical week. Pre-anchor channels, whose fee is fixed when it is signed, show the same (0.98).</p>
+
+      <div class="two-col">
+        <div>
+          <h3>Each spike against the four weeks before</h3>
+          <div class="legend" aria-hidden="true">
+            <span><i class="sw" style="background: var(--c-cln);"></i> More force closes</span>
+            <span><i class="sw" style="background: var(--ink-mid);"></i> Fewer</span>
+          </div>
+          <div class="chart" id="c-spike-events"></div>
+          <p class="sub">Organic public force closes in the spike week and the next, divided by the four weeks before, 2019–2024. Labels give the previous eight weeks' median fee rate and the spike week's (sat/vB).</p>
+        </div>
+        <div>
+          <h3>Spikes against ordinary weeks of the same years</h3>
+          <div class="legend" aria-hidden="true">
+            <span><i class="dot" style="background: var(--c-lnd);"></i> Observed ratio</span>
+            <span><i class="ln" style="background: var(--c-lnd); width: 16px;"></i> Middle 90% of ordinary weeks</span>
+          </div>
+          <div class="chart" id="c-spike-forest"></div>
+          <p class="sub">10,000 draws of one ordinary week per spike from the same year. The weeks +2 to +3 row is a window chosen after seeing the data.</p>
+        </div>
+      </div>
+
+      <div class="callout"><strong>The chain shows confirmation, not broadcast.</strong> A close broadcast during a spike at too low a fee would confirm in the weeks after it. Those weeks show no rise beyond what ordinary weeks produce either.</div>
+    </section>
+
+    <!-- ===================================================================== 2. COST -->
+    <section class="report-card" id="s2">
+      <h2><span class="num">2</span> A force close costs two to six times a cooperative close, and days of locked funds</h2>
+      <p>In fees alone a force close is cheap: the median public force close cost <strong>925 sat</strong> in 2026 and 14,318 sat in 2020, the dearest year. Against a cooperative close of the same year it cost <strong>two to six times</strong> as much, in every year. The closer's own balance comes back a median <strong>1.7 days</strong> after the close, and in the slowest tenth of closes up to 22 days.</p>
+      <p>To set the wait against the fees, the paper uses a break-even rate: the yearly return on the locked funds at which the wait costs as much as the fees. It was 2.7% in 2025 and <strong>1.2%</strong> in 2026, but 6.1–54.1% before 2025, so the wait is the larger cost only when fees are low.</p>
+
+      <div class="two-col">
+        <div>
+          <h3>A force close's fees as a multiple of a cooperative close's</h3>
+          <div class="chart" id="c-close-fees"></div>
+          <p class="sub">Median fees, public channels, 2019–2026 (2026: closes to 4 October). A force close's fees include every transaction it requires: commitment, fee bumps, HTLCs and sweeps.</p>
+        </div>
+        <div>
+          <h3>Return at which the wait costs as much as the fees</h3>
+          <div class="legend" aria-hidden="true">
+            <span><i class="sw" style="background: var(--ink-mid);"></i> 2019–2024</span>
+            <span><i class="sw" style="background: var(--c-lnd);"></i> Low-fee years</span>
+          </div>
+          <div class="chart" id="c-breakeven"></div>
+          <p class="sub">Yearly return on the closers' locked balances (BTC-days) at which the wait equals that year's force-close fees, public channels, 2019–2026.</p>
+        </div>
+      </div>
+
+      <div class="callout"><strong>Costs are per channel, both parties together.</strong> The chain does not show which side broadcast a force close.</div>
+    </section>
+
+    <!-- ===================================================================== 3. HTLC DEADLINES -->
+    <section class="report-card" id="s3">
+      <h2><span class="num">3</span> When fees spike, HTLC timeouts run late, but few payments were lost</h2>
+      <p>In every year the median HTLC timeout confirmed 1–3 blocks after its expiry. The tail grows with fees: in 2023, <strong>18.2%</strong> confirmed more than 40 blocks late, the tenth percentile of the margins public channels advertise. When the block fee rate at expiry was 50 sat/vB or more, 30.5% of pre-anchor timeouts were that late, against <strong>20.6%</strong> of anchor ones: the effect anchors were designed for.</p>
+      <p>Late is not lost. Since 2021, forwarding nodes lost <strong>38 payments</strong> (0.44 BTC) by paying out downstream while the upstream HTLC timed out. In every one the preimage was already on-chain, a median 58 blocks before the upstream timeout, so the node failed to act rather than being outbid.</p>
+
+      <div class="two-col">
+        <div>
+          <h3>HTLC timeouts more than 40 blocks late</h3>
+          <div class="legend" aria-hidden="true">
+            <span><i class="sw" style="background: var(--c-lnd);"></i> Pre-anchor</span>
+            <span><i class="sw" style="background: var(--c-cln);"></i> Anchor</span>
+          </div>
+          <div class="chart" id="c-htlc-late"></div>
+          <p class="sub">By the median fee rate of the block at expiry, for channels whose commitment had confirmed by the expiry, so the delay is the HTLC transaction's own. 2019–2026.</p>
+        </div>
+        <div>
+          <h3>Split resolutions since 2021</h3>
+          <div class="mini-stats">
+            <div><b>38 of 38</b><span>Forwarder losses with the preimage on-chain before the upstream timeout confirmed.</span></div>
+            <div><b>0</b><span>In the order a successful replacement-cycling attack leaves. The seven losses that have it were a test one operator ran on mainnet against its own forwarder.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout"><strong>Only payments settled on-chain on both sides are visible.</strong> These counts bound attacks that succeeded that way; failed attempts leave no trace.</div>
+    </section>
+
+    <!-- ===================================================================== 4. ANCHORS -->
+    <section class="report-card" id="s4">
+      <h2><span class="num">4</span> Owners abandoned their anchors, and no third party sweeps taproot ones</h2>
+      <p>Owners spent 81% of the P2WSH anchors of 2022's force closes and <strong>5%</strong> of 2026's, mostly as cleanup rather than fee bumps. Third parties sweep the rest, and none of the 387,502 anchors is left unspent. Sweeping barely pays: of <strong>0.95 BTC</strong> swept since 2022, 0.75 BTC went to miners in fees.</p>
+      <p>Simple-taproot anchors are the exception: <strong>22,158 of 23,864</strong> are unspent, and no third party has swept one. The key a sweeper needs appears on-chain only when the matching output is swept, but for 14,828 unspent anchors it has been public for a median 101 days. An open LND proposal to stop sweeping dangling anchors (<a href="https://github.com/lightningnetwork/lnd/issues/8997">#8997</a>) assumes third parties will; that holds for P2WSH anchors only.</p>
+
+      <div class="two-col">
+        <div>
+          <h3>Who spent each anchor</h3>
+          <div class="legend" aria-hidden="true">
+            <span><i class="sw" style="background: var(--c-lnd);"></i> Owner</span>
+            <span><i class="sw" style="background: var(--c-cln);"></i> Third party, block 16–17</span>
+            <span><i class="sw" style="background: var(--c-gold);"></i> Third party, later</span>
+            <span><i class="sw" style="background: var(--ink-faint);"></i> Unspent</span>
+          </div>
+          <div class="chart" id="c-anchor-fates"></div>
+          <p class="sub">P2WSH anchors by year of the force close (closes at least four weeks before the cutoff), and simple-taproot anchors created 2023–2026.</p>
+        </div>
+        <div>
+          <h3>Where swept anchor value went</h3>
+          <div class="legend" aria-hidden="true">
+            <span><i class="sw" style="background: var(--c-cln);"></i> To miners (fees)</span>
+            <span><i class="sw" style="background: var(--ink-mid);"></i> Kept by sweepers</span>
+          </div>
+          <div class="chart" id="c-sweeper-value"></div>
+          <p class="sub">Third-party sweeps of P2WSH anchors by year of the sweep, 2022–2026. A sweep pays only below 6.38 sat/vB.</p>
+        </div>
+      </div>
+
+      <div class="callout"><strong>Zero-fee commitments save 12% of the anchor mechanism's block space, not of Lightning's.</strong> Their gains lie elsewhere: no 330-sat outputs left to sweep, no fee guessed at signing, and no dependence on the mempool rule Bitcoin Core 31.0 removed.</div>
+    </section>
+
+    <!-- ===================================================================== 5. CENSUS -->
+    <section class="report-card" id="s5">
+      <h2><span class="num">5</span> Force closes became rarer per channel, and most now happen off the public graph</h2>
+      <p>Of the public channels funded in 2019, <strong>35%</strong> were force-closed within a year; of those funded in 2025, <strong>17%</strong>. Unlike a rate per open channel, this measure is not inflated by abandoned channels. Most force closes now happen off the public graph: in 2026, unlisted force closes outnumbered public ones <strong>3.4 to one</strong>. Of 2026's public force closes, 26% still used the pre-anchor format, but five nodes were party to 74% of those; without them the share was 8%.</p>
+
+      <div class="two-col">
+        <div>
+          <h3>Force-closed within a year, by year funded</h3>
+          <div class="chart" id="c-cohort"></div>
+          <p class="sub">Share of public channels force-closed within 365 days of funding, 2019–2025 cohorts. The channel list is still filling in during January 2019.</p>
+        </div>
+        <div>
+          <h3>Pre-anchor share of public force closes</h3>
+          <div class="legend" aria-hidden="true">
+            <span><i class="sw" style="background: var(--ink-mid);"></i> 2021–2025</span>
+            <span><i class="sw" style="background: var(--c-cln);"></i> 2026, all</span>
+            <span><i class="sw" style="background: var(--c-eclair);"></i> 2026, without five nodes</span>
+          </div>
+          <div class="chart" id="c-legacy-2026"></div>
+          <p class="sub">Four of the five nodes are LDK nodes that announced no anchor support; their channels lasted a median of 4 days.</p>
+        </div>
+      </div>
+
+      <div class="callout"><strong>Unlisted counts are not rates.</strong> A private channel shows up on-chain only when it force-closes, so its force-close rate is unknown.</div>
+    </section>
+
+    <!-- ===================================================================== TAKEAWAYS & MISREADINGS -->
+    <section class="report-card">
+      <h2><i class="fas fa-compass" style="color: var(--primary);"></i> Takeaways</h2>
+      <ul class="plain">
+        <li><strong>Judge zero-fee commitments by HTLC deadlines, not block space.</strong> The baseline: at 50 sat/vB or more, 20.6% of anchor channels' HTLC timeouts confirmed over 40 blocks late.</li>
+        <li><strong>Treat taproot anchors apart when changing anchor sweeping (our reading).</strong> No third party sweeps them, so a node that stops sweeping its own leaves them in the UTXO set.</li>
+        <li><strong>For forwarding nodes, staying online matters more than outbidding (our reading).</strong> Every forwarder loss since 2021 had the preimage on-chain before the upstream timeout.</li>
+        <li><strong>Compare rates, not totals.</strong> Public force closes fell from 57,896 in 2022 to 15,440 in January–October 2026, partly because the network shrank.</li>
+      </ul>
+    </section>
+
+    <section class="report-card">
+      <h2><i class="fas fa-magnifying-glass" style="color: var(--primary);"></i> Common misreadings</h2>
+      <ul class="dodont">
+        <li><span class="no">"No wave means fee spikes don't hurt Lightning."</span><span class="yes">They hurt after the close: in 2023, 18.2% of HTLC timeouts confirmed more than 40 blocks late.</span></li>
+        <li><span class="no">"Late HTLC timeouts mean forwarders lost money."</span><span class="yes">Since 2021, 38 payments (0.44 BTC) were lost, each with the preimage already on-chain.</span></li>
+        <li><span class="no">"Zero-fee commitments cut Lightning's block space by 12%."</span><span class="yes">They cut the anchor mechanism's block space by 12%: 173 to 152 vB per close.</span></li>
+        <li><span class="no">"Private channels force-close 3.4 times as often as public ones."</span><span class="yes">It is a count: private channels' cooperative closes are invisible, so no rate exists.</span></li>
+        <li><span class="no">"A week of 306 penalties means cheating on Lightning rose."</span><span class="yes">305 match a Core Lightning splicing bug fixed in v26.06.8 on 19 September, before the wave: a close at the moment a splice locked broadcast a commitment that was soon revoked.</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================== METHOD, LIMITS -->
+    <section class="report-card">
+      <h2><i class="fas fa-flask" style="color: var(--primary);"></i> How we measured it</h2>
+      <ul class="plain">
+        <li><strong>Chain:</strong> every block from 12 January 2018 to block 974,041 (31 October 2026), from our own Bitcoin Core node.</li>
+        <li><strong>Closes:</strong> public channels from our gossip since May 2023, mempool.space and the lnresearch archive (dense from January 2019, so public series start then). A commitment's fingerprint in its locktime and input sequence finds private channels' force closes too; each of their 1,346,588 outputs is followed to its spend.</li>
+        <li><strong>Validation:</strong> a separate index of the chain agrees on all 698,476 public closes compared; mempool.space's close reasons agree on 100.00% of the 480,440 it labels.</li>
+        <li><strong>Fee spikes:</strong> judged against ordinary weeks of the same years; organic force closes leave out days on which one node was party to 20 or more.</li>
+      </ul>
+      <h3>What this doesn't show</h3>
+      <ul class="plain">
+        <li>Which side broadcast a force close.</li>
+        <li>Fee bumps that never confirmed, and private channels' cooperative closes.</li>
+        <li>Simple taproot channels' delays and HTLCs: their spends are not classified.</li>
+      </ul>
+      <p>Code, the aggregate data behind every figure and a script that recomputes every number are in the
+        <a href="https://github.com/bitcoindatalabs/ln-force-close-costs">paper's repository</a>.</p>
+    </section>
+
+    <section class="report-card">
+      <h2><i class="fas fa-quote-right" style="color: var(--primary);"></i> The paper</h2>
+      <p>Saurabh Kumar. <em>What Does It Cost to Force-Close a Lightning Channel? Evidence from 974,000 Channel Closes, 2018–2026.</em>
+        arXiv:2611.16311, 2026. <a href="https://arxiv.org/abs/2611.16311">Abstract</a> ·
+        <a href="https://arxiv.org/html/2611.16311">HTML</a> · <a href="https://github.com/bitcoindatalabs/ln-force-close-costs">Code and data</a></p>
+      <details class="tableview"><summary>BibTeX</summary>
+        <pre class="cite">@misc{kumar2026forceclosecosts,
+  title  = {What Does It Cost to Force-Close a Lightning Channel? Evidence from 974,000 Channel Closes, 2018--2026},
+  author = {Saurabh Kumar},
+  year   = {2026},
+  eprint = {2611.16311},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR},
+  doi    = {10.48550/arXiv.2611.16311},
+  url    = {https://arxiv.org/abs/2611.16311}
+}</pre>
+      </details>
+      <p style="margin-top: 14px;">Related: <a href="../2026-11-client-diversity-explained/index.html">Does client diversity protect the Lightning Network?</a> · <a href="../2026-11-who-patches-lightning/index.html">Who patches the Lightning Network?</a> · <a href="../2026-10-lightning-network-analysis/index.html">The Summer Lightning Broke (a Little)</a></p>
+      <p class="sub">We report aggregates only: no node, channel, transaction or address is named. Writing about this? Contact <a href="mailto:sorukumar@bitcoindatalabs.org">sorukumar@bitcoindatalabs.org</a>.</p>
+    </section>
+  </main>
+
+  <footer class="bdl-global-footer">
+    <div class="bdl-footer-inner">
+      <div class="bdl-footer-copyright">
+        <p style="margin: 0;">© <span id="footer-year">2026</span> <a href="https://bitcoindatalabs.org" target="_blank">Bitcoin Data Labs</a>. All rights reserved.</p>
+      </div>
+      <div class="bdl-footer-socials">
+        <a href="https://github.com/bitcoindatalabs/Bitcoin-Data-Labs" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://x.com/sorukumar" target="_blank" title="X / Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/bitcoin-data-labs" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../shared/js/explainer-charts.js"></script>
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    (async () => {
+      const C = BDLCharts;
+      const blue = C.css('--c-lnd'), terra = C.css('--c-cln'), teal = C.css('--c-eclair'),
+            gold = C.css('--c-gold'), mid = C.css('--ink-mid'), faint = C.css('--ink-faint');
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const ymLabel = (iso) => {
+        const d = new Date(C.parseDay(iso));
+        return `${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+      };
+      const fmtInt = (v) => Number(v).toLocaleString('en-US');
+
+      let D;
+      try {
+        D = await (await fetch('data/processed/paper03.json')).json();
+      } catch (err) {
+        document.querySelectorAll('.chart').forEach((el) => {
+          el.innerHTML = '<p class="sub">Could not load <code>data/processed/paper03.json</code>. Serve this folder over HTTP rather than opening it directly from disk.</p>';
+        });
+        return;
+      }
+
+      // 1a. Each spike against the four weeks before
+      C.hbars(document.getElementById('c-spike-events'), {
+        aria: 'Organic public force closes in each fee-spike week and the next, divided by the four weeks before, 2019 to 2024',
+        max: 1.5,
+        tickFmt: (v) => v.toFixed(1) + '×',
+        rows: D.spikes.map((s) => {
+          const pct = Math.round((s.ratio_all - 1) * 100);
+          const sign = pct >= 0 ? `+${pct}%` : `−${Math.abs(pct)}%`;
+          return {
+            label: `${ymLabel(s.week)} (${s.p50_before}→${s.p50})`,
+            value: s.ratio_all,
+            color: s.ratio_all > 1 ? terra : mid,
+            valueText: `${s.ratio_all.toFixed(2)}× (${sign})`,
+            note: `Median fee rate: ${s.p50_before} sat/vB over the previous eight weeks, ${s.p50} in the spike week`,
+          };
+        }),
+        tableHeaders: ['Spike week (fee rate before → spike, sat/vB)', 'Force closes, weeks 0 to +1 ÷ four weeks before'],
+      });
+
+      // 1b. Pooled ratio against ordinary weeks of the same years
+      C.forest(document.getElementById('c-spike-forest'), {
+        aria: 'Pooled spike ratio against the middle 90 percent of ordinary weeks of the same years',
+        min: 0.6,
+        max: 1.67,
+        ticks: [0.6, 0.8, 1, 1.25, 1.6],
+        leftNote: '← fewer after',
+        rightNote: 'more after →',
+        tooltipLabel: 'pooled spike ratio',
+        rows: D.spike_placebo.map((r) => ({
+          label: r.label,
+          sub: r.sub,
+          strong: false,
+          est: r.est,
+          lo: r.lo,
+          hi: r.hi,
+          color: r.sub ? mid : blue,
+          valueText: `${r.est.toFixed(2)} (${r.lo.toFixed(2)}–${r.hi.toFixed(2)})`,
+          note: `Typical ordinary week ${r.ord_med.toFixed(2)}; observed at the ${r.pctl}th percentile${r.sub ? ' (window chosen after seeing the data)' : ''}`,
+          tableRow: [r.label, r.est.toFixed(2), r.ord_med.toFixed(2), `${r.lo.toFixed(2)}–${r.hi.toFixed(2)}`, `${r.pctl}th`],
+        })),
+        tableHeaders: ['Group', 'Observed ratio', 'Typical ordinary week', 'Middle 90% of ordinary weeks', 'Percentile'],
+      });
+
+      // 2a. Force-close fees as a multiple of a cooperative close
+      C.hbars(document.getElementById('c-close-fees'), {
+        aria: 'Median fees of a public force close divided by those of a cooperative close, by year, 2019 to 2026',
+        max: 7,
+        tickFmt: (v) => v + '×',
+        rows: D.close_fees.map((r) => ({
+          label: String(r.y),
+          value: r.ratio,
+          color: terra,
+          valueText: `${r.ratio.toFixed(1)}× (${fmtInt(r.force)} vs ${fmtInt(r.coop)} sat)`,
+          note: `Median force close ${fmtInt(r.force)} sat; cooperative close ${fmtInt(r.coop)} sat`,
+        })),
+        tableHeaders: ['Year', 'Force close ÷ cooperative close (median fees, sat)'],
+      });
+
+      // 2b. Break-even rate by year
+      C.hbars(document.getElementById('c-breakeven'), {
+        aria: 'Yearly return on locked balances at which the wait costs as much as the force-close fees, 2019 to 2026',
+        max: 60,
+        tickFmt: (v) => v + '%',
+        rows: D.breakeven.map((r) => ({
+          label: String(r.y),
+          value: r.rate,
+          color: r.y >= 2025 ? blue : mid,
+          strong: r.y >= 2025,
+          valueText: `${r.rate.toFixed(1)}% a year`,
+          note: `${r.fees_btc.toFixed(2)} BTC in force-close fees; ${fmtInt(r.btc_days)} BTC-days locked`,
+        })),
+        tableHeaders: ['Year', 'Break-even return (% a year)'],
+      });
+
+      // 3a. HTLC timeouts more than 40 blocks late, by fee rate at expiry
+      C.groupedH(document.getElementById('c-htlc-late'), {
+        aria: 'Share of HTLC timeouts confirmed more than 40 blocks after expiry, by block fee rate at expiry, pre-anchor and anchor channels',
+        max: 36,
+        tickFmt: (v) => v + '%',
+        series: [{ name: 'Pre-anchor', color: blue }, { name: 'Anchor', color: terra }],
+        groups: D.htlc_by_fee.map((r) => ({
+          label: r.label,
+          values: [r.legacy, r.anchor],
+          texts: [`${r.legacy.toFixed(1)}% (n=${fmtInt(r.n_legacy)})`, `${r.anchor.toFixed(1)}% (n=${fmtInt(r.n_anchor)})`],
+        })),
+      });
+
+      // 4a. Who spent each anchor
+      C.stack100(document.getElementById('c-anchor-fates'), {
+        aria: 'Who spent each P2WSH anchor by year of the force close, and simple-taproot anchors',
+        unit: 'anchors',
+        cohortLabel: 'Anchors',
+        rows: D.anchor_fates.map((r) => ({
+          label: r.label,
+          parts: [
+            { name: 'Owner', short: 'owner', value: r.owner, color: blue },
+            { name: 'Third party, block 16–17', short: '3rd, 16–17', value: r.third_fast, color: terra },
+            { name: 'Third party, later', short: '3rd, later', value: r.third_late, color: gold },
+            { name: 'Unspent', short: 'unspent', value: r.unspent, color: faint, textClass: 'val-in-dark' },
+          ],
+        })),
+      });
+
+      // 4b. Where swept anchor value went
+      C.stack100(document.getElementById('c-sweeper-value'), {
+        aria: 'Share of third-party swept P2WSH anchor value paid to miners or kept by sweepers, 2022 to 2026',
+        unit: '',
+        cohortLabel: 'Year of sweep',
+        rows: D.sweeper_value.map((r) => ({
+          label: `${r.label} (${(r.miners_btc + r.sweepers_btc).toFixed(2)} BTC swept)`,
+          parts: [
+            { name: 'To miners (fees)', short: 'miners', value: r.miners_sat, valueText: `${r.miners_btc.toFixed(3)} BTC`, color: terra },
+            { name: 'Kept by sweepers', short: 'sweepers', value: r.sweepers_sat, valueText: `${r.sweepers_btc.toFixed(3)} BTC`, color: mid },
+          ],
+        })),
+      });
+
+      // 5a. Force-closed within a year, by year funded
+      C.hbars(document.getElementById('c-cohort'), {
+        aria: 'Share of public channels force-closed within a year of funding, by year funded, 2019 to 2025',
+        max: 40,
+        tickFmt: (v) => v + '%',
+        rows: D.cohort_one_year.map((r) => ({
+          label: String(r.y),
+          value: r.pct,
+          color: r.y === 2025 ? blue : mid,
+          strong: r.y === 2019 || r.y === 2025,
+          valueText: `${r.pct}%`,
+          note: r.y === 2019 ? 'The channel list is still filling in during January 2019' : '',
+        })),
+        tableHeaders: ['Year funded', 'Force-closed within a year'],
+      });
+
+      // 5b. Pre-anchor share and the 2026 five-node cluster
+      C.hbars(document.getElementById('c-legacy-2026'), {
+        aria: 'Pre-anchor share of public force closes, 2021 to 2026, and 2026 without five nodes',
+        max: 100,
+        tickFmt: (v) => v + '%',
+        rows: D.legacy_share.map((r) => ({
+          label: r.label,
+          value: r.pct,
+          color: r.kind === 'all26' ? terra : (r.kind === 'ex5' ? teal : mid),
+          strong: r.kind !== 'year',
+          valueText: `${Math.round(r.pct)}%`,
+          note: r.note || '',
+        })),
+        tableHeaders: ['Year', 'Pre-anchor share'],
+      });
+    })();
+  </script>
+</body>
+</html>

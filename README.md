@@ -11,6 +11,13 @@ and answers it with interactive charts, and each one stands on its own.
 
 Newest first.
 
+**[What Does It Cost to Force-Close a Lightning Channel?](https://bitcoindatalabs.github.io/deep-dives/analyses/2026-11-lightning-force-closes/)**
+· 2018 – Oct 2026<br>
+A short guide to our paper *What Does It Cost to Force-Close a Lightning Channel? Evidence from 974,000 Channel Closes,
+2018–2026*. Fee spikes do not bring waves of force closes. A force close costs two to six times a cooperative close
+and days of locked funds, and since 2021 forwarding nodes lost only 38 payments to missed deadlines.<br>
+[source](analyses/2026-11-lightning-force-closes/)
+
 **[Who Patches the Lightning Network?](https://bitcoindatalabs.github.io/deep-dives/analyses/2026-11-who-patches-lightning/)**
 · 2023 – 2026<br>
 A short guide to our paper *Who Patches the Lightning Network? Evidence from Release Lines in Gossip, 2023–2026*.
@@ -65,7 +72,8 @@ python3 run.py --paper-repo /path/to/ln-client-diversity
 ## 🔗 Related
 
 * Paper code and data: [ln-client-diversity](https://github.com/bitcoindatalabs/ln-client-diversity) ·
-  [ln-upgrade-dynamics](https://github.com/bitcoindatalabs/ln-upgrade-dynamics)
+  [ln-upgrade-dynamics](https://github.com/bitcoindatalabs/ln-upgrade-dynamics) ·
+  [ln-force-close-costs](https://github.com/bitcoindatalabs/ln-force-close-costs)
 * [Bitcoin Data Labs](https://bitcoindatalabs.org)
 * Questions or corrections: open an issue, or write to
   [sorukumar@bitcoindatalabs.org](mailto:sorukumar@bitcoindatalabs.org).
